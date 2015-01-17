@@ -1,0 +1,21 @@
+{
+  "name": "ozdemir/datatables",
+  "description": "Handles server-side processing for Datatables.",
+  "license": "MIT",
+  "require": {
+    "greenlion/php-sql-parser": "2014-03-10"
+  },
+  "config": {
+    "bin-dir": "vendor/bin"
+  },
+  "authors": [
+    {
+      "name": "Yusuf Özdemir",
+      "email": "yusuf@ozdemir.be"
+    }
+  ],
+  "autoload": {
+    "psr-4": {"Ozdemir\\Datatables\\": "src/"}
+  },
+  "minimum-stability": "dev"
+}

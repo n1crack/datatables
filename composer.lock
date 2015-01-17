@@ -1,0 +1,67 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "83d6b3b038dfd680ed1f47376437dbf7",
+    "packages": [
+        {
+            "name": "greenlion/php-sql-parser",
+            "version": "2014-03-10",
+            "source": {
+                "type": "svn",
+                "url": "http://php-sql-parser.googlecode.com/svn",
+                "reference": "/tags/2014-03-10/@1230"
+            },
+            "require": {
+                "php": ">=5.2.13"
+            },
+            "require-dev": {
+                "squizlabs/php_codesniffer": ">=1.5.1"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/PHPSQLCreator.php",
+                    "src/PHPSQLParser.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD New"
+            ],
+            "authors": [
+                {
+                    "name": "André Rothe",
+                    "email": "phosco@gmx.de",
+                    "homepage": "https://www.phosco.info",
+                    "role": "Committer"
+                },
+                {
+                    "name": "Justin Swanhart",
+                    "email": "greenlion@gmail.com",
+                    "homepage": "http://code.google.com/u/greenlion@gmail.com/",
+                    "role": "Owner"
+                }
+            ],
+            "description": "A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL",
+            "homepage": "http://code.google.com/p/php-sql-parser/",
+            "keywords": [
+                "creator",
+                "mysql",
+                "parser",
+                "sql"
+            ],
+            "time": "2014-03-10 14:07:51"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}
