@@ -4,56 +4,66 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "83d6b3b038dfd680ed1f47376437dbf7",
+    "hash": "0cbaa2e2544d0d384acff0d4c026b2b0",
     "packages": [
         {
             "name": "greenlion/php-sql-parser",
-            "version": "2014-03-10",
+            "version": "v4.0.0",
             "source": {
-                "type": "svn",
-                "url": "http://php-sql-parser.googlecode.com/svn",
-                "reference": "/tags/2014-03-10/@1230"
+                "type": "git",
+                "url": "https://github.com/greenlion/PHP-SQL-Parser.git",
+                "reference": "c162c6458ee21cc0a7dfe73a3eec303e5c9a6945"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/greenlion/PHP-SQL-Parser/zipball/c162c6458ee21cc0a7dfe73a3eec303e5c9a6945",
+                "reference": "c162c6458ee21cc0a7dfe73a3eec303e5c9a6945",
+                "shasum": ""
             },
             "require": {
-                "php": ">=5.2.13"
+                "php": ">=5.3.2"
             },
             "require-dev": {
+                "phpunit/phpunit": ">=4.0.14",
                 "squizlabs/php_codesniffer": ">=1.5.1"
             },
             "type": "library",
             "autoload": {
-                "classmap": [
-                    "src/PHPSQLCreator.php",
-                    "src/PHPSQLParser.php"
+                "files": [
+                    "src/PHPSQLParser/PHPSQLCreator.php",
+                    "src/PHPSQLParser/PHPSQLParser.php"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "BSD New"
+                "BSD-3-Clause"
             ],
             "authors": [
-                {
-                    "name": "André Rothe",
-                    "email": "phosco@gmx.de",
-                    "homepage": "https://www.phosco.info",
-                    "role": "Committer"
-                },
                 {
                     "name": "Justin Swanhart",
                     "email": "greenlion@gmail.com",
                     "homepage": "http://code.google.com/u/greenlion@gmail.com/",
                     "role": "Owner"
+                },
+                {
+                    "name": "André Rothe",
+                    "email": "phosco@gmx.de",
+                    "homepage": "https://www.phosco.info",
+                    "role": "Committer"
                 }
             ],
             "description": "A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL",
             "homepage": "http://code.google.com/p/php-sql-parser/",
             "keywords": [
+                "MySQL",
                 "creator",
-                "mysql",
                 "parser",
                 "sql"
             ],
-            "time": "2014-03-10 14:07:51"
+            "support": {
+                "issues": "http://code.google.com/p/php-sql-parser/issues/list",
+                "source": "http://php-sql-parser.googlecode.com/svn/trunk/"
+            },
+            "time": "2014-04-16 10:03:29"
         }
     ],
     "packages-dev": [],
