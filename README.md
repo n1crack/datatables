@@ -16,7 +16,7 @@ Put a file named `composer.json` at the root of your project, containing this in
 
     {
         "require": {
-           "ozdemir/datatables": "~1.0"  
+           "ozdemir/datatables": "~1.1"
         }
     }
 

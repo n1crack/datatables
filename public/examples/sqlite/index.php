@@ -16,12 +16,13 @@
 </head>
 <body id="dt_example">
 <div id="container">
-    <h1>Datatables - Simple Page</h1>
+    <h1>Datatables - An example of using different DB (SQLite here)</h1>
     <table border="0" cellpadding="4" cellspacing="0" class="display" id="example">
         <thead>
         <tr>
-            <th width="50%">Category</th>
-            <th width="50%">Total Sales</th>
+            <th width="8%">Film ID</th>
+            <th width="32%">Title</th>
+            <th width="60%">Description</th>
         </tr>
         </thead>
         <tbody>

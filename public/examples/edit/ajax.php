@@ -10,7 +10,7 @@ $dt = new Datatables(new MySQL($config));
 
 $dt->query("Select film_id, title, description from film");
 
-$dt->edit('title', "$2 - $1", 'editurl(film_id, edit), strtolower(title)');
+$dt->edit('title', "$2 - $1", 'editurl(film_id, edit), strtolower(title), title');
 $dt->edit('description', '$1...', 'substr(description,0,25)');
 
 echo $dt->generate();

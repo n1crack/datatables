@@ -19,7 +19,7 @@
 </head>
 <body id="dt_example">
 <div id="container">
-    <h1>Datatables - Simple Page</h1>
+    <h1>Datatables - An example of using POST request instead of GET</h1>
     <table border="0" cellpadding="4" cellspacing="0" class="display" id="example">
         <thead>
         <tr>

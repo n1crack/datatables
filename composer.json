@@ -2,15 +2,6 @@
   "name": "ozdemir/datatables",
   "description": "Handles server-side processing for Datatables.",
   "license": "MIT",
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/greenlion/PHP-SQL-Parser"
-    }
-  ],
-  "require": {
-    "greenlion/php-sql-parser": "~4.0"
-  },
   "config": {
     "bin-dir": "vendor/bin"
   },

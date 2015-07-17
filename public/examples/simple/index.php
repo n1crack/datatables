@@ -16,7 +16,7 @@
 </head>
 <body id="dt_example">
 <div id="container">
-    <h1>Datatables - Simple Page</h1>
+    <h1>Datatables - A simple example</h1>
     <table border="0" cellpadding="4" cellspacing="0" class="display" id="example">
         <thead>
         <tr>
