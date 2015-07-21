@@ -60,7 +60,7 @@ class Datatables {
         {
             $column = trim(preg_replace('/(.*)\s+as\s+(\w*)/i', '$2', $value)); // get word after "as"
             $column = trim(preg_replace('/(.*)\s+(\w*)/i', '$2', $column)); //get word after " "
-            //$column = preg_replace('/.*\.(.*)/i', '$1', $column); // get word after `.`
+            $column = preg_replace('/.*\.(.*)/i', '$1', $column); // get word after `.`
             //$column = preg_replace('/[^\da-z]/i', '', $column); // clear
             $this->columns[] = $column;
         }
@@ -146,7 +146,6 @@ class Datatables {
 
         return false;
     }
-
     private function exec_replace($content, $replacements, $row_data)
     {
         if ( ! isset($replacements) && ! is_array($replacements))
