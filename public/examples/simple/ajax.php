@@ -8,6 +8,6 @@ include "../../_config.php";
 
 $dt = new Datatables(new MySQL($config));
 
-$dt->query("Select film_id as fid, title, description from film");
+$dt->query("Select film_id, title, description from film");
 
 echo $dt->generate();

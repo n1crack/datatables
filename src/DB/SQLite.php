@@ -36,9 +36,9 @@ class SQLite implements DatabaseInterface {
     {
         $result = $this->sqlite->query($query);
         $numrows = 0;
-        while ( $result->fetchArray(SQLITE3_ASSOC))
+        while ($result->fetchArray(SQLITE3_ASSOC))
         {
-            $numrows++;
+            $numrows ++;
         }
 
         return $numrows;
