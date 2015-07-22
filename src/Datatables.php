@@ -23,16 +23,13 @@ class Datatables {
     public function query($query)
     {
         $this->setColumns($query);
-
         $columns = implode(", ", $this->columns);
-
+        $query = str_replace(";", "", $query);
         $sql = "Select $columns from ($query)t";
-
         $this->recordstotal = $this->getCount($sql); // unfiltered data count is here.
 
         // filtering via global search
         $search = "";
-
         $globalsearch = $this->input('search')['value'];
 
         if ($globalsearch <> "")
@@ -44,6 +41,8 @@ class Datatables {
             }
             $search .= implode(" OR ", $lookfor) . ")";
         }
+
+        // todo: Individual column filtering
 
         $this->recordsfiltered = $this->getCount($sql . $search);  // filtered data count is here.
 

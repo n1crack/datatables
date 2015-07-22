@@ -16,13 +16,13 @@
 </head>
 <body id="dt_example">
 <div id="container">
-    <h1>Datatables - A simple example</h1>
+    <h1>Datatables - 300k data example.</h1>
     <table border="0" cellpadding="4" cellspacing="0" class="display" id="example">
         <thead>
         <tr>
-            <th width="8%">Film ID</th>
-            <th width="32%">Title</th>
-            <th width="60%">Description</th>
+            <th width="40%">Name</th>
+            <th width="40%">Last name</th>
+            <th width="20%">Birth Date</th>
         </tr>
         </thead>
         <tbody>

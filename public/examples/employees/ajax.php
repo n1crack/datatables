@@ -4,6 +4,9 @@ require '../../../vendor/autoload.php';
 use Ozdemir\Datatables\Datatables;
 use Ozdemir\Datatables\DB\MySQL;
 
+# 300k data example.
+# http://dev.mysql.com/doc/employee/en/employees-installation.html
+
 $config = ['host'     => 'localhost',
            'port'     => '3306',
            'username' => 'homestead',
@@ -12,6 +15,6 @@ $config = ['host'     => 'localhost',
 
 $dt = new Datatables(new MySQL($config));
 
-$dt->query("SELECT first_name, last_name, Count(gender) as g FROM employees group by gender");
+$dt->query("SELECT first_name, last_name, birth_date bd FROM employees;");
 
 echo $dt->generate();
