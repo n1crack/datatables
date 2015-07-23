@@ -1,6 +1,7 @@
 <?php namespace Ozdemir\Datatables\DB;
 
 use mysqli;
+use Exception;
 
 class MySQL implements DatabaseInterface {
 
@@ -36,6 +37,10 @@ class MySQL implements DatabaseInterface {
     public function query($query)
     {
         $result = $this->mysqli->query($query);
+        if ( ! $result)
+        {
+            throw new Exception("Database Error [{$this->mysqli->errno}] {$this->mysqli->error}");
+        }
         $rows = [];
         while ($row = $result->fetch_assoc())
         {

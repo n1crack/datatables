@@ -9,19 +9,17 @@ This is a php library that handles server-side processing for DataTables which i
 
 ## How to install?
 
-The only (currently) supported method of installation is via [Composer](http://https://getcomposer.org/).
-
+Installation via composer is supported.  [Composer](http://https://getcomposer.org/).
 
 Put a file named `composer.json` at the root of your project, containing this information: 
 
     {
         "require": {
-           "ozdemir/datatables": "~1.1"
+           "ozdemir/datatables": "~1.*"
         }
     }
 
 And then run: `composer install`
-
 
 Add the autoloader to your project:
 
@@ -30,7 +28,7 @@ Add the autoloader to your project:
     require_once 'vendor/autoload.php'
 
 
-You're now ready to begin using the Datatables php library.  
+You're now ready to begin using the Datatables php library. 
 
 
 ## How to use?  
@@ -68,7 +66,6 @@ This is the list of available public methods.
 
 ## Requirements
 
-Composer  
 DataTables > 1.10  
 PHP > 5.3.7  
 

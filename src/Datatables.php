@@ -11,7 +11,6 @@ class Datatables {
     private $recordsfiltered;
     private $columns;
     private $edit;
-
     private $calledby;
 
     function __construct(DatabaseInterface $db, $calledby = null)
@@ -23,18 +22,14 @@ class Datatables {
 
     public function query($query)
     {
-
         $this->setColumns($query);
-
         $columns = implode(", ", $this->columns);
-
-        $newquery = "Select $columns from ($query) t1";
-
-        $this->recordstotal = $this->getCount($newquery); // unfiltered data count is here.
+        $query = str_replace(";", "", $query);
+        $sql = "Select $columns from ($query)t";
+        $this->recordstotal = $this->getCount($sql); // unfiltered data count is here.
 
         // filtering via global search
         $search = "";
-
         $globalsearch = $this->input('search')['value'];
 
         if ($globalsearch <> "")
@@ -47,23 +42,22 @@ class Datatables {
             $search .= implode(" OR ", $lookfor) . ")";
         }
 
-        $this->recordsfiltered = $this->getCount($newquery . $search);  // filtered data count is here.
+        // todo: Individual column filtering
 
-        $this->data = $this->db->query($newquery . $search . $this->orderby() . $this->limit());
+        $this->recordsfiltered = $this->getCount($sql . $search);  // filtered data count is here.
+
+        $this->data = $this->db->query($sql . $search . $this->orderby() . $this->limit());
 
     }
 
     function setColumns($query)
     {
-        $query = preg_replace('/^SELECT(.*?)FROM.*$/i', '$1', $query);  // only columns
-        foreach ($this->explode(",", $query) as $value)
-        {
-            $column = trim(preg_replace('/(.*)\s+as\s+(\w*)/i', '$2', $value)); // get word after "as"
-            $column = trim(preg_replace('/(.*)\s+(\w*)/i', '$2', $column)); //get word after " "
-            //$column = preg_replace('/.*\.(.*)/i', '$1', $column); // get word after `.`
-            //$column = preg_replace('/[^\da-z]/i', '', $column); // clear
-            $this->columns[] = $column;
-        }
+        preg_match_all("/SELECT([\s\S]*?)FROM([\s\S]*?)/i", $query, $columns);
+        $columns = $this->explode(",", $columns[1][0]);
+        $columns = preg_replace("/(.*)\s+as\s+(.*)/i", "$2", $columns);
+        $columns = preg_replace("/(.+)(\([^()]+\))?\s+(.+)/i", "$3", $columns);
+        $columns = preg_replace('/[\s"\'`]+/', '', $columns);
+        $this->columns = preg_replace("/([\w\-]*)\.([\w\-]*)/", "$2", $columns);
     }
 
     private function getCount($query)
