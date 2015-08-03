@@ -70,6 +70,10 @@ class Datatables {
         $skip = (integer) $this->input('start');
         $take = (integer) $this->input('length');
 
+        if ($take == -1){
+            return null;
+        }
+        
         return " LIMIT $skip, $take ";
     }
 
