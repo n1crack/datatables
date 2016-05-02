@@ -60,9 +60,9 @@ There are several examples in the `public/examples` folder.
 #### Methods  
 This is the list of available public methods.
 
-##### query (<code> $query : string </code>) `(required)`  
-##### edit (<code>$column:string</code>, <code>$content:string</code>, <code>$matches:string</code>) `(optional)`   
-##### generate ( ) `(required)`  
+* query (<code> $query : string </code>) `(required)`  
+* edit (<code>$column:string</code>, <code>$content:string</code>, <code>$matches:string</code>) `(optional)`   
+* generate ( ) `(required)`  
 
 ## Requirements
 
