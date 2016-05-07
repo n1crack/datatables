@@ -4,12 +4,15 @@ This is a php library that handles server-side processing for DataTables which i
 
 ## Features  
 1. Easy to use. Generates json using only a few lines of code.  
-2. Editable custom variables with callback function (or method) support.  
-3. Auto detects HTTP method (POST or GET)  
+2. Editable custom variables with callback function (or method) support.
+3. Editable columns with a closure function.
+4. Auto detects HTTP method (POST or GET)
 
 ## How to install?
 
 Installation via composer is supported.  [Composer](http://https://getcomposer.org/).
+
+You don't have to install the composer to use the library. There is an example folder named 'nocomposer', but I highly recommend you to use composer.
 
 Put a file named `composer.json` at the root of your project, containing this information: 
 
@@ -62,7 +65,8 @@ This is the list of available public methods.
 
 * query (<code> $query : string </code>) `(required)`  
 * edit (<code>$column:string</code>, <code>$content:string</code>, <code>$matches:string</code>) `(optional)`   
-* generate ( ) `(required)`  
+* editc (<code>$column:string</code>, <code>Closure:object</code>) `(optional)`
+* generate ( ) `(required)`
 
 ## Requirements
 

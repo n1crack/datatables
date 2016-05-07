@@ -135,6 +135,13 @@ class Datatables {
         return $this;
     }
 
+    public function editc($column, $closure)
+    {
+        $this->edit[ $column ][] = array('content' => '', 'replacement' => $closure);
+
+        return $this;
+    }
+
     private function input($input)
     {
         if (isset($this->input[ $input ]))
@@ -147,6 +154,10 @@ class Datatables {
 
     private function exec_replace($content, $replacements, $row_data)
     {
+        // if this is a closure function, return calculated data.
+        if (get_class($replacements) == 'Closure')
+            return $replacements($row_data);
+
         if ( ! isset($replacements) && ! is_array($replacements))
         {
             return $content;
