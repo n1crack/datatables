@@ -26,45 +26,47 @@ And then run: `composer install`
 
 Add the autoloader to your project:
 
+```php
     <?php
-    
+
     require_once 'vendor/autoload.php'
+```
+
+You're now ready to begin using the Datatables php library.
 
 
-You're now ready to begin using the Datatables php library. 
-
-
-## How to use?  
+## How to use?
 
 A simple ajax example:
 
+```php
     <?php
     require_once 'vendor/autoload.php';
-    
+
     use Ozdemir\Datatables\Datatables;
     use Ozdemir\Datatables\DB\MySQL;
-    
+
     $config = [ 'host'     => 'localhost',
                 'post'     => '3306',
                 'username' => 'homestead',
                 'password' => 'secret',
                 'database' => 'sakila' ];
-                
+
     $dt = new Datatables( new MySQL($config) );
-    
+
     $dt->query("Select film_id, title, description from film");
-    
+
     echo $dt->generate();
-    
+```
 
 
 There are several examples in the `public/examples` folder.
 
-#### Methods  
+#### Methods
 This is the list of available public methods.
 
-* query (<code> $query : string </code>) `(required)`  
-* edit (<code>$column:string</code>, <code>$content:string</code>, <code>$matches:string</code>) `(optional)`   
+* query (<code> $query : string </code>) `(required)`
+* edit (<code>$column:string</code>, <code>$content:string</code>, <code>$matches:string</code>) `(optional)`
 * editc (<code>$column:string</code>, <code>Closure:object</code>) `(optional)`
 * generate ( ) `(required)`
 

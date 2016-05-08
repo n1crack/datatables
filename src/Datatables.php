@@ -70,10 +70,11 @@ class Datatables {
         $skip = (integer) $this->input('start');
         $take = (integer) $this->input('length');
 
-        if ($take == -1){
+        if ($take == - 1)
+        {
             return null;
         }
-        
+
         return " LIMIT $skip, $take ";
     }
 
@@ -156,7 +157,9 @@ class Datatables {
     {
         // if this is a closure function, return calculated data.
         if (get_class($replacements) == 'Closure')
+        {
             return $replacements($row_data);
+        }
 
         if ( ! isset($replacements) && ! is_array($replacements))
         {
