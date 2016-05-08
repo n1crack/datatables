@@ -89,10 +89,10 @@ This is the list of available public methods.
         // check if user has authorized to see that
         $current_user_plevel = 4;
         if ($current_user_plevel > 2 && $current_user_plevel > $data['plevel']) {
-            return 'you are not authorized to view this column';
+            return $data['address'];
         }
 
-        return $data['address'];
+        return 'you are not authorized to view this column';
     });
 
     echo $dt->generate();
