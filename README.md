@@ -70,6 +70,34 @@ This is the list of available public methods.
 * editc (<code>$column:string</code>, <code>Closure:object</code>) `(optional)`
 * generate ( ) `(required)`
 
+#### An example of methods
+
+```php
+    <?php
+    $dt = new Datatables( new MySQL($config) );
+
+    $dt->query("Select id, name, email, address, plevel from users");
+
+    $dt->edit('id', '<a href='user.php?id=$1'>edit</a>', 'id');
+
+    $dt->editc('email', function($data){
+        // return mail@mail.com to m***@mail.com
+        return preg_replace('/(?<=.).(?=.*@)/u','*', $data['email']);
+    });
+
+    $dt->editc('address', function($data){
+        // check if user has authorized to see that
+        $current_user_plevel = 4;
+        if ($current_user_plevel > 2 || $current_user_plevel > $data['plevel']) {
+            return 'you are not authorized to view this column';
+        }
+
+        return $data['address'];
+    });
+
+    echo $dt->generate();
+```
+
 ## Requirements
 
 DataTables > 1.10  
