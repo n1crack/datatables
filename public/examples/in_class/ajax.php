@@ -10,10 +10,17 @@ class myClass {
     {
         include "../../_config.php";
 
-        $dt = new Datatables(new MySQL($config), $this);
+        $dt = new Datatables(new MySQL($config));
 
         $dt->query("Select film_id, title, description, rating, length from film");
-        $dt->edit('description', "$1", 'sample_callback(film_id), strtolower(title)');
+
+        $dt->edit('description', function ($data){
+            return $this->sample_callback($data['description']);
+        });
+
+        $dt->edit('title', function ($data){
+            return strtolower($data['title']);
+        });
 
         echo $dt->generate();
     }

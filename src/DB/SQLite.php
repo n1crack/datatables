@@ -1,11 +1,13 @@
 <?php namespace Ozdemir\Datatables\DB;
 
-use SQLite3;
+use PDO;
+use PDOException;
 
 class SQLite implements DatabaseInterface {
 
-    private $sqlite;
+    private $pdo;
     private $config;
+    private $escape = [];
 
     function __construct($config)
     {
@@ -14,39 +16,33 @@ class SQLite implements DatabaseInterface {
 
     public function connect()
     {
-        $dir = $this->config['dir'];
-        $this->sqlite = new SQLite3($dir);
+        try {
+            $this->pdo = new PDO('sqlite:' . $this->config);
+        } catch ( PDOException $e ){
+            print $e->getMessage();
+        }
 
         return $this;
     }
 
     public function query($query)
     {
-        $result = $this->sqlite->query($query);
-        $rows = [];
-        while ($row = $result->fetchArray(SQLITE3_ASSOC))
-        {
-            $rows[] = $row;
-        }
-
-        return $rows;
+        $sql = $this->pdo->prepare($query);
+        $rows=$sql->execute($this->escape);
+        return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function count($query)
     {
-        $result = $this->sqlite->query($query);
-        $numrows = 0;
-        while ($result->fetchArray(SQLITE3_ASSOC))
-        {
-            $numrows ++;
-        }
-
-        return $numrows;
+        $sql = $this->pdo->prepare($query);
+        $rows = $sql->execute($this->escape);
+        return count($sql->fetchAll());
     }
 
     public function escape($string)
     {
-        return $this->sqlite->escapeString($string);
+        $this->escape[':escape' . (count($this->escape) + 1) ] = '%' . $string . '%';
+        return ":escape" . (count($this->escape));
     }
 
 }

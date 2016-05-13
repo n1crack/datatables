@@ -3,10 +3,13 @@
 This is a php library that handles server-side processing for DataTables which is plug-in for the jQuery Javascript library.
 
 ## Features  
-1. Easy to use. Generates json using only a few lines of code.  
-2. Editable custom variables with callback function (or method) support.
-3. Editable columns with a closure function.
-4. Auto detects HTTP method (POST or GET)
+1. Easy to use. Generates json using only a few lines of code.
+2. Editable columns with a closure function.  (new)
+3. Auto detects HTTP method (POST or GET)
+4. Supports mysql and sqlite for native php.
+5. Works with [laravel](https://github.com/n1crack/Datatables/tree/master/public/examples/laravel) and [codeigniter3](https://github.com/n1crack/Datatables/tree/master/public/examples/codeigniter3). (new)
+
+
 
 ## How to install?
 
@@ -23,6 +26,8 @@ Put a file named `composer.json` at the root of your project, containing this in
     }
 
 And then run: `composer install`
+
+Or just run : `composer require ozdemir/datatables`
 
 Add the autoloader to your project:
 
@@ -60,14 +65,13 @@ A simple ajax example:
 ```
 
 
-There are several examples in the `public/examples` folder.
+There are several examples in the [examples](https://github.com/n1crack/Datatables/tree/master/public/examples) folder.
 
 #### Methods
 This is the list of available public methods.
 
-* query (<code> $query : string </code>) `(required)`
-* edit (<code>$column:string</code>, <code>$content:string</code>, <code>$matches:string</code>) `(optional)`
-* editc (<code>$column:string</code>, <code>Closure:object</code>) `(optional)`
+* query ( $query : string ) `(required)`
+* edit ($column:string, Closure:object ) `(optional)`
 * generate ( ) `(required)`
 
 #### An example of methods
@@ -78,14 +82,17 @@ This is the list of available public methods.
 
     $dt->query("Select id, name, email, address, plevel from users");
 
-    $dt->edit('id', '<a href='user.php?id=$1'>edit</a>', 'id');
+    $dt->edit('id', function($data){
+        // return an edit link.
+        return "<a href='user.php?id=" . $data['id'] . "'>edit</a>";
+    });
 
-    $dt->editc('email', function($data){
+    $dt->edit('email', function($data){
         // return mail@mail.com to m***@mail.com
         return preg_replace('/(?<=.).(?=.*@)/u','*', $data['email']);
     });
 
-    $dt->editc('address', function($data){
+    $dt->edit('address', function($data){
         // check if user has authorized to see that
         $current_user_plevel = 4;
         if ($current_user_plevel > 2 && $current_user_plevel > $data['plevel']) {
@@ -102,7 +109,6 @@ This is the list of available public methods.
 
 DataTables > 1.10  
 PHP > 5.3.7  
-
 
 ## License  
 

@@ -11,11 +11,9 @@ class Datatables {
     private $recordsfiltered;
     private $columns;
     private $edit;
-    private $calledby;
 
-    function __construct(DatabaseInterface $db, $calledby = null)
+    function __construct(DatabaseInterface $db)
     {
-        $this->calledby = $calledby;
         $this->db = $db->connect();
         $this->input = isset($_POST["draw"]) ? $_POST : $_GET;
     }
@@ -37,7 +35,7 @@ class Datatables {
             $search = " WHERE (";
             foreach ($this->columns as $column)
             {
-                $lookfor[] = $column . " LIKE '%" . $this->db->escape($globalsearch) . "%'";
+                $lookfor[] = $column . " LIKE " . $this->db->escape('%' . $globalsearch . '%') . "";
             }
             $search .= implode(" OR ", $lookfor) . ")";
         }
@@ -82,16 +80,17 @@ class Datatables {
     {
         $dtorders = $this->input('order');
         $orders = " ORDER BY ";
+        $dir = ['asc' => 'asc', 'desc' => 'desc'];
 
         if (is_array($dtorders))
         {
             foreach ($dtorders as $order)
             {
-                $takeorders[] = $this->columns[ $order['column'] ] . " " . $this->db->escape($order['dir']);
+                $takeorders[] = $this->columns[ $order['column'] ] . " " . $dir[ $order['dir'] ];
             }
             $orders .= implode(",", $takeorders);
         } else
-        { // nothing to order use default
+        {   // nothing to order use default
             $orders .= $this->columns[0] . " asc";
         }
 
@@ -107,38 +106,26 @@ class Datatables {
             // editing columns..
             if (count($this->edit) > 0)
             {
-                foreach ($this->edit as $edit_key => $edit_job)
+                foreach ($this->edit as $edit_job => $edit_column)
                 {
-                    foreach ($edit_job as $edit_value)
+                    foreach ($edit_column as $closure)
                     {
-                        $row[ $edit_key ] = $this->exec_replace($edit_value['content'], $edit_value['replacement'], $row);
+                        $row[ $edit_job ] = $this->exec_replace($closure, $row);
                     }
                 }
             }
 
-            // Check datatables if it uses column names as data keys or not. todo: should be improved
-            if ($this->isIndexed())
-            {
-                $formatted_data[] = array_values($row);
-            } else
-            {
-                $formatted_data[] = $row;
-            }
+            // Check datatables if it uses column names as data keys or not.
+            $formatted_data[] = $this->isIndexed($row);
+
         }
 
         return $this->response($formatted_data);
     }
 
-    public function edit($column, $content, $match_replacement)
+    public function edit($column, $closure)
     {
-        $this->edit[ $column ][] = array('content' => $content, 'replacement' => $this->explode(',', $match_replacement));
-
-        return $this;
-    }
-
-    public function editc($column, $closure)
-    {
-        $this->edit[ $column ][] = array('content' => '', 'replacement' => $closure);
+        $this->edit[ $column ][] = $closure;
 
         return $this;
     }
@@ -153,62 +140,18 @@ class Datatables {
         return false;
     }
 
-    private function exec_replace($content, $replacements, $row_data)
+    private function exec_replace($closure, $row_data)
     {
         // if this is a closure function, return calculated data.
-        if (get_class($replacements) == 'Closure')
+        if (is_object($closure))
         {
-            return $replacements($row_data);
-        }
-
-        if ( ! isset($replacements) && ! is_array($replacements))
-        {
-            return $content;
-        }
-        foreach ($replacements as $key => $replace)
-        {
-            $cleanup = "/(?<!\w)([\'\"])(.*)\\1(?!\w)/i";
-            $replace = preg_replace($cleanup, '$2', trim($replace));
-            //if this is a function.  matches test(arg1,arg2,..)
-            if (preg_match('/(\w+::\w+|\w+)\((.*)\)/i', $replace, $matches) && (is_callable($matches[1]) || is_callable(array($this->calledby, $matches [1]))))
+            if (get_class($closure) == 'Closure')
             {
-                $function = $matches[1]; // set function name
-                $arguments = preg_split("/[\s,]*\\\"([^\\\"]+)\\\"[\s,]*|" . "[\s,]*'([^']+)'[\s,]*|" . "[,]+/", $matches[2], 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-
-                foreach ($arguments as $arg_index => $argument)
-                {
-                    $argument = preg_replace($cleanup, '$2', trim($argument)); // cleaning
-                    if (in_array($argument, $this->columns))
-                    {
-                        $arguments[ $arg_index ] = ($row_data[ $argument ]);
-                    } else
-                    {
-                        $arguments[ $arg_index ] = $argument;
-                    }
-                }
-
-                if (is_callable($function))
-                {// is a function
-                    $replace_string = call_user_func_array($function, $arguments);  // execute given function and return a value.
-                } elseif (is_callable(array($this->calledby, $function)))
-                {//is a method
-                    $replace_string = call_user_func_array(array($this->calledby, $function), $arguments);
-                }
-
-            } elseif (in_array($replace, $this->columns))
-            { // if we have a $replace column
-                $replace_string = $row_data[ $replace ];
-
-            } else
-            { // or just return the text.
-                $replace_string = $replace;
+                return $closure($row_data);
             }
-
-            // finally get the string and replace it with ${number} ( $1, $2 etc.)
-            $content = preg_replace("/\\" . '$(' . ($key + 1) . "(?!\d))/i", $replace_string, $content);
         }
 
-        return $content;
+        return false;
     }
 
     private function response($data)
@@ -221,15 +164,15 @@ class Datatables {
         return json_encode($response);
     }
 
-    private function isIndexed() // if data source uses associative keys or index
+    private function isIndexed($row) // if data source uses associative keys or index
     {
         $column = $this->input('columns');
         if (is_numeric($column[0]['data']))
         {
-            return true;
+            return array_values($row);
         }
 
-        return false;
+        return $row;
     }
 
     private function balanceChars($str, $open, $close)
