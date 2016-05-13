@@ -1,5 +1,7 @@
 <?php namespace Ozdemir\Datatables\DB;
 
+use DB;
+
 class LaravelAdapter implements DatabaseInterface {
 
     protected $escape = [];
