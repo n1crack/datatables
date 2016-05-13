@@ -7,7 +7,7 @@ This is a php library that handles server-side processing for DataTables which i
 2. Editable columns with a closure function.  (new)
 3. Auto detects HTTP method (POST or GET)
 4. Supports mysql and sqlite for native php.
-5. Works with [laravel](https://github.com/n1crack/Datatables/tree/master/public/examples/laravel) and [codeigniter3](https://github.com/n1crack/Datatables/tree/master/public/examples/codeigniter3). (new)
+5. Works with [laravel](https://github.com/n1crack/Datatables/blob/master/public/examples/laravel/routes.php) and [codeigniter3](https://github.com/n1crack/Datatables/blob/master/public/examples/codeigniter3/Controller.php). (new)
 
 
 
@@ -15,7 +15,7 @@ This is a php library that handles server-side processing for DataTables which i
 
 Installation via composer is supported.  [Composer](http://https://getcomposer.org/).
 
-You don't have to install the composer to use the library. There is an example folder named 'nocomposer', but I highly recommend you to use composer.
+You don't have to install the composer to use the library. There is an example in the folder named 'nocomposer', but I highly recommend you to use composer.
 
 Put a file named `composer.json` at the root of your project, containing this information: 
 
