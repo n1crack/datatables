@@ -20,11 +20,8 @@
     <table border="0" cellpadding="4" cellspacing="0" class="display" id="example">
         <thead>
         <tr>
-            <th width="8%">Film ID</th>
-            <th width="27%">Title</th>
-            <th width="55%">Description</th>
-            <th width="10%">Rental Rate</th>
-
+            <th width="50%">Film Category</th>
+            <th width="50%">Total Length</th>
         </tr>
         </thead>
         <tbody>
