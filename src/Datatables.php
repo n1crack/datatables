@@ -161,19 +161,17 @@ class Datatables {
         $orders = " ORDER BY ";
         $dir = ['asc' => 'asc', 'desc' => 'desc'];
 
-        if (is_array($dtorders))
+        if ( ! is_array($dtorders))
         {
-            foreach ($dtorders as $order)
-            {
-                $takeorders[] = $this->columns[ $order['column'] ] . " " . $dir[ $order['dir'] ];
-            }
-            $orders .= implode(",", $takeorders);
-        } else
-        {
-            $orders .= $this->columns[0] . " asc";  // default
+            return $orders . $this->columns[0] . " asc";  // default
         }
 
-        return $orders;
+        foreach ($dtorders as $order)
+        {
+            $takeorders[] = $this->columns[ $order['column'] ] . " " . $dir[ $order['dir'] ];
+        }
+
+        return $orders . implode(",", $takeorders);
     }
 
     public function generate()
