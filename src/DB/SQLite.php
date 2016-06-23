@@ -21,7 +21,7 @@ class SQLite implements DatabaseInterface {
         } catch ( PDOException $e ){
             print $e->getMessage();
         }
-
+        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         return $this;
     }
 

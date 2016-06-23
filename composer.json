@@ -14,5 +14,8 @@
   "autoload": {
     "psr-4": {"Ozdemir\\Datatables\\": "src/"}
   },
-  "minimum-stability": "dev"
+  "minimum-stability": "dev",
+  "require-dev": {
+    "phpspec/phpspec": "~2.0"
+  }
 }

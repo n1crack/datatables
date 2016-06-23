@@ -13,7 +13,7 @@ This is a php library that handles server-side processing for DataTables which i
 
 ## How to install?
 
-Installation via composer is supported.  [Composer](http://https://getcomposer.org/).
+Installation via composer is supported.  [Composer](https://getcomposer.org/).
 
 You don't have to install the composer to use the library. There is an example in the folder named 'nocomposer', but I highly recommend you to use composer.
 

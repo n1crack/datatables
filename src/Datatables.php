@@ -5,12 +5,13 @@ use Ozdemir\Datatables\DB\DatabaseInterface;
 
 class Datatables {
 
-    private $db;
-    private $data;
-    private $recordstotal;
-    private $recordsfiltered;
-    private $columns;
-    private $edit;
+    protected $db;
+    protected $data;
+    protected $recordstotal;
+    protected $recordsfiltered;
+    protected $columns;
+    protected $edit;
+    protected $sql;
 
     function __construct(DatabaseInterface $db)
     {
@@ -23,46 +24,45 @@ class Datatables {
         $this->columns = $this->setcolumns($query);
         $columns = implode(", ", $this->columns);
         $query = rtrim($query, "; ");
-        $sql = "Select $columns from ($query)t";
+        $this->sql = "Select $columns from ($query)t";
 
-        $this->recordstotal = $this->db->count($sql); // unfiltered data count is here.
+        return $this;
+    }
+
+    protected function execute()
+    {
+        $this->recordstotal = $this->db->count($this->sql); // unfiltered data count is here.
         $where = $this->filter();
-        $this->recordsfiltered = $this->db->count($sql . $where);  // filtered data count is here.
+        $this->recordsfiltered = $this->db->count($this->sql . $where);  // filtered data count is here.
 
-        $this->data = $this->db->query($sql . $where . $this->orderby() . $this->limit());
+        $this->data = $this->db->query($this->sql . $where . $this->orderby() . $this->limit());
 
         return $this;
     }
 
     private function filter()
     {
-        $search = "";
+        $search = '';
 
         $filterglobal = $this->filterglobal();
         $filterindividual = $this->filterindividual();
 
-        if ($filterglobal <> null)
+        if ( ! $filterindividual && ! $filterglobal)
         {
-            $search .= $filterglobal;
+            return null;
         }
 
-        if ($filterindividual <> null)
+        $search .= $filterglobal;
+
+        if ($filterindividual <> null && $filterglobal <> null)
         {
-            if ($filterglobal <> null)
-            {
-                $search .= " AND ";
-            }
-            $search .= $filterindividual;
+            $search .= ' AND ';
         }
 
-        if ($filterindividual || $filterglobal)
-        {
-            $search = " WHERE " . $search;
+        $search .= $filterindividual;
+        $search = " WHERE " . $search;
 
-            return $search;
-        }
-
-        return null;
+        return $search;
     }
 
     private function filterglobal()
@@ -70,24 +70,25 @@ class Datatables {
         $searchinput = $this->input('search')['value'];
         $allcolumns = $this->input('columns');
 
-        if ($searchinput <> "")
+        if ($searchinput == '')
         {
-            $search = " (";
-
-            foreach ($this->columns as $key => $column)
-            {
-                if ($allcolumns[ $key ]['searchable'] == 'true')
-                {
-                    $lookfor[] = $column . " LIKE " . $this->db->escape('%' . $searchinput . '%') . "";
-                }
-            }
-
-            $search .= implode(" OR ", $lookfor) . ")";
-
-            return $search;
+            return null;
         }
 
-        return null;
+        $search = " (";
+
+        foreach ($this->columns as $key => $column)
+        {
+            if ($allcolumns[ $key ]['searchable'] == 'true')
+            {
+                $lookfor[] = $column . " LIKE " . $this->db->escape('%' . $searchinput . '%') . "";
+            }
+        }
+
+        $search .= implode(" OR ", $lookfor) . ")";
+
+        return $search;
+
     }
 
     private function filterindividual()
@@ -96,6 +97,11 @@ class Datatables {
 
         $search = " (";
         $lookfor = [];
+
+        if ( ! $allcolumns)
+        {
+            return null;
+        }
 
         foreach ($allcolumns as $key)
         {
@@ -122,19 +128,14 @@ class Datatables {
         $columns = $this->explode(",", $columns[1][0]);
 
         // gets alias of the table -> 'table.column as col' or 'table.column col' to 'col'
-        $regex[0] = "/(.*)\s+as\s+(.*)/i";
-        $regex[1] = "/.+(\([^()]+\))?\s+(.+)/i";
+        $regex[] = "/(.*)\s+as\s+(.*)/i";
+        $regex[] = "/.+(\([^()]+\))?\s+(.+)/i";
         // wipe unwanted characters => '`" and space
-        $regex[2] = '/[\s"\'`]+/';
+        $regex[] = '/[\s"\'`]+/';
         // if there is no alias, return column name -> table.column to column
-        $regex[3] = "/([\w\-]*)\.([\w\-]*)/";
+        $regex[] = "/([\w\-]*)\.([\w\-]*)/";
 
-        foreach ($regex as $pattern)
-        {
-            $columns = preg_replace($pattern, "$2", $columns);
-        }
-
-        return $columns;
+        return preg_replace($regex, "$2", $columns);
     }
 
     private function limit()
@@ -174,8 +175,9 @@ class Datatables {
         return $orders . implode(",", $takeorders);
     }
 
-    public function generate()
+    public function generate($json = true)
     {
+        $this->execute();
         $formatted_data = [];
 
         foreach ($this->data as $key => $row)
@@ -183,29 +185,26 @@ class Datatables {
             // editing columns..
             if (count($this->edit) > 0)
             {
-                foreach ($this->edit as $edit_column => $edit_job)
+                foreach ($this->edit as $edit_column => $closure)
                 {
-                    foreach ($edit_job as $closure)
-                    {
-                        $row[ $edit_column ] = $this->exec_replace($closure, $row);
-                    }
+                    $row[ $edit_column ] = $this->exec_replace($closure, $row);
                 }
             }
 
             $formatted_data[] = $this->isIndexed($row);
         }
 
-        return $this->response($formatted_data);
+        return $this->response($formatted_data, $json);
     }
 
     public function edit($column, $closure)
     {
-        $this->edit[ $column ][] = $closure;
+        $this->edit[ $column ] = $closure;
 
         return $this;
     }
 
-    private function input($input)
+    public function input($input)
     {
         if (isset($this->input[ $input ]))
         {
@@ -225,31 +224,27 @@ class Datatables {
         return $input;
     }
 
-    private function exec_replace($closure, $row_data)
+    protected function exec_replace($closure, $row_data)
     {
-        // if this is a closure function, return calculated data.
-        if (is_object($closure))
-        {
-            if (get_class($closure) == 'Closure')
-            {
-                return $closure($row_data);
-            }
-        }
-
-        return false;
+        return $closure($row_data);
     }
 
-    private function response($data)
+    protected function response($data, $json)
     {
         $response['draw'] = $this->input('draw');
         $response['recordsTotal'] = $this->recordstotal;
         $response['recordsFiltered'] = $this->recordsfiltered;
         $response['data'] = $data;
 
-        return json_encode($response);
+        if ($json)
+        {
+            return json_encode($response);
+        }
+
+        return $response;
     }
 
-    private function isIndexed($row) // if data source uses associative keys or index number
+    protected function isIndexed($row) // if data source uses associative keys or index number
     {
         $column = $this->input('columns');
         if (is_numeric($column[0]['data']))
