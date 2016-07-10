@@ -5,9 +5,9 @@ use PDOException;
 
 class SQLite implements DatabaseInterface {
 
-    private $pdo;
-    private $config;
-    private $escape = [];
+    protected $pdo;
+    protected $config;
+    protected $escape = [];
 
     function __construct($config)
     {

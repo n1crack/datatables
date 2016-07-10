@@ -148,7 +148,7 @@ class Datatables {
             $take = (integer) $this->input('length');
         }
 
-        if ($take == - 1)
+        if ($take == - 1 || !$this->input('draw'))
         {
             return null;
         }
@@ -194,7 +194,12 @@ class Datatables {
             $formatted_data[] = $this->isIndexed($row);
         }
 
-        return $this->response($formatted_data, $json);
+        $response['draw'] = $this->input('draw');
+        $response['recordsTotal'] = $this->recordstotal;
+        $response['recordsFiltered'] = $this->recordsfiltered;
+        $response['data'] = $formatted_data;
+
+        return $this->response($response, $json);
     }
 
     public function edit($column, $closure)
@@ -229,19 +234,15 @@ class Datatables {
         return $closure($row_data);
     }
 
-    protected function response($data, $json)
+    protected function response($data, $json = true)
     {
-        $response['draw'] = $this->input('draw');
-        $response['recordsTotal'] = $this->recordstotal;
-        $response['recordsFiltered'] = $this->recordsfiltered;
-        $response['data'] = $data;
-
         if ($json)
         {
-            return json_encode($response);
+            header('Content-type: application/json');
+            return json_encode($data);
         }
 
-        return $response;
+        return $data;
     }
 
     protected function isIndexed($row) // if data source uses associative keys or index number
