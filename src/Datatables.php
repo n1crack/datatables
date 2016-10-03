@@ -29,6 +29,19 @@ class Datatables {
         return $this;
     }
 
+    public function get($request)
+    {
+        switch ($request)
+        {
+            case 'columns':
+                return $this->columns;
+                break;
+            case 'sql':
+                return $this->sql;
+                break;
+        }
+    }
+
     protected function execute()
     {
         $this->recordstotal = $this->db->count($this->sql); // unfiltered data count is here.
@@ -123,6 +136,7 @@ class Datatables {
 
     private function setcolumns($query)
     {
+        $query = preg_replace("/\((?:[^()]+|(?R))*+\)/i", "", $query);
         preg_match_all("/SELECT([\s\S]*?)((\s*)FROM(?![\s\S]*\)))([\s\S]*?)/i", $query, $columns);
 
         $columns = $this->explode(",", $columns[1][0]);
@@ -148,7 +162,7 @@ class Datatables {
             $take = (integer) $this->input('length');
         }
 
-        if ($take == - 1 || !$this->input('draw'))
+        if ($take == - 1 || ! $this->input('draw'))
         {
             return null;
         }
@@ -239,6 +253,7 @@ class Datatables {
         if ($json)
         {
             header('Content-type: application/json');
+
             return json_encode($data);
         }
 

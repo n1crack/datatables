@@ -116,6 +116,35 @@ class DatatablesSpec extends ObjectBehavior {
 
         $data['category_name']->shouldReturn("Comedy");
         $data['total_length']->shouldReturn("6718 minutes");
+        $data->shouldHaveColumns(['category_name', 'total_length']);
     }
 
+    public function it_returns_column_names_from_query_that_includes_a_subquery_in_select_statement()
+    {
+        $dt = $this->query( "SELECT column_name,
+            (SELECT group_concat(cp.GRANTEE)
+            FROM COLUMN_PRIVILEGES cp
+            WHERE cp.TABLE_SCHEMA = COLUMNS.TABLE_SCHEMA
+            AND cp.TABLE_NAME = COLUMNS.TABLE_NAME
+            AND cp.COLUMN_NAME = COLUMNS.COLUMN_NAME)
+            privs
+            FROM COLUMNS
+            WHERE table_schema = 'mysql' AND table_name = 'user';");
+
+        $dt->get('columns')->shouldReturn(['column_name', 'privs']);
+    }
+
+    public function it_returns_column_names_from_query_that_includes_a_subquery_in_where_statement()
+    {
+        $dt = $this->query( "SELECT column_name
+            FROM COLUMNS
+            WHERE table_schema = 'mysql' AND table_name = 'user'
+            and (SELECT group_concat(cp.GRANTEE)
+            FROM COLUMN_PRIVILEGES cp
+            WHERE cp.TABLE_SCHEMA = COLUMNS.TABLE_SCHEMA
+            AND cp.TABLE_NAME = COLUMNS.TABLE_NAME
+            AND cp.COLUMN_NAME = COLUMNS.COLUMN_NAME) is not null;");
+
+        $dt->get('columns')->shouldReturn(['column_name']);
+    }
 }
