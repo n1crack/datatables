@@ -34,14 +34,6 @@ class DatatablesSpec extends ObjectBehavior {
 
     public function it_returns_record_counts()
     {
-        $this->query("Select film_id as fid, title, description from film");
-        $datatables = $this->generate(false);
-        $datatables['recordsTotal']->shouldReturn(1000);
-        $datatables['recordsFiltered']->shouldReturn(1000);
-    }
-
-    public function it_returns_record_counts_with_where_statement()
-    {
         $this->query("Select film_id as fid, title, description from film where film_id > 655");
         $datatables = $this->generate(false);
         $datatables['recordsTotal']->shouldReturn(345);
@@ -69,9 +61,7 @@ class DatatablesSpec extends ObjectBehavior {
                   film.rental_rate,
                   film.length as mins
             from film");
-
-        $data = $this->generate(false)['data'][0];
-        $data->shouldHaveColumns(['fid', 'title', 'info', 'r_year', 'rental_rate', 'mins']);
+        $this->get('columns')->shouldReturn(['fid', 'title', 'info', 'r_year', 'rental_rate', 'mins']);
     }
 
     public function it_returns_modified_data_via_closure_function()

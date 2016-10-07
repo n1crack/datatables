@@ -12,6 +12,7 @@ class Datatables {
     protected $columns;
     protected $edit;
     protected $sql;
+    protected $query;
 
     function __construct(DatabaseInterface $db)
     {
@@ -37,7 +38,7 @@ class Datatables {
                 return $this->columns;
                 break;
             case 'sql':
-                return $this->sql;
+                return $this->query;
                 break;
         }
     }
@@ -49,6 +50,8 @@ class Datatables {
         $this->recordsfiltered = $this->db->count($this->sql . $where);  // filtered data count is here.
 
         $this->data = $this->db->query($this->sql . $where . $this->orderby() . $this->limit());
+
+        $this->query = $this->sql . $where . $this->orderby() . $this->limit();
 
         return $this;
     }
