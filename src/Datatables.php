@@ -13,6 +13,7 @@ class Datatables {
     protected $edit;
     protected $sql;
     protected $query;
+    protected $hasOrderIn;
 
     function __construct(DatabaseInterface $db)
     {
@@ -142,6 +143,8 @@ class Datatables {
         $query = preg_replace("/\((?:[^()]+|(?R))*+\)/i", "", $query);
         preg_match_all("/SELECT([\s\S]*?)((\s*)FROM(?![\s\S]*\)))([\s\S]*?)/i", $query, $columns);
 
+        $this->hasOrderIn = $this->isQueryWithOrderBy($query);
+
         $columns = $this->explode(",", $columns[1][0]);
 
         // gets alias of the table -> 'table.column as col' or 'table.column col' to 'col'
@@ -153,6 +156,11 @@ class Datatables {
         $regex[] = "/([\w\-]*)\.([\w\-]*)/";
 
         return preg_replace($regex, "$2", $columns);
+    }
+
+    private function isQueryWithOrderBy($query)
+    {
+        return (bool) count(preg_grep("/(order\s+by)\s+(.+)$/i", explode("\n", $query)));
     }
 
     private function limit()
@@ -181,6 +189,11 @@ class Datatables {
 
         if ( ! is_array($dtorders))
         {
+            if ($this->hasOrderIn)
+            {
+                return null;
+            }
+
             return $orders . $this->columns[0] . " asc";  // default
         }
 
