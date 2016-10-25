@@ -6,7 +6,6 @@ use Ozdemir\Datatables\DB\MySQL;
 
 # 300k data example.
 # http://dev.mysql.com/doc/employee/en/employees-installation.html
-
 $config = ['host'     => 'localhost',
            'port'     => '3306',
            'username' => 'homestead',
