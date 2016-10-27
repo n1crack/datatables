@@ -65,7 +65,7 @@ A simple ajax example:
 ```
 
 
-There are several examples in the [examples](https://github.com/n1crack/Datatables/tree/master/public/examples) folder.
+There are some examples in [here](https://github.com/n1crack/datatables-examples).
 
 #### Methods
 This is the list of available public methods.

@@ -1,6 +1,6 @@
 {
   "name": "ozdemir/datatables",
-  "description": "Handles server-side processing for Datatables.",
+  "description": "This is a php library that handles server-side processing for DataTables which is plug-in for the jQuery Javascript library.",
   "license": "MIT",
   "config": {
     "bin-dir": "vendor/bin"
