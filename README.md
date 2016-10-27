@@ -5,24 +5,23 @@ This is a php library that handles server-side processing for DataTables which i
 
 ## Features  
 1. Easy to use. Generates json using only a few lines of code.
-2. Editable columns with a closure function.  (new)
+2. Editable columns with a closure function.
 3. Auto detects HTTP method (POST or GET)
 4. Supports mysql and sqlite for native php.
-5. Works with [laravel](https://github.com/n1crack/Datatables/blob/master/public/examples/laravel/routes.php) and [codeigniter3](https://github.com/n1crack/Datatables/blob/master/public/examples/codeigniter3/Controller.php). (new)
-
+5. Works with [laravel](https://github.com/n1crack/datatables-examples/blob/master/other_examples/laravel.php) and [codeigniter3](https://github.com/n1crack/datatables-examples/blob/master/other_examples/codeigniter.php)
 
 
 ## How to install?
 
 Installation via composer is supported.  [Composer](https://getcomposer.org/).
 
-You don't have to install the composer to use the library. There is an example in the folder named 'nocomposer', but I highly recommend you to use composer.
+If you haven't start using composer, I highly recommend you to use it.
 
 Put a file named `composer.json` at the root of your project, containing this information: 
 
     {
         "require": {
-           "ozdemir/datatables": "~1.*"
+           "ozdemir/datatables": "^1.*"
         }
     }
 
