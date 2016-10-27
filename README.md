@@ -1,5 +1,5 @@
 # Datatables library for PHP
-[![GitHub version](https://badge.fury.io/gh/n1crack%2Fdatatables.svg)](https://badge.fury.io/gh/n1crack%2Fdatatables) [![Build Status](https://travis-ci.org/n1crack/datatables.svg?branch=master)](https://travis-ci.org/n1crack/datatables) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/n1crack/datatables/blob/master/LICENCE) [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/php-datatables/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link) 
+[![Latest Stable Version](https://poser.pugx.org/ozdemir/datatables/v/stable)](https://packagist.org/packages/ozdemir/datatables) [![Build Status](https://travis-ci.org/n1crack/datatables.svg?branch=master)](https://travis-ci.org/n1crack/datatables) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/n1crack/datatables/blob/master/LICENCE) [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/php-datatables/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link) 
 
 This is a php library that handles server-side processing for DataTables which is plug-in for the jQuery Javascript library.
 
