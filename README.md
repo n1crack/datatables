@@ -1,7 +1,7 @@
 # Datatables library for PHP
 [![Latest Stable Version](https://poser.pugx.org/ozdemir/datatables/v/stable)](https://packagist.org/packages/ozdemir/datatables) [![Build Status](https://travis-ci.org/n1crack/datatables.svg?branch=master)](https://travis-ci.org/n1crack/datatables) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/n1crack/datatables/blob/master/LICENCE) [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/php-datatables/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link) 
 
-This is a php library that handles server-side processing for DataTables which is plug-in for the jQuery Javascript library.
+PHP Library to handle server-side processing for Datatables, in a fast and simple way.
 
 ## Features  
 1. Easy to use. Generates json using only a few lines of code.
@@ -21,7 +21,7 @@ Put a file named `composer.json` at the root of your project, containing this in
 
     {
         "require": {
-           "ozdemir/datatables": "^1.*"
+           "ozdemir/datatables": "~1.*"
         }
     }
 
