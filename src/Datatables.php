@@ -23,6 +23,7 @@ class Datatables {
 
     public function query($query)
     {
+        $this->hasOrderIn = $this->isQueryWithOrderBy($query);
         $this->columns = $this->setcolumns($query);
         $columns = implode(", ", $this->columns);
         $query = rtrim($query, "; ");
@@ -49,15 +50,14 @@ class Datatables {
         $this->recordstotal = $this->db->count($this->sql); // unfiltered data count is here.
         $where = $this->filter();
         $this->recordsfiltered = $this->db->count($this->sql . $where);  // filtered data count is here.
-
-        $this->data = $this->db->query($this->sql . $where . $this->orderby() . $this->limit());
-
         $this->query = $this->sql . $where . $this->orderby() . $this->limit();
+
+        $this->data = $this->db->query($this->query);
 
         return $this;
     }
 
-    private function filter()
+    protected function filter()
     {
         $search = '';
 
@@ -82,7 +82,7 @@ class Datatables {
         return $search;
     }
 
-    private function filterglobal()
+    protected function filterglobal()
     {
         $searchinput = $this->input('search')['value'];
         $allcolumns = $this->input('columns');
@@ -108,7 +108,7 @@ class Datatables {
 
     }
 
-    private function filterindividual()
+    protected function filterindividual()
     {
         $allcolumns = $this->input('columns');
 
@@ -138,12 +138,10 @@ class Datatables {
         return null;
     }
 
-    private function setcolumns($query)
+    protected function setcolumns($query)
     {
         $query = preg_replace("/\((?:[^()]+|(?R))*+\)/i", "", $query);
         preg_match_all("/SELECT([\s\S]*?)((\s*)FROM(?![\s\S]*\)))([\s\S]*?)/i", $query, $columns);
-
-        $this->hasOrderIn = $this->isQueryWithOrderBy($query);
 
         $columns = $this->explode(",", $columns[1][0]);
 
@@ -158,12 +156,12 @@ class Datatables {
         return preg_replace($regex, "$2", $columns);
     }
 
-    private function isQueryWithOrderBy($query)
+    protected function isQueryWithOrderBy($query)
     {
         return (bool) count(preg_grep("/(order\s+by)\s+(.+)$/i", explode("\n", $query)));
     }
 
-    private function limit()
+    protected function limit()
     {
         $take = 10;
         $skip = (integer) $this->input('start');
@@ -181,7 +179,7 @@ class Datatables {
         return " LIMIT $skip, $take ";
     }
 
-    private function orderby()
+    protected function orderby()
     {
         $dtorders = $this->input('order');
         $orders = " ORDER BY ";
@@ -249,7 +247,7 @@ class Datatables {
         return false;
     }
 
-    private function column($input)
+    protected function column($input)
     {
         if (is_numeric($input))
         {
@@ -287,7 +285,7 @@ class Datatables {
         return $row;
     }
 
-    private function balanceChars($str, $open, $close)
+    protected function balanceChars($str, $open, $close)
     {
         $openCount = substr_count($str, $open);
         $closeCount = substr_count($str, $close);
@@ -296,7 +294,7 @@ class Datatables {
         return $retval;
     }
 
-    private function explode($delimiter, $str, $open = '(', $close = ')')
+    protected function explode($delimiter, $str, $open = '(', $close = ')')
     {
         $retval = array();
         $hold = array();
