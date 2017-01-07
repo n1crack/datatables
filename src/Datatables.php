@@ -92,20 +92,19 @@ class Datatables {
             return null;
         }
 
-        $search = " (";
-
-        foreach ($this->columns as $key => $column)
-        {
-            if ($allcolumns[ $key ]['searchable'] == 'true')
-            {
-                $lookfor[] = $column . " LIKE " . $this->db->escape('%' . $searchinput . '%') . "";
+        $search = [];
+        $searchinput = preg_replace("/\W+/", " ", $searchinput);
+        foreach (explode(' ',$searchinput) as $word) {
+            $lookfor = [];
+            foreach ($this->columns as $key => $column) {
+                if ($allcolumns[$key]['searchable'] == 'true') {
+                    $lookfor[] = $column . " LIKE " . $this->db->escape($word) . "";
+                }
             }
+            $search[] = "(".implode(" OR ", $lookfor) . ")";
         }
 
-        $search .= implode(" OR ", $lookfor) . ")";
-
-        return $search;
-
+        return implode(" AND ", $search);
     }
 
     protected function filterindividual()
