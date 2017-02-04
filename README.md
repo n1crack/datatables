@@ -52,7 +52,7 @@ A simple ajax example:
     use Ozdemir\Datatables\DB\MySQL;
 
     $config = [ 'host'     => 'localhost',
-                'post'     => '3306',
+                'port'     => '3306',
                 'username' => 'homestead',
                 'password' => 'secret',
                 'database' => 'sakila' ];
