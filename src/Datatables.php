@@ -140,7 +140,7 @@ class Datatables {
     protected function setcolumns($query)
     {
         $query = preg_replace("/\((?:[^()]+|(?R))*+\)/i", "", $query);
-        preg_match_all("/SELECT([\s\S]*?)((\s*)FROM(?![\s\S]*\)))([\s\S]*?)/i", $query, $columns);
+        preg_match_all("/SELECT([\s\S]*?)((\s*)\bFROM\b(?![\s\S]*\)))([\s\S]*?)/i", $query, $columns);
 
         $columns = $this->explode(",", $columns[1][0]);
 
