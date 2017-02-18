@@ -1,21 +1,20 @@
 # Datatables library for PHP
 [![Latest Stable Version](https://poser.pugx.org/ozdemir/datatables/v/stable)](https://packagist.org/packages/ozdemir/datatables) [![Build Status](https://travis-ci.org/n1crack/datatables.svg?branch=master)](https://travis-ci.org/n1crack/datatables) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/n1crack/datatables/blob/master/LICENCE) [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/php-datatables/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link) 
 
-PHP Library to handle server-side processing for Datatables, in a fast and simple way.
+PHP Library to handle server-side processing for Datatables, in a fast and simple way. [Live Demo](http://datatables.16mb.com/)
 
 ## Features  
 1. Easy to use. Generates json using only a few lines of code.
 2. Editable columns with a closure function.
-3. Auto detects HTTP method (POST or GET)
-4. Supports mysql and sqlite for native php.
-5. Works with [laravel](https://github.com/n1crack/datatables-examples/blob/master/other_examples/laravel.php) and [codeigniter3](https://github.com/n1crack/datatables-examples/blob/master/other_examples/codeigniter.php)
+3. Supports mysql and sqlite for native php.
+4. Works with [laravel](https://github.com/n1crack/datatables-examples/blob/master/other_examples/laravel.php) and [codeigniter3](https://github.com/n1crack/datatables-examples/blob/master/other_examples/codeigniter.php)
 
 
 ## How to install?
 
-Installation via composer is supported.  [Composer](https://getcomposer.org/).
+Installation via [composer](https://getcomposer.org/) is supported.  
 
-If you haven't start using composer, I highly recommend you to use it.
+If you haven't started using composer, I highly recommend you to use it.
 
 Put a file named `composer.json` at the root of your project, containing this information: 
 
@@ -64,9 +63,6 @@ A simple ajax example:
     echo $dt->generate();
 ```
 
-
-There are some examples in [here](https://github.com/n1crack/datatables-examples).
-
 #### Methods
 This is the list of available public methods.
 
@@ -74,7 +70,7 @@ This is the list of available public methods.
 * edit ($column:string, Closure:object ) `(optional)`
 * generate ( ) `(required)`
 
-#### An example of methods
+#### Example
 
 ```php
     <?php
