@@ -139,14 +139,14 @@ class Datatables {
 
     protected function setcolumns($query)
     {
-        $query = preg_replace("/\((?:[^()]+|(?R))*+\)/i", "", $query);
-        preg_match_all("/SELECT([\s\S]*?)((\s*)\bFROM\b(?![\s\S]*\)))([\s\S]*?)/i", $query, $columns);
+        $query = preg_replace("/\((?:[^()]+|(?R))*+\)/is", "", $query);
+        preg_match_all("/SELECT([\s\S]*?)((\s*)\bFROM\b(?![\s\S]*\)))([\s\S]*?)/is", $query, $columns);
 
         $columns = $this->explode(",", $columns[1][0]);
 
         // gets alias of the table -> 'table.column as col' or 'table.column col' to 'col'
-        $regex[] = "/(.*)\s+as\s+(.*)/i";
-        $regex[] = "/.+(\([^()]+\))?\s+(.+)/i";
+        $regex[] = "/(.*)\s+as\s+(.*)/is";
+        $regex[] = "/.+(\([^()]+\))?\s+(.+)/is";
         // wipe unwanted characters => '`" and space
         $regex[] = '/[\s"\'`]+/';
         // if there is no alias, return column name -> table.column to column
@@ -175,7 +175,7 @@ class Datatables {
             return null;
         }
 
-        return " LIMIT $skip, $take ";
+        return " LIMIT $take OFFSET $skip";
     }
 
     protected function orderby()
