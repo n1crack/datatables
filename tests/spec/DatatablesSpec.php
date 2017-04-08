@@ -1,4 +1,5 @@
 <?php
+
 namespace spec\Ozdemir\Datatables;
 
 use Ozdemir\Datatables\DB\MySQL;
@@ -55,7 +56,18 @@ class DatatablesSpec extends ObjectBehavior {
                   film.rental_rate,
                   film.length as mins
             from film");
-        $this->get('columns')->shouldReturn(['fid', 'title', 'info', 'r_year', 'rental_rate', 'mins']);
+        $this->get('all_columns')->shouldReturn(['fid', 'title', 'info', 'r_year', 'rental_rate', 'mins']);
+    }
+
+    public function it_hides_unnecessary_columns_from_output()
+    {
+        $this->query("Select id as fid, name, surname, age from mytable");
+        $this->hide('fid');
+        $data = $this->generate(false)['data']['2'];
+
+        $data->shouldHaveCount(3); //  name, surname and age --
+        $this->get('columns')->shouldReturn(['name', 'surname', 'age']);
+
     }
 
     public function it_returns_modified_data_via_closure_function()
@@ -85,7 +97,7 @@ class DatatablesSpec extends ObjectBehavior {
 
     public function it_returns_column_names_from_query_that_includes_a_subquery_in_select_statement()
     {
-        $dt = $this->query( "SELECT column_name,
+        $dt = $this->query("SELECT column_name,
             (SELECT group_concat(cp.GRANTEE)
             FROM COLUMN_PRIVILEGES cp
             WHERE cp.TABLE_SCHEMA = COLUMNS.TABLE_SCHEMA
@@ -100,7 +112,7 @@ class DatatablesSpec extends ObjectBehavior {
 
     public function it_returns_column_names_from_query_that_includes_a_subquery_in_where_statement()
     {
-        $dt = $this->query( "SELECT column_name
+        $dt = $this->query("SELECT column_name
             FROM COLUMNS
             WHERE table_schema = 'mysql' AND table_name = 'user'
             and (SELECT group_concat(cp.GRANTEE)

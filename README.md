@@ -68,6 +68,8 @@ This is the list of available public methods.
 
 * query ( $query : string ) `(required)`
 * edit ($column:string, Closure:object ) `(optional)`
+* get ($value:string ) `(optional - for dev purpose)`
+* hide ($column:mixed ) `(optional)`
 * generate ( ) `(required)`
 
 #### Example

@@ -1,4 +1,5 @@
 <?php
+
 namespace Ozdemir\Datatables;
 
 use Ozdemir\Datatables\DB\DatabaseInterface;
@@ -11,6 +12,7 @@ class Datatables {
     protected $recordsfiltered;
     protected $columns;
     protected $edit;
+    protected $hide;
     protected $sql;
     protected $query;
     protected $hasOrderIn;
@@ -37,12 +39,27 @@ class Datatables {
         switch ($request)
         {
             case 'columns':
+                return array_values(array_diff($this->columns, (array) $this->hide));
+                break;
+            case 'all_columns':
                 return $this->columns;
                 break;
             case 'sql':
                 return $this->query;
                 break;
         }
+    }
+
+    public function hide($columns)
+    {
+        if ( ! is_array($columns))
+        {
+            $columns = func_get_args();
+        }
+        $columns = array_intersect($this->columns, $columns);
+        $this->hide = array_merge((array) $this->hide, array_combine($columns, $columns));
+
+        return $this;
     }
 
     protected function execute()
@@ -94,14 +111,17 @@ class Datatables {
 
         $search = [];
         $searchinput = preg_replace("/\W+/", " ", $searchinput);
-        foreach (explode(' ',$searchinput) as $word) {
+        foreach (explode(' ', $searchinput) as $word)
+        {
             $lookfor = [];
-            foreach ($this->columns as $key => $column) {
-                if ($allcolumns[$key]['searchable'] == 'true') {
+            foreach ($this->columns as $key => $column)
+            {
+                if ($allcolumns[ $key ]['searchable'] == 'true')
+                {
                     $lookfor[] = $column . " LIKE " . $this->db->escape($word) . "";
                 }
             }
-            $search[] = "(".implode(" OR ", $lookfor) . ")";
+            $search[] = "(" . implode(" OR ", $lookfor) . ")";
         }
 
         return implode(" AND ", $search);
@@ -214,9 +234,12 @@ class Datatables {
             {
                 foreach ($this->edit as $edit_column => $closure)
                 {
-                    $row[ $edit_column ] = $this->exec_replace($closure, $row);
+                    $row[ $edit_column ] = $closure($row);
                 }
             }
+
+            // hide unwanted columns from output
+            $row = array_diff_key($row, (array) $this->hide);
 
             $formatted_data[] = $this->isIndexed($row);
         }
@@ -254,11 +277,6 @@ class Datatables {
         }
 
         return $input;
-    }
-
-    protected function exec_replace($closure, $row_data)
-    {
-        return $closure($row_data);
     }
 
     protected function response($data, $json = true)
