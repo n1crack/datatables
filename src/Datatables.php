@@ -110,7 +110,7 @@ class Datatables {
         }
 
         $search = [];
-        $searchinput = preg_replace("/\W+/", " ", $searchinput);
+        $searchinput = preg_replace("/[^\wá-žÁ-Ž]+/", " ", $searchinput);
         foreach (explode(' ', $searchinput) as $word)
         {
             $lookfor = [];
