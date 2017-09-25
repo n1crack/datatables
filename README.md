@@ -7,7 +7,10 @@ PHP Library to handle server-side processing for Datatables, in a fast and simpl
 1. Easy to use. Generates json using only a few lines of code.
 2. Editable columns with a closure function.
 3. Supports mysql and sqlite for native php.
-4. Works with [laravel](https://github.com/n1crack/datatables-examples/blob/master/other_examples/laravel.php) and [codeigniter3](https://github.com/n1crack/datatables-examples/blob/master/other_examples/codeigniter.php)
+4. Works with :
+    - [Laravel](https://github.com/n1crack/datatables-examples/blob/master/other_examples/laravel.php)
+    - [CodeIgniter 3](https://github.com/n1crack/datatables-examples/blob/master/other_examples/codeigniter.php)
+    - [Phalcon 3+](https://github.com/n1crack/datatables-examples/blob/master/other_examples/phalcon.php)
 
 
 ## How to install?
