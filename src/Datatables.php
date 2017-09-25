@@ -244,7 +244,9 @@ class Datatables {
             {
                 foreach ($this->edit as $edit_column => $closure)
                 {
-                    $row[ $edit_column ] = $closure($row);
+                    if (isset($row[ $edit_column ])) {
+                        $row[ $edit_column ] = $closure($row);
+                    }
                 }
             }
 
