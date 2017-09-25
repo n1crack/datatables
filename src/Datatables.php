@@ -11,6 +11,7 @@ class Datatables {
     protected $recordstotal;
     protected $recordsfiltered;
     protected $columns;
+    protected $add;
     protected $edit;
     protected $hide;
     protected $sql;
@@ -229,6 +230,15 @@ class Datatables {
 
         foreach ($this->data as $key => $row)
         {
+            // new columns..
+            if (count($this->add) > 0)
+            {
+                foreach ($this->add as $new_column => $closure)
+                {
+                    $row[ $new_column ] = $closure($row);
+                }
+            }
+
             // editing columns..
             if (count($this->edit) > 0)
             {
@@ -250,6 +260,13 @@ class Datatables {
         $response['data'] = $formatted_data;
 
         return $this->response($response, $json);
+    }
+
+    public function add($newColumn, $closure)
+    {
+        $this->add[ $newColumn ] =  $closure;
+
+        return $this;
     }
 
     public function edit($column, $closure)

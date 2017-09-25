@@ -67,6 +67,7 @@ A simple ajax example:
 This is the list of available public methods.
 
 * query ( $query : string ) `(required)`
+* add ($newColumn:string, Closure:object ) `(optional)`
 * edit ($column:string, Closure:object ) `(optional)`
 * get ($value:string ) `(optional - for dev purpose)`
 * hide ($column:mixed ) `(optional)`
@@ -98,6 +99,11 @@ This is the list of available public methods.
         }
 
         return 'you are not authorized to view this column';
+    });
+
+    $dt->add('action', function($data){
+        // return an edit link in new column action
+        return "<a href='user.php?id=" . $data['id'] . "'>edit</a>";
     });
 
     echo $dt->generate();
