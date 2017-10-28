@@ -117,10 +117,10 @@ class Datatables {
             $lookfor = [];
             foreach ($this->columns as $key => $column)
             {
-                if ($allcolumns[ $key ]['searchable'] == 'true')
-                {
-                    $lookfor[] = $column . " LIKE " . $this->db->escape($word) . "";
-                }
+				if(array_key_exists($key,$allcolumns)){
+					if ($allcolumns[ $key ]['searchable'] == 'true')
+						$lookfor[] = $column . " LIKE " . $this->db->escape($word) . "";
+				}
             }
             $search[] = "(" . implode(" OR ", $lookfor) . ")";
         }
