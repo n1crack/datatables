@@ -2,13 +2,9 @@
 
 use DB;
 
-class LaravelAdapter implements DatabaseInterface {
+class LaravelAdapter extends AbstractDatabase {
 
     protected $escape = [];
-
-    function __construct($config = null)
-    {
-    }
 
     public function connect()
     {

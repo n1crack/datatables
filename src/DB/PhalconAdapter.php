@@ -9,6 +9,7 @@ class PhalconAdapter implements DatabaseInterface
     protected $db;
     protected $escape = [];
 
+    // @todo this constructor does not satisfy the loose Database interface types / behavior expectations
     function __construct($di, $serviceName = "db")
     {
         $this->db = $di->get($serviceName);

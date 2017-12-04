@@ -1,12 +1,13 @@
 <?php namespace Ozdemir\Datatables\DB;
 
-class CodeigniterAdapter implements DatabaseInterface {
+class CodeigniterAdapter extends AbstractDatabase {
 
     protected $escape = [];
     protected $CI;
 
     function __construct($config = null)
     {
+        parent::__construct($config);
         $this->CI =& get_instance();
         $this->CI->load->database();
     }

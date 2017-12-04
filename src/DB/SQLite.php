@@ -3,26 +3,22 @@
 use PDO;
 use PDOException;
 
-class SQLite implements DatabaseInterface {
+class SQLite extends AbstractDatabase {
 
     protected $pdo;
     protected $config;
     protected $escape = [];
 
-    function __construct($config)
-    {
-        $this->config = $config;
-    }
-
     public function connect()
     {
         try {
             $this->pdo = new PDO('sqlite:' . $this->config);
+            $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch ( PDOException $e ){
-            print $e->getMessage();
+            $this->errorBag->add($e->getMessage());
+        } finally {
+            return $this;
         }
-        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $this;
     }
 
     public function query($query)

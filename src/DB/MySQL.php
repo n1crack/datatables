@@ -3,16 +3,19 @@
 use PDO;
 use PDOException;
 
-class MySQL implements DatabaseInterface {
+class MySQL extends AbstractDatabase {
 
+    /**
+     * @var PDO
+     */
     protected $pdo;
-    protected $config;
-    protected $escape = [];
 
-    function __construct($config)
-    {
-        $this->config = $config;
-    }
+    protected $config;
+
+    /**
+     * @var array
+     */
+    protected $escape = [];
 
     public function connect()
     {
@@ -25,11 +28,12 @@ class MySQL implements DatabaseInterface {
 
         try {
             $this->pdo = new PDO("mysql:host=$host;dbname=$database;port=$port;charset=$charset", "$user", "$pass");
+            $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch ( PDOException $e ){
-            print $e->getMessage();
+            $this->errorBag->add($e->getMessage());
+        } finally {
+            return $this;
         }
-        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $this;
     }
 
     public function query($query)
