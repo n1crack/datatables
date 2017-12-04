@@ -16,7 +16,7 @@ abstract class AbstractDatabase implements DatabaseInterface
     /**
      * @var array
      */
-    private $config;
+    protected $config;
 
     public function __construct($config)
     {
