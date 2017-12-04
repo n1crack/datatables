@@ -1,8 +1,4 @@
-<?php
-
-
-namespace Ozdemir\Datatables\DB;
-
+<?php namespace Ozdemir\Datatables\DB;
 
 use Ozdemir\Datatables\Bags\ErrorBag;
 

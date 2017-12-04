@@ -1,7 +1,4 @@
-<?php
-
-
-namespace Ozdemir\Datatables\Bags;
+<?php namespace Ozdemir\Datatables\Bags;
 
 
 class ErrorBag extends AbstractIterator
@@ -9,16 +6,22 @@ class ErrorBag extends AbstractIterator
     /**
      * @param string $element
      */
-    public function add(string $element) : void
+    public function add(string $element)
     {
         $this->bag[] = $element;
     }
 
-    public function isEmpty() : bool
+    /**
+     * @return bool
+     */
+    public function isEmpty()
     {
         return empty($this->bag);
     }
 
+    /**
+     * @return int
+     */
     public function size()
     {
         return count($this->bag);

@@ -1,7 +1,4 @@
-<?php
-
-
-namespace Ozdemir\Datatables\Bags;
+<?php namespace Ozdemir\Datatables\Bags;
 
 
 abstract class AbstractIterator implements \Iterator
