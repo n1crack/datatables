@@ -3,13 +3,21 @@
 use PDO;
 use PDOException;
 
+/**
+ * Class SQLite
+ * @package Ozdemir\Datatables\DB
+ */
 class SQLite extends AbstractDatabase
 {
 
+    /** @var  PDO */
     protected $pdo;
     protected $config;
     protected $escape = [];
 
+    /**
+     * @return $this
+     */
     public function connect()
     {
         try {
@@ -22,6 +30,10 @@ class SQLite extends AbstractDatabase
         }
     }
 
+    /**
+     * @param $query
+     * @return array
+     */
     public function query($query)
     {
         $sql = $this->pdo->prepare($query);
@@ -29,6 +41,10 @@ class SQLite extends AbstractDatabase
         return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @param $query
+     * @return int
+     */
     public function count($query)
     {
         $sql = $this->pdo->prepare($query);
@@ -36,6 +52,10 @@ class SQLite extends AbstractDatabase
         return count($sql->fetchAll());
     }
 
+    /**
+     * @param $string
+     * @return string
+     */
     public function escape($string)
     {
         $this->escape[':escape' . (count($this->escape) + 1)] = '%' . $string . '%';

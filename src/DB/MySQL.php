@@ -3,6 +3,10 @@
 use PDO;
 use PDOException;
 
+/**
+ * Class MySQL
+ * @package Ozdemir\Datatables\DB
+ */
 class MySQL extends AbstractDatabase
 {
 
@@ -18,6 +22,9 @@ class MySQL extends AbstractDatabase
      */
     protected $escape = [];
 
+    /**
+     * @return $this
+     */
     public function connect()
     {
         $host = $this->config['host'];
@@ -37,6 +44,10 @@ class MySQL extends AbstractDatabase
         }
     }
 
+    /**
+     * @param $query
+     * @return array
+     */
     public function query($query)
     {
         $sql = $this->pdo->prepare($query);
@@ -45,6 +56,10 @@ class MySQL extends AbstractDatabase
         return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @param $query
+     * @return int
+     */
     public function count($query)
     {
         $sql = $this->pdo->prepare($query);
@@ -53,6 +68,10 @@ class MySQL extends AbstractDatabase
         return $sql->rowCount();
     }
 
+    /**
+     * @param $string
+     * @return string
+     */
     public function escape($string)
     {
         $this->escape[':escape' . (count($this->escape) + 1)] = '%' . $string . '%';

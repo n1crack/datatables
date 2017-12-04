@@ -1,6 +1,10 @@
 <?php namespace Ozdemir\Datatables\Bags;
 
 
+/**
+ * Class AbstractIterator
+ * @package Ozdemir\Datatables\Bags
+ */
 abstract class AbstractIterator implements \Iterator
 {
     /**
