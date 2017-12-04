@@ -2,7 +2,8 @@
 
 namespace Ozdemir\Datatables\DB;
 
-interface DatabaseInterface {
+interface DatabaseInterface
+{
 
     public function __construct($config);
 

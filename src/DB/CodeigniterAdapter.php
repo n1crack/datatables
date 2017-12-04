@@ -1,6 +1,7 @@
 <?php namespace Ozdemir\Datatables\DB;
 
-class CodeigniterAdapter extends AbstractDatabase {
+class CodeigniterAdapter extends AbstractDatabase
+{
 
     protected $escape = [];
     protected $CI;
@@ -19,7 +20,7 @@ class CodeigniterAdapter extends AbstractDatabase {
 
     public function query($query)
     {
-        $data =  $this->CI->db->query($query, $this->escape);
+        $data = $this->CI->db->query($query, $this->escape);
 
         return $data->result_array();
     }
@@ -27,7 +28,7 @@ class CodeigniterAdapter extends AbstractDatabase {
     public function count($query)
     {
         $query = "Select count(*) as rowcount from ($query)t";
-        $data =  $this->CI->db->query($query, $this->escape)->result_array();
+        $data = $this->CI->db->query($query, $this->escape)->result_array();
 
         return $data[0]['rowcount'];
     }

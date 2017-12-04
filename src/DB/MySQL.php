@@ -3,7 +3,8 @@
 use PDO;
 use PDOException;
 
-class MySQL extends AbstractDatabase {
+class MySQL extends AbstractDatabase
+{
 
     /**
      * @var PDO
@@ -29,7 +30,7 @@ class MySQL extends AbstractDatabase {
         try {
             $this->pdo = new PDO("mysql:host=$host;dbname=$database;port=$port;charset=$charset", "$user", "$pass");
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        } catch ( PDOException $e ){
+        } catch (PDOException $e) {
             $this->errorBag->add($e->getMessage());
         } finally {
             return $this;
@@ -39,7 +40,7 @@ class MySQL extends AbstractDatabase {
     public function query($query)
     {
         $sql = $this->pdo->prepare($query);
-        $rows=$sql->execute($this->escape);
+        $rows = $sql->execute($this->escape);
 
         return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -47,14 +48,14 @@ class MySQL extends AbstractDatabase {
     public function count($query)
     {
         $sql = $this->pdo->prepare($query);
-        $rows=$sql->execute($this->escape);
+        $rows = $sql->execute($this->escape);
 
         return $sql->rowCount();
     }
 
     public function escape($string)
     {
-        $this->escape[':escape' . (count($this->escape) + 1) ] = '%' . $string . '%';
+        $this->escape[':escape' . (count($this->escape) + 1)] = '%' . $string . '%';
 
         return ":escape" . (count($this->escape));
     }

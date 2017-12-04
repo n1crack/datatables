@@ -3,7 +3,8 @@
 use PDO;
 use PDOException;
 
-class SQLite extends AbstractDatabase {
+class SQLite extends AbstractDatabase
+{
 
     protected $pdo;
     protected $config;
@@ -14,7 +15,7 @@ class SQLite extends AbstractDatabase {
         try {
             $this->pdo = new PDO('sqlite:' . $this->config);
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        } catch ( PDOException $e ){
+        } catch (PDOException $e) {
             $this->errorBag->add($e->getMessage());
         } finally {
             return $this;
@@ -24,7 +25,7 @@ class SQLite extends AbstractDatabase {
     public function query($query)
     {
         $sql = $this->pdo->prepare($query);
-        $rows=$sql->execute($this->escape);
+        $rows = $sql->execute($this->escape);
         return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -37,7 +38,7 @@ class SQLite extends AbstractDatabase {
 
     public function escape($string)
     {
-        $this->escape[':escape' . (count($this->escape) + 1) ] = '%' . $string . '%';
+        $this->escape[':escape' . (count($this->escape) + 1)] = '%' . $string . '%';
         return ":escape" . (count($this->escape));
     }
 
