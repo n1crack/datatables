@@ -51,7 +51,7 @@ class MySQL extends AbstractDatabase
     public function query($query)
     {
         $sql = $this->pdo->prepare($query);
-        $rows = $sql->execute($this->escape);
+        $sql->execute($this->escape);
 
         return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -63,7 +63,7 @@ class MySQL extends AbstractDatabase
     public function count($query)
     {
         $sql = $this->pdo->prepare($query);
-        $rows = $sql->execute($this->escape);
+        $sql->execute($this->escape);
 
         return $sql->rowCount();
     }
