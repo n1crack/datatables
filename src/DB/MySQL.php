@@ -28,7 +28,7 @@ class MySQL extends AbstractDatabase
     public function connect()
     {
         $host = $this->config['host'];
-        $port = $this->config['port'];
+        $port = isset($this->config['port']) ?: 3306;
         $user = $this->config['username'];
         $pass = $this->config['password'];
         $database = $this->config['database'];
