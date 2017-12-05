@@ -1,6 +1,9 @@
 <?php namespace Ozdemir\Datatables;
 
+use Illuminate\Http\Request;
 use Ozdemir\Datatables\DB\DatabaseInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class Datatables
@@ -22,13 +25,19 @@ class Datatables
     protected $hasOrderIn;
 
     /**
+     * @var array
+     */
+    private $input = [];
+
+    /**
      * Datatables constructor.
      * @param DatabaseInterface $db
+     * @param ServerRequestInterface $request
      */
-    function __construct(DatabaseInterface $db)
+    function __construct(DatabaseInterface $db, ServerRequestInterface $request)
     {
         $this->db = $db->connect();
-        $this->input = isset($_POST["draw"]) ? $_POST : $_GET;
+        $this->input = $request->getParsedBody()?:$request->getQueryParams();
     }
 
     /**
@@ -254,7 +263,7 @@ class Datatables
 
     /**
      * @param bool $json
-     * @return string
+     * @return string|array
      */
     public function generate($json = true)
     {
@@ -318,15 +327,11 @@ class Datatables
 
     /**
      * @param $input
-     * @return bool
+     * @return array
      */
     public function input($input)
     {
-        if (isset($this->input[$input])) {
-            return $this->input[$input];
-        }
-
-        return false;
+        return (isset($this->input[$input])) ? $this->input[$input] : [];
     }
 
     /**

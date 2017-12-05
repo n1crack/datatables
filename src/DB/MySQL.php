@@ -15,7 +15,10 @@ class MySQL extends AbstractDatabase
      */
     protected $pdo;
 
-    protected $config;
+    /**
+     * @var array
+     */
+    protected $config = null;
 
     /**
      * @var array
