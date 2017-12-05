@@ -26,6 +26,11 @@ class MySQL extends AbstractDatabase
     protected $escape = [];
 
     /**
+     * @var array
+     */
+    protected $bindings = [];
+
+    /**
      * @return $this
      */
     public function connect()
@@ -49,24 +54,28 @@ class MySQL extends AbstractDatabase
 
     /**
      * @param $query
+     * @param array $bindings
      * @return array
      */
-    public function query($query)
+    public function query($query, $bindings = [])
     {
         $sql = $this->pdo->prepare($query);
-        $sql->execute($this->escape);
+
+        $sql->execute(array_merge($this->bindings, $this->escape));
 
         return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
      * @param $query
+     * @param array $bindings
      * @return int
      */
-    public function count($query)
+    public function count($query, $bindings = [])
     {
         $sql = $this->pdo->prepare($query);
-        $sql->execute($this->escape);
+
+        $sql->execute(array_merge($this->bindings, $this->escape));
 
         return $sql->rowCount();
     }
@@ -80,6 +89,16 @@ class MySQL extends AbstractDatabase
         $this->escape[':escape' . (count($this->escape) + 1)] = '%' . $string . '%';
 
         return ":escape" . (count($this->escape));
+    }
+
+    /**
+     * @param string $parameter
+     * @param string $value
+     * @return void
+     */
+    public function bind($parameter, $value)
+    {
+        $this->bindings[$parameter] = $value;
     }
 
 }

@@ -1,8 +1,7 @@
 <?php namespace Ozdemir\Datatables;
 
-use Illuminate\Http\Request;
 use Ozdemir\Datatables\DB\DatabaseInterface;
-use Psr\Http\Message\RequestInterface;
+use Ozdemir\Datatables\DB\MySQL;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -12,6 +11,9 @@ use Psr\Http\Message\ServerRequestInterface;
 class Datatables
 {
 
+    /**
+     * @var MySQL
+     */
     protected $db;
     protected $data;
     protected $recordstotal;

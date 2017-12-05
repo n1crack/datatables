@@ -5,7 +5,7 @@
  * Class ErrorBag
  * @package Ozdemir\Datatables\Bags
  */
-class ErrorBag extends AbstractIterator
+class Bag extends AbstractIterator
 {
     /**
      * @param string $element
