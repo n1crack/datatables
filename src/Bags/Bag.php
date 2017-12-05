@@ -1,7 +1,11 @@
 <?php namespace Ozdemir\Datatables\Bags;
 
 
-class ErrorBag extends AbstractIterator
+/**
+ * Class ErrorBag
+ * @package Ozdemir\Datatables\Bags
+ */
+class Bag extends AbstractIterator
 {
     /**
      * @param string $element
