@@ -3,6 +3,7 @@
 namespace Ozdemir\Datatables;
 
 use Ozdemir\Datatables\DB\DatabaseInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class Datatables {
 
@@ -17,11 +18,12 @@ class Datatables {
     protected $sql;
     protected $query;
     protected $hasOrderIn;
+    protected $request;
 
-    function __construct(DatabaseInterface $db)
+    function __construct(DatabaseInterface $db, Request $request = null)
     {
         $this->db = $db->connect();
-        $this->input = isset($_POST["draw"]) ? $_POST : $_GET;
+        $this->request = $request ?: (Request::createFromGlobals());
     }
 
     public function query($query)
@@ -82,7 +84,7 @@ class Datatables {
         $filterglobal = $this->filterglobal();
         $filterindividual = $this->filterindividual();
 
-        if ( ! $filterindividual && ! $filterglobal)
+        if (!$filterindividual && !$filterglobal)
         {
             return null;
         }
@@ -102,10 +104,10 @@ class Datatables {
 
     protected function filterglobal()
     {
-        $searchinput = $this->input('search')['value'];
-        $allcolumns = $this->input('columns');
+        $searchinput = $this->request->get('search')["value"];
+        $allcolumns = $this->request->get('columns');
 
-        if ($searchinput == '')
+        if ($searchinput == null)
         {
             return null;
         }
@@ -117,10 +119,10 @@ class Datatables {
             $lookfor = [];
             foreach ($this->columns as $key => $column)
             {
-				if(array_key_exists($key,$allcolumns)){
-					if ($allcolumns[ $key ]['searchable'] == 'true')
-						$lookfor[] = $column . " LIKE " . $this->db->escape($word) . "";
-				}
+                if(array_key_exists($key,$allcolumns)){
+                    if ($allcolumns[ $key ]['searchable'] == 'true')
+                        $lookfor[] = $column . " LIKE " . $this->db->escape($word) . "";
+                }
             }
             $search[] = "(" . implode(" OR ", $lookfor) . ")";
         }
@@ -130,7 +132,7 @@ class Datatables {
 
     protected function filterindividual()
     {
-        $allcolumns = $this->input('columns');
+        $allcolumns = $this->request->get('columns');
 
         $search = " (";
         $lookfor = [];
@@ -184,14 +186,14 @@ class Datatables {
     protected function limit()
     {
         $take = 10;
-        $skip = (integer) $this->input('start');
+        $skip = (integer) $this->request->get('start');
 
-        if ($this->input('length'))
+        if ($this->request->get('length'))
         {
-            $take = (integer) $this->input('length');
+            $take = (integer) $this->request->get('length');
         }
 
-        if ($take == - 1 || ! $this->input('draw'))
+        if ($take == - 1 || ! $this->request->get('draw'))
         {
             return null;
         }
@@ -201,7 +203,7 @@ class Datatables {
 
     protected function orderby()
     {
-        $dtorders = $this->input('order');
+        $dtorders = $this->request->get('order');
         $orders = " ORDER BY ";
         $dir = ['asc' => 'asc', 'desc' => 'desc'];
 
@@ -235,7 +237,7 @@ class Datatables {
             {
                 foreach ($this->add as $new_column => $closure)
                 {
-                    $row[ $new_column ] = $closure($row);
+                    $row[$new_column] = $closure($row);
                 }
             }
 
@@ -256,7 +258,7 @@ class Datatables {
             $formatted_data[] = $this->isIndexed($row);
         }
 
-        $response['draw'] = $this->input('draw');
+        $response['draw'] = (integer)$this->request->get('draw');
         $response['recordsTotal'] = $this->recordstotal;
         $response['recordsFiltered'] = $this->recordsfiltered;
         $response['data'] = $formatted_data;
@@ -276,16 +278,6 @@ class Datatables {
         $this->edit[ $column ] = $closure;
 
         return $this;
-    }
-
-    public function input($input)
-    {
-        if (isset($this->input[ $input ]))
-        {
-            return $this->input[ $input ];
-        }
-
-        return false;
     }
 
     protected function column($input)
@@ -312,7 +304,8 @@ class Datatables {
 
     protected function isIndexed($row) // if data source uses associative keys or index number
     {
-        $column = $this->input('columns');
+        $column = $this->request->get('columns');
+
         if (is_numeric($column[0]['data']))
         {
             return array_values($row);

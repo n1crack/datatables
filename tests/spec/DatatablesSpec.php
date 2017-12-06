@@ -2,28 +2,30 @@
 
 namespace spec\Ozdemir\Datatables;
 
-use Ozdemir\Datatables\DB\MySQL;
 use Ozdemir\Datatables\DB\SQLite;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
+use Symfony\Component\HttpFoundation\Request;
 
-class DatatablesSpec extends ObjectBehavior {
+class DatatablesSpec extends ObjectBehavior
+{
+    private $request;
 
     function let()
     {
-        $sqlconfig = realpath(dirname(__FILE__) . '/test.db');
+        $sqlconfig = realpath(dirname(__FILE__).'/test.db');
         $db = new SQLite($sqlconfig);
 
-        $this->beConstructedWith($db);
+        $this->request = Request::create(null, 'GET', ['draw' => 1]);
+
+        $this->beConstructedWith($db, $this->request);
     }
 
     public function getMatchers()
     {
         return [
-            'haveColumns' => function ($subject, $key)
-            {
+            'haveColumns' => function ($subject, $key) {
                 return (array_keys($subject) === $key);
-            }
+            },
         ];
     }
 
@@ -67,20 +69,17 @@ class DatatablesSpec extends ObjectBehavior {
 
         $data->shouldHaveCount(3); //  name, surname and age --
         $this->get('columns')->shouldReturn(['name', 'surname', 'age']);
-
     }
 
     public function it_returns_modified_data_via_closure_function()
     {
         $this->query("Select id as fid, name, surname, age from mytable");
 
-        $this->edit('name', function ($data)
-        {
+        $this->edit('name', function ($data) {
             return strtolower($data['name']);
         });
 
-        $this->edit('surname', function ($data)
-        {
+        $this->edit('surname', function ($data) {
             return $this->customfunction($data['surname']);
         });
 
@@ -92,7 +91,7 @@ class DatatablesSpec extends ObjectBehavior {
 
     function customfunction($data)
     {
-        return substr($data, 0, 3) . '...';
+        return substr($data, 0, 3).'...';
     }
 
     public function it_returns_column_names_from_query_that_includes_a_subquery_in_select_statement()
@@ -122,5 +121,38 @@ class DatatablesSpec extends ObjectBehavior {
             AND cp.COLUMN_NAME = COLUMNS.COLUMN_NAME) is not null;");
 
         $dt->get('columns')->shouldReturn(['column_name']);
+    }
+
+    public function it_filters_data_via_global_search()
+    {
+        $this->request->query->set('search', ['value' => 'doe']);
+
+        $this->request->query->set('columns', [
+            ['data' => 0, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->query("Select  name, surname from mytable");
+        $datatables = $this->generate(false);
+
+        $datatables['recordsTotal']->shouldReturn(11);
+        $datatables['recordsFiltered']->shouldReturn(2);
+    }
+
+    public function it_sorts_data_via_sorting()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => 1, 'dir' => 'desc']]); //surname-desc
+
+        $this->request->query->set('columns', [
+            ['data' => 0, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 2, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->query("Select name, surname, age from mytable");
+        $datatables = $this->generate(false);
+
+        $datatables['data'][0]->shouldReturn(["Todd", "Wycoff", "36"]);
     }
 }

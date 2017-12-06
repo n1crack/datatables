@@ -27,9 +27,17 @@ Put a file named `composer.json` at the root of your project, containing this in
         }
     }
 
-And then run: `composer install`
+And then run: 
 
-Or just run : `composer require ozdemir/datatables`
+```
+composer install
+```
+
+Or just run : 
+
+```
+composer require ozdemir/datatables
+```
 
 Add the autoloader to your project:
 
@@ -113,9 +121,9 @@ This is the list of available public methods.
 ```
 
 ## Requirements
-
-DataTables > 1.10  
-PHP > 5.3.7  
+Composer
+DataTables > 1.10
+PHP > 5.6
 
 ## License
 
