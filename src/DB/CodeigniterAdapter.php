@@ -1,8 +1,9 @@
 <?php namespace Ozdemir\Datatables\DB;
 
-class CodeigniterAdapter implements DatabaseInterface {
-
+class CodeigniterAdapter implements DatabaseInterface
+{
     protected $escape = [];
+
     protected $CI;
 
     function __construct($config = null)
@@ -18,7 +19,7 @@ class CodeigniterAdapter implements DatabaseInterface {
 
     public function query($query)
     {
-        $data =  $this->CI->db->query($query, $this->escape);
+        $data = $this->CI->db->query($query, $this->escape);
 
         return $data->result_array();
     }
@@ -26,16 +27,15 @@ class CodeigniterAdapter implements DatabaseInterface {
     public function count($query)
     {
         $query = "Select count(*) as rowcount from ($query)t";
-        $data =  $this->CI->db->query($query, $this->escape)->result_array();
+        $data = $this->CI->db->query($query, $this->escape)->result_array();
 
         return $data[0]['rowcount'];
     }
 
     public function escape($string)
     {
-        $this->escape[] = '%' . $string . '%';
+        $this->escape[] = '%'.$string.'%';
 
         return "?";
     }
-
 }

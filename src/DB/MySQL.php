@@ -3,10 +3,12 @@
 use PDO;
 use PDOException;
 
-class MySQL implements DatabaseInterface {
-
+class MySQL implements DatabaseInterface
+{
     protected $pdo;
+
     protected $config;
+
     protected $escape = [];
 
     function __construct($config)
@@ -25,17 +27,18 @@ class MySQL implements DatabaseInterface {
 
         try {
             $this->pdo = new PDO("mysql:host=$host;dbname=$database;port=$port;charset=$charset", "$user", "$pass");
-        } catch ( PDOException $e ){
+        } catch (PDOException $e) {
             print $e->getMessage();
         }
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
         return $this;
     }
 
     public function query($query)
     {
         $sql = $this->pdo->prepare($query);
-        $rows=$sql->execute($this->escape);
+        $rows = $sql->execute($this->escape);
 
         return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -43,16 +46,15 @@ class MySQL implements DatabaseInterface {
     public function count($query)
     {
         $sql = $this->pdo->prepare($query);
-        $rows=$sql->execute($this->escape);
+        $rows = $sql->execute($this->escape);
 
         return $sql->rowCount();
     }
 
     public function escape($string)
     {
-        $this->escape[':escape' . (count($this->escape) + 1) ] = '%' . $string . '%';
+        $this->escape[':escape'.(count($this->escape) + 1)] = '%'.$string.'%';
 
-        return ":escape" . (count($this->escape));
+        return ":escape".(count($this->escape));
     }
-
 }

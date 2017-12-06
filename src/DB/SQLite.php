@@ -3,10 +3,12 @@
 use PDO;
 use PDOException;
 
-class SQLite implements DatabaseInterface {
-
+class SQLite implements DatabaseInterface
+{
     protected $pdo;
+
     protected $config;
+
     protected $escape = [];
 
     function __construct($config)
@@ -17,18 +19,20 @@ class SQLite implements DatabaseInterface {
     public function connect()
     {
         try {
-            $this->pdo = new PDO('sqlite:' . $this->config);
-        } catch ( PDOException $e ){
+            $this->pdo = new PDO('sqlite:'.$this->config);
+        } catch (PDOException $e) {
             print $e->getMessage();
         }
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
         return $this;
     }
 
     public function query($query)
     {
         $sql = $this->pdo->prepare($query);
-        $rows=$sql->execute($this->escape);
+        $rows = $sql->execute($this->escape);
+
         return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -36,13 +40,14 @@ class SQLite implements DatabaseInterface {
     {
         $sql = $this->pdo->prepare($query);
         $rows = $sql->execute($this->escape);
+
         return count($sql->fetchAll());
     }
 
     public function escape($string)
     {
-        $this->escape[':escape' . (count($this->escape) + 1) ] = '%' . $string . '%';
-        return ":escape" . (count($this->escape));
-    }
+        $this->escape[':escape'.(count($this->escape) + 1)] = '%'.$string.'%';
 
+        return ":escape".(count($this->escape));
+    }
 }

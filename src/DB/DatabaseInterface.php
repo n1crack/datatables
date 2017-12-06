@@ -2,8 +2,8 @@
 
 namespace Ozdemir\Datatables\DB;
 
-interface DatabaseInterface {
-
+interface DatabaseInterface
+{
     public function __construct($config);
 
     public function connect();
@@ -13,5 +13,4 @@ interface DatabaseInterface {
     public function count($query);
 
     public function escape($string);
-
 }

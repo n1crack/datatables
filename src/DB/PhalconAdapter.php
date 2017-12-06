@@ -7,6 +7,7 @@ use \Phalcon\Db;
 class PhalconAdapter implements DatabaseInterface
 {
     protected $db;
+
     protected $escape = [];
 
     function __construct($di, $serviceName = "db")
@@ -22,6 +23,7 @@ class PhalconAdapter implements DatabaseInterface
     public function query($query)
     {
         $data = $this->db->query($query, $this->escape);
+
         return $data->fetchAll(Db::FETCH_ASSOC);
     }
 
@@ -35,8 +37,8 @@ class PhalconAdapter implements DatabaseInterface
 
     public function escape($string)
     {
-        $this->escape[':escape' . (count($this->escape) + 1)] = '%' . $string . '%';
+        $this->escape[':escape'.(count($this->escape) + 1)] = '%'.$string.'%';
 
-        return ":escape" . (count($this->escape));
+        return ":escape".(count($this->escape));
     }
 }
