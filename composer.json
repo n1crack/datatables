@@ -16,7 +16,8 @@
   },
   "minimum-stability": "dev",
   "require-dev": {
-    "phpspec/phpspec": "~2.0"
+    "phpspec/phpspec": "~2.0",
+    "zendframework/zend-diactoros": "^1.6@dev"
   },
   "require": {
     "psr/http-message": "^1.0@dev"

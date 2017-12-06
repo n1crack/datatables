@@ -6,7 +6,12 @@ use Ozdemir\Datatables\DB\MySQL;
 use Ozdemir\Datatables\DB\SQLite;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use Zend\Diactoros\ServerRequest;
 
+/**
+ * Class DatatablesSpec
+ * @package spec\Ozdemir\Datatables
+ */
 class DatatablesSpec extends ObjectBehavior
 {
 
@@ -15,9 +20,41 @@ class DatatablesSpec extends ObjectBehavior
         $sqlconfig = realpath(dirname(__FILE__) . '/test.db');
         $db = new SQLite($sqlconfig);
 
-        $this->beConstructedWith($db);
+        $request = new ServerRequest();
+        $request = $request->withParsedBody([
+            'draw' => '2',
+            'columns' => [
+                0 => [
+                    'data' => 'Test Column',
+                    'name' => '',
+                    'searchable' => 'true',
+                    'orderable' => 'true',
+                    'search' => [
+                        'value' => '',
+                        'regex' => false,
+                    ],
+                ],
+            ],
+            'order' => [
+                0 => [
+                    'column' => "0",
+                    'dir' => 'asc',
+                ],
+            ],
+            'start' => '0',
+            'length' => '20',
+            'search' => [
+                'value' => '',
+                'regex' => 'false',
+            ],
+        ]);
+
+        $this->beConstructedWith($db, $request);
     }
 
+    /**
+     * @return array
+     */
     public function getMatchers()
     {
         return [
