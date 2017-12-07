@@ -17,5 +17,8 @@
   "minimum-stability": "dev",
   "require-dev": {
     "phpspec/phpspec": "~2.0"
+  },
+  "require": {
+    "psr/http-message": "^1.0@dev"
   }
 }

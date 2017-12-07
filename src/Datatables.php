@@ -1,11 +1,19 @@
-<?php
-
-namespace Ozdemir\Datatables;
+<?php namespace Ozdemir\Datatables;
 
 use Ozdemir\Datatables\DB\DatabaseInterface;
+use Ozdemir\Datatables\DB\MySQL;
+use Psr\Http\Message\ServerRequestInterface;
 
-class Datatables {
+/**
+ * Class Datatables
+ * @package Ozdemir\Datatables
+ */
+class Datatables
+{
 
+    /**
+     * @var MySQL
+     */
     protected $db;
     protected $data;
     protected $recordstotal;
@@ -18,12 +26,26 @@ class Datatables {
     protected $query;
     protected $hasOrderIn;
 
-    function __construct(DatabaseInterface $db)
+    /**
+     * @var array
+     */
+    private $input = [];
+
+    /**
+     * Datatables constructor.
+     * @param DatabaseInterface $db
+     * @param ServerRequestInterface $request
+     */
+    function __construct(DatabaseInterface $db, ServerRequestInterface $request)
     {
         $this->db = $db->connect();
-        $this->input = isset($_POST["draw"]) ? $_POST : $_GET;
+        $this->input = $request->getParsedBody()?:$request->getQueryParams();
     }
 
+    /**
+     * @param $query
+     * @return $this
+     */
     public function query($query)
     {
         $this->hasOrderIn = $this->isQueryWithOrderBy($query);
@@ -35,12 +57,15 @@ class Datatables {
         return $this;
     }
 
+    /**
+     * @param $request
+     * @return array
+     */
     public function get($request)
     {
-        switch ($request)
-        {
+        switch ($request) {
             case 'columns':
-                return array_values(array_diff($this->columns, (array) $this->hide));
+                return array_values(array_diff($this->columns, (array)$this->hide));
                 break;
             case 'all_columns':
                 return $this->columns;
@@ -51,18 +76,24 @@ class Datatables {
         }
     }
 
+    /**
+     * @param $columns
+     * @return $this
+     */
     public function hide($columns)
     {
-        if ( ! is_array($columns))
-        {
+        if (!is_array($columns)) {
             $columns = func_get_args();
         }
         $columns = array_intersect($this->columns, $columns);
-        $this->hide = array_merge((array) $this->hide, array_combine($columns, $columns));
+        $this->hide = array_merge((array)$this->hide, array_combine($columns, $columns));
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     protected function execute()
     {
         $this->recordstotal = $this->db->count($this->sql); // unfiltered data count is here.
@@ -75,6 +106,9 @@ class Datatables {
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     protected function filter()
     {
         $search = '';
@@ -82,15 +116,13 @@ class Datatables {
         $filterglobal = $this->filterglobal();
         $filterindividual = $this->filterindividual();
 
-        if ( ! $filterindividual && ! $filterglobal)
-        {
+        if (!$filterindividual && !$filterglobal) {
             return null;
         }
 
         $search .= $filterglobal;
 
-        if ($filterindividual <> null && $filterglobal <> null)
-        {
+        if ($filterindividual <> null && $filterglobal <> null) {
             $search .= ' AND ';
         }
 
@@ -100,27 +132,27 @@ class Datatables {
         return $search;
     }
 
+    /**
+     * @return null|string
+     */
     protected function filterglobal()
     {
         $searchinput = $this->input('search')['value'];
         $allcolumns = $this->input('columns');
 
-        if ($searchinput == '')
-        {
+        if ($searchinput == '') {
             return null;
         }
 
         $search = [];
         $searchinput = preg_replace("/[^\wá-žÁ-Ž]+/", " ", $searchinput);
-        foreach (explode(' ', $searchinput) as $word)
-        {
+        foreach (explode(' ', $searchinput) as $word) {
             $lookfor = [];
-            foreach ($this->columns as $key => $column)
-            {
-				if(array_key_exists($key,$allcolumns)){
-					if ($allcolumns[ $key ]['searchable'] == 'true')
-						$lookfor[] = $column . " LIKE " . $this->db->escape($word) . "";
-				}
+            foreach ($this->columns as $key => $column) {
+                if (array_key_exists($key, $allcolumns)) {
+                    if ($allcolumns[$key]['searchable'] == 'true')
+                        $lookfor[] = $column . " LIKE " . $this->db->escape($word) . "";
+                }
             }
             $search[] = "(" . implode(" OR ", $lookfor) . ")";
         }
@@ -128,6 +160,9 @@ class Datatables {
         return implode(" AND ", $search);
     }
 
+    /**
+     * @return null|string
+     */
     protected function filterindividual()
     {
         $allcolumns = $this->input('columns');
@@ -135,21 +170,17 @@ class Datatables {
         $search = " (";
         $lookfor = [];
 
-        if ( ! $allcolumns)
-        {
+        if (!$allcolumns) {
             return null;
         }
 
-        foreach ($allcolumns as $key)
-        {
-            if ($key['search']['value'] <> "" and $key['searchable'] == 'true')
-            {
+        foreach ($allcolumns as $key) {
+            if ($key['search']['value'] <> "" and $key['searchable'] == 'true') {
                 $lookfor[] = $this->column($key['data']) . " LIKE " . $this->db->escape('%' . $key['search']['value'] . '%') . "";
             }
         }
 
-        if (count($lookfor) > 0)
-        {
+        if (count($lookfor) > 0) {
             $search .= implode(" AND ", $lookfor) . ")";
 
             return $search;
@@ -158,6 +189,10 @@ class Datatables {
         return null;
     }
 
+    /**
+     * @param $query
+     * @return mixed
+     */
     protected function setcolumns($query)
     {
         $query = preg_replace("/\((?:[^()]+|(?R))*+\)/is", "", $query);
@@ -176,82 +211,86 @@ class Datatables {
         return preg_replace($regex, "$2", $columns);
     }
 
+    /**
+     * @param $query
+     * @return bool
+     */
     protected function isQueryWithOrderBy($query)
     {
-        return (bool) count(preg_grep("/(order\s+by)\s+(.+)$/i", explode("\n", $query)));
+        return (bool)count(preg_grep("/(order\s+by)\s+(.+)$/i", explode("\n", $query)));
     }
 
+    /**
+     * @return null|string
+     */
     protected function limit()
     {
         $take = 10;
-        $skip = (integer) $this->input('start');
+        $skip = (integer)$this->input('start');
 
-        if ($this->input('length'))
-        {
-            $take = (integer) $this->input('length');
+        if ($this->input('length')) {
+            $take = (integer)$this->input('length');
         }
 
-        if ($take == - 1 || ! $this->input('draw'))
-        {
+        if ($take == -1 || !$this->input('draw')) {
             return null;
         }
 
         return " LIMIT $take OFFSET $skip";
     }
 
+    /**
+     * @return null|string
+     */
     protected function orderby()
     {
         $dtorders = $this->input('order');
         $orders = " ORDER BY ";
         $dir = ['asc' => 'asc', 'desc' => 'desc'];
 
-        if ( ! is_array($dtorders))
-        {
-            if ($this->hasOrderIn)
-            {
+        if (!is_array($dtorders)) {
+            if ($this->hasOrderIn) {
                 return null;
             }
 
             return $orders . $this->columns[0] . " asc";  // default
         }
 
-        foreach ($dtorders as $order)
-        {
-            $takeorders[] = $this->columns[ $order['column'] ] . " " . $dir[ $order['dir'] ];
+        foreach ($dtorders as $order) {
+            $takeorders[] = $this->columns[$order['column']] . " " . $dir[$order['dir']];
         }
 
         return $orders . implode(",", $takeorders);
     }
 
+    /**
+     * @param bool $json
+     * @return string|array
+     */
     public function generate($json = true)
     {
         $this->execute();
         $formatted_data = [];
 
-        foreach ($this->data as $key => $row)
-        {
+        foreach ($this->data as $key => $row) {
             // new columns..
-            if (count($this->add) > 0)
-            {
-                foreach ($this->add as $new_column => $closure)
-                {
-                    $row[ $new_column ] = $closure($row);
+            if (count($this->add) > 0) {
+                foreach ($this->add as $new_column => $closure) {
+                    $row[$new_column] = $closure($row);
                 }
             }
 
             // editing columns..
-            if (count($this->edit) > 0)
-            {
-                foreach ($this->edit as $edit_column => $closure)
-                {
-                    if (isset($row[ $edit_column ])) {
-                        $row[ $edit_column ] = $closure($row);
+            if (count($this->edit) > 0) {
+                foreach ($this->edit as $edit_column => $closure) {
+                    if (isset($row[$edit_column])) {
+                        $row[$edit_column] = $closure($row);
                     }
                 }
             }
 
             // hide unwanted columns from output
-            $row = array_diff_key($row, (array) $this->hide);
+            $row = array_diff_key($row, (array)$this->hide);
 
             $formatted_data[] = $this->isIndexed($row);
         }
@@ -264,44 +303,60 @@ class Datatables {
         return $this->response($response, $json);
     }
 
+    /**
+     * @param $newColumn
+     * @param $closure
+     * @return $this
+     */
     public function add($newColumn, $closure)
     {
-        $this->add[ $newColumn ] =  $closure;
+        $this->add[$newColumn] = $closure;
 
         return $this;
     }
 
+    /**
+     * @param $column
+     * @param $closure
+     * @return $this
+     */
     public function edit($column, $closure)
     {
-        $this->edit[ $column ] = $closure;
+        $this->edit[$column] = $closure;
 
         return $this;
     }
 
+    /**
+     * @param $input
+     * @return array
+     */
     public function input($input)
     {
-        if (isset($this->input[ $input ]))
-        {
-            return $this->input[ $input ];
-        }
-
-        return false;
+        return (isset($this->input[$input])) ? $this->input[$input] : [];
     }
 
+    /**
+     * @param $input
+     * @return mixed
+     */
     protected function column($input)
     {
-        if (is_numeric($input))
-        {
-            return $this->columns[ $input ];
+        if (is_numeric($input)) {
+            return $this->columns[$input];
         }
 
         return $input;
     }
 
+    /**
+     * @param $data
+     * @param bool $json
+     * @return string
+     */
     protected function response($data, $json = true)
     {
-        if ($json)
-        {
+        if ($json) {
             header('Content-type: application/json');
 
             return json_encode($data);
@@ -310,17 +365,26 @@ class Datatables {
         return $data;
     }
 
+    /**
+     * @param $row
+     * @return array
+     */
     protected function isIndexed($row) // if data source uses associative keys or index number
     {
         $column = $this->input('columns');
-        if (is_numeric($column[0]['data']))
-        {
+        if (is_numeric($column[0]['data'])) {
             return array_values($row);
         }
 
         return $row;
     }
 
+    /**
+     * @param $str
+     * @param $open
+     * @param $close
+     * @return int
+     */
     protected function balanceChars($str, $open, $close)
     {
         $openCount = substr_count($str, $open);
@@ -330,25 +394,29 @@ class Datatables {
         return $retval;
     }
 
+    /**
+     * @param $delimiter
+     * @param $str
+     * @param string $open
+     * @param string $close
+     * @return array
+     */
     protected function explode($delimiter, $str, $open = '(', $close = ')')
     {
         $retval = array();
         $hold = array();
         $balance = 0;
         $parts = explode($delimiter, $str);
-        foreach ($parts as $part)
-        {
+        foreach ($parts as $part) {
             $hold[] = $part;
             $balance += $this->balanceChars($part, $open, $close);
-            if ($balance < 1)
-            {
+            if ($balance < 1) {
                 $retval[] = implode($delimiter, $hold);
                 $hold = array();
                 $balance = 0;
             }
         }
-        if (count($hold) > 0)
-        {
+        if (count($hold) > 0) {
             $retval[] = implode($delimiter, $hold);
         }
 
