@@ -58,7 +58,7 @@ class DatatablesSpec extends ObjectBehavior
                   film.rental_rate,
                   film.length as mins
             from film");
-        $this->get('all_columns')->shouldReturn(['fid', 'title', 'info', 'r_year', 'rental_rate', 'mins']);
+        $this->get('columns')->shouldReturn(['fid', 'title', 'info', 'r_year', 'rental_rate', 'mins']);
     }
 
     public function it_hides_unnecessary_columns_from_output()
@@ -155,4 +155,5 @@ class DatatablesSpec extends ObjectBehavior
 
         $datatables['data'][0]->shouldReturn(["Todd", "Wycoff", "36"]);
     }
+
 }

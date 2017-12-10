@@ -5,87 +5,125 @@ namespace Ozdemir\Datatables;
 use Ozdemir\Datatables\DB\DatabaseInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Class Datatables
+ *
+ * @package Ozdemir\Datatables
+ */
 class Datatables
 {
+    /**
+     * @var \Ozdemir\Datatables\DB\DatabaseInterface
+     */
     protected $db;
 
+    /**
+     * @var
+     */
     protected $data;
 
+    /**
+     * @var
+     */
     protected $recordstotal;
 
+    /**
+     * @var
+     */
     protected $recordsfiltered;
 
+    /**
+     * @var \Ozdemir\Datatables\Columns
+     */
     protected $columns;
 
-    protected $add;
-
-    protected $edit;
-
-    protected $hide;
-
-    protected $sql;
-
+    /**
+     * @var \Ozdemir\Datatables\Query
+     */
     protected $query;
 
-    protected $hasOrderIn;
-
+    /**
+     * @var \Symfony\Component\HttpFoundation\Request
+     */
     protected $request;
 
+    /**
+     * Datatables constructor.
+     *
+     * @param \Ozdemir\Datatables\DB\DatabaseInterface $db
+     * @param \Symfony\Component\HttpFoundation\Request|null $request
+     */
     function __construct(DatabaseInterface $db, Request $request = null)
     {
         $this->db = $db->connect();
         $this->request = $request ?: (Request::createFromGlobals());
     }
 
+    /**
+     * @param $query
+     * @return $this
+     */
     public function query($query)
     {
-        $this->hasOrderIn = $this->isQueryWithOrderBy($query);
-        $this->columns = $this->setcolumns($query);
-        $columns = implode(", ", $this->columns);
-        $query = rtrim($query, "; ");
-        $this->sql = "Select $columns from ($query)t";
+        $this->query = new Query($query);
+
+        $this->columns = new Columns($this->query->bare, $this->request);
+
+        $this->query->set(implode(", ", $this->columns->list));
 
         return $this;
     }
 
+    /**
+     * @param $request
+     * @return array
+     */
     public function get($request)
     {
         switch ($request) {
             case 'columns':
-                return array_values(array_diff($this->columns, (array) $this->hide));
+                return $this->columns->list;
                 break;
-            case 'all_columns':
-                return $this->columns;
-                break;
-            case 'sql':
-                return $this->query;
+            case 'query':
+                return $this->query->full;
                 break;
         }
     }
 
+    /**
+     * @param $columns
+     * @return $this
+     */
     public function hide($columns)
     {
         if (! is_array($columns)) {
             $columns = func_get_args();
         }
-        $columns = array_intersect($this->columns, $columns);
-        $this->hide = array_merge((array) $this->hide, array_combine($columns, $columns));
+        foreach ($columns as $name) {
+            $this->columns->hide($name, true);
+        }
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     protected function execute()
     {
-        $this->recordstotal = $this->db->count($this->sql); // unfiltered data count is here.
+        $this->recordstotal = $this->db->count($this->query->base); // unfiltered data count is here.
         $where = $this->filter();
-        $this->recordsfiltered = $this->db->count($this->sql.$where);  // filtered data count is here.
-        $this->query = $this->sql.$where.$this->orderby().$this->limit();
+        $this->recordsfiltered = $this->db->count($this->query->base.$where);  // filtered data count is here.
 
-        $this->data = $this->db->query($this->query);
+        $this->query->full = $this->query->base.$where.$this->orderby().$this->limit();
+        $this->data = $this->db->query($this->query->full);
 
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     protected function filter()
     {
         $search = '';
@@ -109,10 +147,12 @@ class Datatables
         return $search;
     }
 
+    /**
+     * @return null|string
+     */
     protected function filterglobal()
     {
         $searchinput = $this->request->get('search')["value"];
-        $allcolumns = $this->request->get('columns');
 
         if ($searchinput == null) {
             return null;
@@ -121,39 +161,42 @@ class Datatables
         $search = [];
         $searchinput = preg_replace("/[^\wá-žÁ-Ž]+/", " ", $searchinput);
         foreach (explode(' ', $searchinput) as $word) {
-            $lookfor = [];
-            foreach ($this->columns as $key => $column) {
-                if (array_key_exists($key, $allcolumns)) {
-                    if ($allcolumns[$key]['searchable'] == 'true') {
-                        $lookfor[] = $column." LIKE ".$this->db->escape($word)."";
-                    }
+            $look = [];
+
+            foreach ($this->columns->list as $column) {
+                if ($this->columns->isSearchable($column)) {
+                    $look[] = $column." LIKE ".$this->db->escape($word);
                 }
             }
-            $search[] = "(".implode(" OR ", $lookfor).")";
+
+            $search[] = "(".implode(" OR ", $look).")";
         }
 
         return implode(" AND ", $search);
     }
 
+    /**
+     * @return null|string
+     */
     protected function filterindividual()
     {
         $allcolumns = $this->request->get('columns');
 
         $search = " (";
-        $lookfor = [];
+        $look = [];
 
         if (! $allcolumns) {
             return null;
         }
 
-        foreach ($allcolumns as $key) {
-            if ($key['search']['value'] <> "" and $key['searchable'] == 'true') {
-                $lookfor[] = $this->column($key['data'])." LIKE ".$this->db->escape('%'.$key['search']['value'].'%')."";
+        foreach ($this->columns->list as $name) {
+            if ($this->columns->isSearching($name) != '' and $this->columns->isSearchable($name)) {
+                $look[] = $name." LIKE ".$this->db->escape('%'.$this->columns->isSearching($name).'%')."";
             }
         }
 
-        if (count($lookfor) > 0) {
-            $search .= implode(" AND ", $lookfor).")";
+        if (count($look) > 0) {
+            $search .= implode(" AND ", $look).")";
 
             return $search;
         }
@@ -161,29 +204,9 @@ class Datatables
         return null;
     }
 
-    protected function setcolumns($query)
-    {
-        $query = preg_replace("/\((?:[^()]+|(?R))*+\)/is", "", $query);
-        preg_match_all("/SELECT([\s\S]*?)((\s*)\bFROM\b(?![\s\S]*\)))([\s\S]*?)/is", $query, $columns);
-
-        $columns = $this->explode(",", $columns[1][0]);
-
-        // gets alias of the table -> 'table.column as col' or 'table.column col' to 'col'
-        $regex[] = "/(.*)\s+as\s+(.*)/is";
-        $regex[] = "/.+(\([^()]+\))?\s+(.+)/is";
-        // wipe unwanted characters => '`" and space
-        $regex[] = '/[\s"\'`]+/';
-        // if there is no alias, return column name -> table.column to column
-        $regex[] = "/([\w\-]*)\.([\w\-]*)/";
-
-        return preg_replace($regex, "$2", $columns);
-    }
-
-    protected function isQueryWithOrderBy($query)
-    {
-        return (bool) count(preg_grep("/(order\s+by)\s+(.+)$/i", explode("\n", $query)));
-    }
-
+    /**
+     * @return null|string
+     */
     protected function limit()
     {
         $take = 10;
@@ -200,53 +223,60 @@ class Datatables
         return " LIMIT $take OFFSET $skip";
     }
 
+    /**
+     * @return null|string
+     */
     protected function orderby()
     {
+        // todo : clean up, this code looks garbage.
         $dtorders = $this->request->get('order');
         $orders = " ORDER BY ";
+
         $dir = ['asc' => 'asc', 'desc' => 'desc'];
 
         if (! is_array($dtorders)) {
-            if ($this->hasOrderIn) {
+            if ($this->query->hasDefaultOrder()) {
                 return null;
             }
 
-            return $orders.$this->columns[0]." asc";  // default
+            return $orders.$this->columns->list[0]." asc";
         }
-
+        $takeorders = [];
         foreach ($dtorders as $order) {
-            $takeorders[] = $this->columns[$order['column']]." ".$dir[$order['dir']];
+            $col = $this->columns->list[$order['column']];
+
+            if ($this->columns->isOrderable($col)) {
+                $takeorders[] = $this->columns->list[$order['column']]." ".$dir[$order['dir']];
+            }
+        }
+        if (count($takeorders) == 0) {
+            return null;
         }
 
         return $orders.implode(",", $takeorders);
     }
 
+    /**
+     * @param bool $json
+     * @return string
+     */
     public function generate($json = true)
     {
         $this->execute();
         $formatted_data = [];
 
-        foreach ($this->data as $key => $row) {
-            // new columns..
-            if (count($this->add) > 0) {
-                foreach ($this->add as $new_column => $closure) {
-                    $row[$new_column] = $closure($row);
+        foreach ($this->data as $row) {
+            $formatted_row = [];
+
+            foreach ($this->columns->all(false) as $col) {
+                $attr = $this->columns->attr($col->name)['data'];
+                if (is_numeric($attr)) {
+                    $formatted_row[] = $col->closure($row, $col->name);
+                } else {
+                    $formatted_row[$col->name] = $col->closure($row, $col->name);
                 }
             }
-
-            // editing columns..
-            if (count($this->edit) > 0) {
-                foreach ($this->edit as $edit_column => $closure) {
-                    if (isset($row[$edit_column])) {
-                        $row[$edit_column] = $closure($row);
-                    }
-                }
-            }
-
-            // hide unwanted columns from output
-            $row = array_diff_key($row, (array) $this->hide);
-
-            $formatted_data[] = $this->isIndexed($row);
+            $formatted_data[] = $formatted_row;
         }
 
         $response['draw'] = (integer) $this->request->get('draw');
@@ -257,29 +287,36 @@ class Datatables
         return $this->response($response, $json);
     }
 
-    public function add($newColumn, $closure)
+    /**
+     * @param $column
+     * @param $closure
+     * @return $this
+     */
+    public function add($column, $closure)
     {
-        $this->add[$newColumn] = $closure;
+        $added = $this->columns->add($column);
+        $added->closure = $closure;
 
         return $this;
     }
 
+    /**
+     * @param $column
+     * @param $closure
+     * @return $this
+     */
     public function edit($column, $closure)
     {
-        $this->edit[$column] = $closure;
+        $this->columns->get($column, false)->closure = $closure;
 
         return $this;
     }
 
-    protected function column($input)
-    {
-        if (is_numeric($input)) {
-            return $this->columns[$input];
-        }
-
-        return $input;
-    }
-
+    /**
+     * @param $data
+     * @param bool $json
+     * @return string
+     */
     protected function response($data, $json = true)
     {
         if ($json) {
@@ -289,47 +326,5 @@ class Datatables
         }
 
         return $data;
-    }
-
-    protected function isIndexed($row) // if data source uses associative keys or index number
-    {
-        $column = $this->request->get('columns');
-
-        if (is_numeric($column[0]['data'])) {
-            return array_values($row);
-        }
-
-        return $row;
-    }
-
-    protected function balanceChars($str, $open, $close)
-    {
-        $openCount = substr_count($str, $open);
-        $closeCount = substr_count($str, $close);
-        $retval = $openCount - $closeCount;
-
-        return $retval;
-    }
-
-    protected function explode($delimiter, $str, $open = '(', $close = ')')
-    {
-        $retval = [];
-        $hold = [];
-        $balance = 0;
-        $parts = explode($delimiter, $str);
-        foreach ($parts as $part) {
-            $hold[] = $part;
-            $balance += $this->balanceChars($part, $open, $close);
-            if ($balance < 1) {
-                $retval[] = implode($delimiter, $hold);
-                $hold = [];
-                $balance = 0;
-            }
-        }
-        if (count($hold) > 0) {
-            $retval[] = implode($delimiter, $hold);
-        }
-
-        return $retval;
     }
 }
