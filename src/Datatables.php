@@ -67,26 +67,48 @@ class Datatables
     {
         $this->query = new Query($query);
 
-        $this->columns = new Columns($this->query->bare, $this->request);
+        $this->columns = new Columns($this->query->bare);
 
-        $this->query->set(implode(", ", $this->columns->list));
+        $this->query->set(implode(", ", $this->columns->names()));
+
+        return $this;
+    }
+
+    /**
+     * @param $column
+     * @param $closure callable
+     * @return $this
+     */
+    public function add($column, $closure)
+    {
+        $this->columns->add($column)->closure = $closure;
+
+        return $this;
+    }
+
+    /**
+     * @param $column
+     * @param $closure callable
+     * @return $this
+     */
+    public function edit($column, $closure)
+    {
+        $this->columns->get($column, false)->closure = $closure;
 
         return $this;
     }
 
     /**
      * @param $request
-     * @return array
+     * @return array|string
      */
     public function get($request)
     {
         switch ($request) {
             case 'columns':
-                return $this->columns->list;
-                break;
+                return $this->columns->names();
             case 'query':
                 return $this->query->full;
-                break;
         }
     }
 
@@ -100,7 +122,7 @@ class Datatables
             $columns = func_get_args();
         }
         foreach ($columns as $name) {
-            $this->columns->hide($name, true);
+            $this->columns->get($name)->hide();
         }
 
         return $this;
@@ -111,6 +133,8 @@ class Datatables
      */
     protected function execute()
     {
+        $this->columns->attr($this->request);
+
         $this->recordstotal = $this->db->count($this->query->base); // unfiltered data count is here.
         $where = $this->filter();
         $this->recordsfiltered = $this->db->count($this->query->base.$where);  // filtered data count is here.
@@ -128,8 +152,8 @@ class Datatables
     {
         $search = '';
 
-        $filterglobal = $this->filterglobal();
-        $filterindividual = $this->filterindividual();
+        $filterglobal = $this->filterGlobal();
+        $filterindividual = $this->filterIndividual();
 
         if (! $filterindividual && ! $filterglobal) {
             return null;
@@ -150,7 +174,7 @@ class Datatables
     /**
      * @return null|string
      */
-    protected function filterglobal()
+    protected function filterGlobal()
     {
         $searchinput = $this->request->get('search')["value"];
 
@@ -160,12 +184,13 @@ class Datatables
 
         $search = [];
         $searchinput = preg_replace("/[^\wá-žÁ-Ž]+/", " ", $searchinput);
+
         foreach (explode(' ', $searchinput) as $word) {
             $look = [];
 
-            foreach ($this->columns->list as $column) {
-                if ($this->columns->isSearchable($column)) {
-                    $look[] = $column." LIKE ".$this->db->escape($word);
+            foreach ($this->columns->names() as $name) {
+                if ($this->columns->get($name)->isSearchable()) {
+                    $look[] = $name." LIKE ".$this->db->escape($word);
                 }
             }
 
@@ -178,7 +203,7 @@ class Datatables
     /**
      * @return null|string
      */
-    protected function filterindividual()
+    protected function filterIndividual()
     {
         $allcolumns = $this->request->get('columns');
 
@@ -189,9 +214,9 @@ class Datatables
             return null;
         }
 
-        foreach ($this->columns->list as $name) {
-            if ($this->columns->isSearching($name) != '' and $this->columns->isSearchable($name)) {
-                $look[] = $name." LIKE ".$this->db->escape('%'.$this->columns->isSearching($name).'%')."";
+        foreach ($this->columns->names() as $name) {
+            if ($this->columns->get($name)->searchValue() != '' and $this->columns->get($name)->isSearchable()) {
+                $look[] = $name." LIKE ".$this->db->escape('%'.$this->columns->get($name)->searchValue().'%')."";
             }
         }
 
@@ -239,16 +264,19 @@ class Datatables
                 return null;
             }
 
-            return $orders.$this->columns->list[0]." asc";
+            return $orders.$this->columns->names()[0]." asc";
         }
-        $takeorders = [];
-        foreach ($dtorders as $order) {
-            $col = $this->columns->list[$order['column']];
 
-            if ($this->columns->isOrderable($col)) {
-                $takeorders[] = $this->columns->list[$order['column']]." ".$dir[$order['dir']];
+        $takeorders = [];
+
+        foreach ($dtorders as $order) {
+            $name = $this->columns->names()[$order['column']];
+
+            if ($this->columns->get($name)->isOrderable()) {
+                $takeorders[] = $name." ".$dir[$order['dir']];
             }
         }
+
         if (count($takeorders) == 0) {
             return null;
         }
@@ -263,53 +291,35 @@ class Datatables
     public function generate($json = true)
     {
         $this->execute();
+        $data = $this->formatData();
+
+        return $this->response($data, $json);
+    }
+
+    /**
+     * @return array
+     */
+    private function formatData()
+    {
         $formatted_data = [];
+        $columns = $this->columns->all(false);
 
         foreach ($this->data as $row) {
             $formatted_row = [];
 
-            foreach ($this->columns->all(false) as $col) {
-                $attr = $this->columns->attr($col->name)['data'];
+            foreach ($columns as $column) {
+                $attr = $column->attr('data');
                 if (is_numeric($attr)) {
-                    $formatted_row[] = $col->closure($row, $col->name);
+                    $formatted_row[] = $column->closure($row, $column->name);
                 } else {
-                    $formatted_row[$col->name] = $col->closure($row, $col->name);
+                    $formatted_row[$column->name] = $column->closure($row, $column->name);
                 }
             }
+
             $formatted_data[] = $formatted_row;
         }
 
-        $response['draw'] = (integer) $this->request->get('draw');
-        $response['recordsTotal'] = $this->recordstotal;
-        $response['recordsFiltered'] = $this->recordsfiltered;
-        $response['data'] = $formatted_data;
-
-        return $this->response($response, $json);
-    }
-
-    /**
-     * @param $column
-     * @param $closure
-     * @return $this
-     */
-    public function add($column, $closure)
-    {
-        $added = $this->columns->add($column);
-        $added->closure = $closure;
-
-        return $this;
-    }
-
-    /**
-     * @param $column
-     * @param $closure
-     * @return $this
-     */
-    public function edit($column, $closure)
-    {
-        $this->columns->get($column, false)->closure = $closure;
-
-        return $this;
+        return $formatted_data;
     }
 
     /**
@@ -319,12 +329,18 @@ class Datatables
      */
     protected function response($data, $json = true)
     {
+        $response = [];
+        $response['draw'] = (integer) $this->request->get('draw');
+        $response['recordsTotal'] = $this->recordstotal;
+        $response['recordsFiltered'] = $this->recordsfiltered;
+        $response['data'] = $data;
+
         if ($json) {
             header('Content-type: application/json');
 
-            return json_encode($data);
+            return json_encode($response);
         }
 
-        return $data;
+        return $response;
     }
 }

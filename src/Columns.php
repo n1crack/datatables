@@ -15,37 +15,25 @@ class Columns
 
     /**
      * it contains all column objects
-     * @var array
+     *
+     * @var \ArrayObject
      *
      */
-    private $container = [];
-
-    /**
-     * This is a list of column names, exclude hiddens.
-     * @var array
-     */
-    public $list = [];
-
-    /**
-     * columns attributes from request
-     * @var array|mixed
-     */
-    public $attr = [];
+    private $container;
 
     /**
      * Columns constructor.
      *
      * @param $query
-     * @param \Symfony\Component\HttpFoundation\Request $request
      */
-    public function __construct($query, Request $request)
+    public function __construct($query)
     {
+        $this->container = new \ArrayObject();
+
         $columns = $this->setColumns($query);
 
-        $this->attr = $request->get('columns');
-
         foreach ($columns as $name) {
-            $this->addColumn($name);
+            $this->container->append(new Column($name));
         }
     }
 
@@ -53,132 +41,84 @@ class Columns
      * It adds extra column for custom usage.
      *
      * @param $name
-     * @return $this
+     * @return \Ozdemir\Datatables\Column
      */
     public function add($name)
     {
-        return $this->addColumn($name)->disableInteraction();
+        $this->container->append(new Column($name));
+
+        return $this->get($name)->disableInteraction();
     }
 
     /**
-     * @param $name
-     * @return $this
-     */
-    protected function addColumn($name)
-    {
-        $this->list[] = $name;
-        $this->container[] = new Column($name);
-
-        return $this;
-    }
-
-    /**
-     * Custom added columns can't interact with the db.
+     * it returns Column object by searching its name
      *
-     * @return $this
-     */
-    public function disableInteraction()
-    {
-        end($this->list);
-        $key = key($this->list);
-        $this->attr[$key]['searchable'] = false;
-        $this->attr[$key]['orderable'] = false;
-
-        return end($this->container);
-    }
-
-    /**
-     * it returns Column object by searching it's name
      * @param $name
      * @param bool $includeHiddens
-     * @return mixed
+     * @return \Ozdemir\Datatables\Column
      */
     public function get($name, $includeHiddens = true)
     {
+        // php 5.6
+        $names = array_map(function ($e) {
+            return $e->name;
+        }, $this->all($includeHiddens));
 
-        $index = array_search($name, array_column($this->all($includeHiddens), 'name'));
+        $index = array_search($name, $names);
 
-        return $this->container[$index];
+        // todo : array_column for array of objects only for php 7+
+        // $index = array_search($name, array_column($this->all($includeHiddens), 'name'));
+
+        return $this->container->offsetGet($index);
     }
 
     /**
      * it returns all column objects
      *
      * @param bool $includeHiddens
-     * @return array
+     * @return \Ozdemir\Datatables\Column[]
      */
     public function all($includeHiddens = true)
     {
-        $activeColumns = array_filter($this->container, function ($c) {
+        $activeColumns = array_filter($this->container->getArrayCopy(), function ($c) {
             return ! $c->hidden;
         });
 
-        return ($includeHiddens) ? $this->container : $activeColumns;
+        return ($includeHiddens) ? $this->container->getArrayCopy() : $activeColumns;
     }
 
     /**
-     * @param $name
-     * @return mixed
+     * Assign column attributes
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
      */
-    public function value($name)
+    public function attr(Request $request)
     {
-        return $this->get($name)->closure;
+        foreach ($this->names() as $index => $name) {
+            $this->get($name)->attr = $request->get('columns')[$index];
+        }
     }
 
     /**
-     * @param $name
-     * @return mixed
+     * Get visible column names
+     *
+     * @return array
      */
-    public function attr($name)
+    public function names()
     {
-        $index = array_search($name, array_column($this->all(false), 'name'));
+        // php 5.6
+        $names = array_map(function ($e) {
+            return $e->name;
+        }, $this->all(false));
+        return array_values($names);
 
-        return $this->attr[$index];
-    }
-
-    /**
-     * @param $name
-     * @param $bool
-     */
-    public function hide($name, $bool)
-    {
-
-        array_splice($this->list, array_search($name, $this->list), 1);
-        $this->get($name, true)->hidden = $bool;
-
-        return;
-    }
-
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function isSearchable($name)
-    {
-        return $this->attr($name)['searchable'];
-    }
-
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function isOrderable($name)
-    {
-        return $this->attr($name)['orderable'];
-    }
-
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function isSearching($name)
-    {
-        return $this->attr($name)['search']['value'];
+        // todo : array_column for array of objects only for php 7+
+        // return array_column($this->all(false), 'name');
     }
 
     /**
      * @param $query
-     * @return null|string|string[]
+     * @return array
      */
     protected function setColumns($query)
     {
