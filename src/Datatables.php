@@ -231,7 +231,7 @@ class Datatables {
         foreach ($this->data as $key => $row)
         {
             // new columns..
-            if (count($this->add) > 0)
+            if (null !== $this->add && count($this->add) > 0)
             {
                 foreach ($this->add as $new_column => $closure)
                 {
@@ -240,7 +240,7 @@ class Datatables {
             }
 
             // editing columns..
-            if (count($this->edit) > 0)
+            if (null !== $this->edit && count($this->edit) > 0)
             {
                 foreach ($this->edit as $edit_column => $closure)
                 {
