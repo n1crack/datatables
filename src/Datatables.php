@@ -53,10 +53,10 @@ class Datatables
      * @param \Ozdemir\Datatables\DB\DatabaseInterface $db
      * @param \Symfony\Component\HttpFoundation\Request|null $request
      */
-    function __construct(DatabaseInterface $db, Request $request = null)
+    public function __construct(DatabaseInterface $db, Request $request = null)
     {
         $this->db = $db->connect();
-        $this->request = $request ?: (Request::createFromGlobals());
+        $this->request = $request ?: Request::createFromGlobals();
     }
 
     /**
@@ -69,7 +69,7 @@ class Datatables
 
         $this->columns = new Columns($this->query->bare);
 
-        $this->query->set(implode(", ", $this->columns->names()));
+        $this->query->set(implode(', ', $this->columns->names()));
 
         return $this;
     }
@@ -161,12 +161,12 @@ class Datatables
 
         $search .= $filterglobal;
 
-        if ($filterindividual <> null && $filterglobal <> null) {
+        if ($filterindividual !== null && $filterglobal !== null) {
             $search .= ' AND ';
         }
 
         $search .= $filterindividual;
-        $search = " WHERE ".$search;
+        $search = ' WHERE '.$search;
 
         return $search;
     }
@@ -176,28 +176,28 @@ class Datatables
      */
     protected function filterGlobal()
     {
-        $searchinput = $this->request->get('search')["value"];
+        $searchinput = $this->request->get('search')['value'];
 
-        if ($searchinput == null) {
+        if ($searchinput === null) {
             return null;
         }
 
         $search = [];
-        $searchinput = preg_replace("/[^\wá-žÁ-Ž]+/", " ", $searchinput);
+        $searchinput = preg_replace("/[^\wá-žÁ-Ž]+/", ' ', $searchinput);
 
         foreach (explode(' ', $searchinput) as $word) {
             $look = [];
 
             foreach ($this->columns->names() as $name) {
                 if ($this->columns->get($name)->isSearchable()) {
-                    $look[] = $name." LIKE ".$this->db->escape($word);
+                    $look[] = $name.' LIKE '.$this->db->escape($word);
                 }
             }
 
-            $search[] = "(".implode(" OR ", $look).")";
+            $search[] = '('.implode(' OR ', $look).')';
         }
 
-        return implode(" AND ", $search);
+        return implode(' AND ', $search);
     }
 
     /**
@@ -207,7 +207,7 @@ class Datatables
     {
         $allcolumns = $this->request->get('columns');
 
-        $search = " (";
+        $search = ' (';
         $look = [];
 
         if (! $allcolumns) {
@@ -215,13 +215,13 @@ class Datatables
         }
 
         foreach ($this->columns->names() as $name) {
-            if ($this->columns->get($name)->searchValue() != '' and $this->columns->get($name)->isSearchable()) {
-                $look[] = $name." LIKE ".$this->db->escape('%'.$this->columns->get($name)->searchValue().'%')."";
+            if ($this->columns->get($name)->searchValue() !== '' && $this->columns->get($name)->isSearchable()) {
+                $look[] = $name.' LIKE '.$this->db->escape('%'.$this->columns->get($name)->searchValue().'%');
             }
         }
 
         if (count($look) > 0) {
-            $search .= implode(" AND ", $look).")";
+            $search .= implode(' AND ', $look).')';
 
             return $search;
         }
@@ -241,7 +241,7 @@ class Datatables
             $take = (integer) $this->request->get('length');
         }
 
-        if ($take == -1 || ! $this->request->get('draw')) {
+        if ($take === -1 || ! $this->request->get('draw')) {
             return null;
         }
 
@@ -253,9 +253,8 @@ class Datatables
      */
     protected function orderby()
     {
-        // todo : clean up, this code looks garbage.
         $dtorders = $this->request->get('order');
-        $orders = " ORDER BY ";
+        $orders = ' ORDER BY ';
 
         $dir = ['asc' => 'asc', 'desc' => 'desc'];
 
@@ -264,7 +263,7 @@ class Datatables
                 return null;
             }
 
-            return $orders.$this->columns->names()[0]." asc";
+            return $orders.$this->columns->names()[0].' asc';
         }
 
         $takeorders = [];
@@ -273,15 +272,15 @@ class Datatables
             $name = $this->columns->names()[$order['column']];
 
             if ($this->columns->get($name)->isOrderable()) {
-                $takeorders[] = $name." ".$dir[$order['dir']];
+                $takeorders[] = $name.' '.$dir[$order['dir']];
             }
         }
 
-        if (count($takeorders) == 0) {
+        if (count($takeorders) === 0) {
             return null;
         }
 
-        return $orders.implode(",", $takeorders);
+        return $orders.implode(',', $takeorders);
     }
 
     /**
@@ -325,7 +324,7 @@ class Datatables
     /**
      * @param $data
      * @param bool $json
-     * @return string
+     * @return array|string
      */
     protected function response($data, $json = true)
     {
