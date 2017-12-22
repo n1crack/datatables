@@ -69,7 +69,7 @@ class Datatables
 
         $this->columns = new Columns($this->query->bare);
 
-        $this->query->set(implode(', ', $this->columns->names()));
+        $this->query->set($this->columns->names());
 
         return $this;
     }

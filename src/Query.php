@@ -10,24 +10,25 @@ namespace Ozdemir\Datatables;
 class Query
 {
     /**
-     * @var
      * Bare query string, user input
+     * @var
      */
     public $bare;
 
     /**
-     * @var
      * Base sql query string without filters and orders
+     * @var
      */
     public $base;
 
     /**
-     * @var
      * Full sql query string
+     * @var
      */
     public $full;
 
     /**
+     * the query has default ordering
      * @var
      */
     protected $hasDefaultOrder = false;
@@ -39,16 +40,17 @@ class Query
      */
     public function __construct($query)
     {
-        $this->bare = rtrim($query, "; ");
+        $this->bare = rtrim($query, '; ');
     }
 
     /**
-     * @param $columns
+     * @param $columns array
      * @return \Ozdemir\Datatables\Query
      */
     public function set($columns)
     {
-        $this->base = "Select $columns from ({$this->bare})t";
+
+        $this->base = 'Select '.implode(', ', $columns)." from ({$this->bare})t";
         $this->hasDefaultOrder = $this->isQueryWithOrderBy($this->bare);
 
         return $this;

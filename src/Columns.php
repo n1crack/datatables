@@ -64,10 +64,10 @@ class Columns
             return $e->name;
         }, $this->all($includeHiddens));
 
-        $index = array_search($name, $names);
+        $index = array_search($name, $names, true);
 
         // todo : array_column for array of objects only for php 7+
-        // $index = array_search($name, array_column($this->all($includeHiddens), 'name'));
+        // $index = array_search($name, array_column($this->all($includeHiddens), 'name'), true);
 
         return $this->container->offsetGet($index);
     }
@@ -84,7 +84,7 @@ class Columns
             return ! $c->hidden;
         });
 
-        return ($includeHiddens) ? $this->container->getArrayCopy() : $activeColumns;
+        return $includeHiddens ? $this->container->getArrayCopy() : $activeColumns;
     }
 
     /**
@@ -125,7 +125,7 @@ class Columns
         $query = preg_replace("/\((?:[^()]+|(?R))*+\)/is", "", $query);
         preg_match_all("/SELECT([\s\S]*?)((\s*)\bFROM\b(?![\s\S]*\)))([\s\S]*?)/is", $query, $columns);
 
-        $columns = $this->explode(",", $columns[1][0]);
+        $columns = $this->explode(',', $columns[1][0]);
 
         // gets alias of the table -> 'table.column as col' or 'table.column col' to 'col'
         $regex[] = "/(.*)\s+as\s+(.*)/is";
@@ -135,6 +135,6 @@ class Columns
         // if there is no alias, return column name -> table.column to column
         $regex[] = "/([\w\-]*)\.([\w\-]*)/";
 
-        return preg_replace($regex, "$2", $columns);
+        return preg_replace($regex, '$2', $columns);
     }
 }

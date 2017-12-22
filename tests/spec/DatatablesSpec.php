@@ -132,7 +132,7 @@ class DatatablesSpec extends ObjectBehavior
             ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
         ]);
 
-        $this->query("Select  name, surname from mytable");
+        $this->query('Select name, surname from mytable');
         $datatables = $this->generate(false);
 
         $datatables['recordsTotal']->shouldReturn(11);
@@ -150,10 +150,10 @@ class DatatablesSpec extends ObjectBehavior
             ['data' => 2, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
         ]);
 
-        $this->query("Select name, surname, age from mytable");
+        $this->query('Select name, surname, age from mytable');
         $datatables = $this->generate(false);
 
-        $datatables['data'][0]->shouldReturn(["Todd", "Wycoff", "36"]);
+        $datatables['data'][0]->shouldReturn(['Todd', 'Wycoff', '36']);
     }
 
 }
