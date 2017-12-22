@@ -122,8 +122,8 @@ class Columns
      */
     protected function setColumns($query)
     {
-        $query = preg_replace("/\((?:[^()]+|(?R))*+\)/is", "", $query);
-        preg_match_all("/SELECT([\s\S]*?)((\s*)\bFROM\b(?![\s\S]*\)))([\s\S]*?)/is", $query, $columns);
+        $query = preg_replace("/\((?:[^()]+|(?R))*+\)/i", '', $query);
+        preg_match_all("/SELECT([\s\S]*?)((\s*)\bFROM\b(?![\s\S]*\)))([\s\S]*?)/i", $query, $columns);
 
         $columns = $this->explode(',', $columns[1][0]);
 
