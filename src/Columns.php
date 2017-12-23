@@ -60,8 +60,8 @@ class Columns
     public function get($name, $includeHiddens = true)
     {
         // php 5.6
-        $names = array_map(function ($e) {
-            return $e->name;
+        $names = array_map(function ($c) {
+            return $c->name;
         }, $this->all($includeHiddens));
 
         $index = array_search($name, $names, true);
@@ -107,13 +107,40 @@ class Columns
     public function names()
     {
         // php 5.6
-        $names = array_map(function ($e) {
-            return $e->name;
+        $names = array_map(function ($c) {
+            return $c->name;
         }, $this->all(false));
+
         return array_values($names);
 
         // todo : array_column for array of objects only for php 7+
         // return array_column($this->all(false), 'name');
+    }
+
+    /**
+     *
+     * @return \Ozdemir\Datatables\Column[]
+     */
+    public function getSearchable()
+    {
+        $columns = array_filter($this->container->getArrayCopy(), function ($c) {
+            return ! $c->hidden && $c->interaction && $c->attr['searchable'];
+        });
+
+        return $columns;
+    }
+
+    /**
+     *
+     * @return \Ozdemir\Datatables\Column[]
+     */
+    public function getSearchableWithSearchValue()
+    {
+        $columns = array_filter($this->getSearchable(), function ($c) {
+            return $c->attr['search']['value'] !== '';
+        });
+
+        return $columns;
     }
 
     /**

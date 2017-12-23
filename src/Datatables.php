@@ -18,7 +18,7 @@ class Datatables
     protected $db;
 
     /**
-     * @var
+     * @var array
      */
     protected $data;
 
@@ -146,40 +146,34 @@ class Datatables
     }
 
     /**
-     * @return null|string
+     * @return string
      */
     protected function filter()
     {
-        $search = '';
+        $filter = array_filter([$this->filterGlobal(), $this->filterIndividual()]);
 
-        $filterglobal = $this->filterGlobal();
-        $filterindividual = $this->filterIndividual();
-
-        if (! $filterindividual && ! $filterglobal) {
-            return null;
+        if (count($filter) > 0) {
+            return ' WHERE '.implode(' AND ', $filter);
         }
 
-        $search .= $filterglobal;
-
-        if ($filterindividual !== null && $filterglobal !== null) {
-            $search .= ' AND ';
-        }
-
-        $search .= $filterindividual;
-        $search = ' WHERE '.$search;
-
-        return $search;
+        return '';
     }
 
     /**
-     * @return null|string
+     * @return string
      */
     protected function filterGlobal()
     {
         $searchinput = $this->request->get('search')['value'];
 
         if ($searchinput === null) {
-            return null;
+            return '';
+        }
+
+        $columns = $this->columns->getSearchable();
+
+        if (count($columns) === 0) {
+            return '';
         }
 
         $search = [];
@@ -188,10 +182,8 @@ class Datatables
         foreach (explode(' ', $searchinput) as $word) {
             $look = [];
 
-            foreach ($this->columns->names() as $name) {
-                if ($this->columns->get($name)->isSearchable()) {
-                    $look[] = $name.' LIKE '.$this->db->escape($word);
-                }
+            foreach ($columns as $column) {
+                $look[] = $column->name.' LIKE '.$this->db->escape($word);
             }
 
             $search[] = '('.implode(' OR ', $look).')';
@@ -201,36 +193,27 @@ class Datatables
     }
 
     /**
-     * @return null|string
+     * @return string
      */
     protected function filterIndividual()
     {
-        $allcolumns = $this->request->get('columns');
+        $columns = $this->columns->getSearchableWithSearchValue();
 
-        $search = ' (';
+        if (count($columns) === 0) {
+            return '';
+        }
+
         $look = [];
 
-        if (! $allcolumns) {
-            return null;
+        foreach ($columns as $column) {
+            $look[] = $column->name.' LIKE '.$this->db->escape($column->searchValue());
         }
 
-        foreach ($this->columns->names() as $name) {
-            if ($this->columns->get($name)->searchValue() !== '' && $this->columns->get($name)->isSearchable()) {
-                $look[] = $name.' LIKE '.$this->db->escape('%'.$this->columns->get($name)->searchValue().'%');
-            }
-        }
-
-        if (count($look) > 0) {
-            $search .= implode(' AND ', $look).')';
-
-            return $search;
-        }
-
-        return null;
+        return ' ('.implode(' AND ', $look).')';
     }
 
     /**
-     * @return null|string
+     * @return string
      */
     protected function limit()
     {
@@ -242,14 +225,14 @@ class Datatables
         }
 
         if ($take === -1 || ! $this->request->get('draw')) {
-            return null;
+            return '';
         }
 
         return " LIMIT $take OFFSET $skip";
     }
 
     /**
-     * @return null|string
+     * @return string
      */
     protected function orderby()
     {
@@ -260,7 +243,7 @@ class Datatables
 
         if (! is_array($dtorders)) {
             if ($this->query->hasDefaultOrder()) {
-                return null;
+                return '';
             }
 
             return $orders.$this->columns->names()[0].' asc';
@@ -277,7 +260,7 @@ class Datatables
         }
 
         if (count($takeorders) === 0) {
-            return null;
+            return '';
         }
 
         return $orders.implode(',', $takeorders);
@@ -285,7 +268,7 @@ class Datatables
 
     /**
      * @param bool $json
-     * @return string
+     * @return mixed
      */
     public function generate($json = true)
     {
@@ -324,7 +307,7 @@ class Datatables
     /**
      * @param $data
      * @param bool $json
-     * @return array|string
+     * @return mixed
      */
     protected function response($data, $json = true)
     {
