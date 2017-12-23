@@ -51,7 +51,7 @@ class Columns
     }
 
     /**
-     * it returns Column object by searching its name
+     * it returns Column object by its name
      *
      * @param $name
      * @param bool $includeHiddens
@@ -66,10 +66,24 @@ class Columns
 
         $index = array_search($name, $names, true);
 
-        // todo : array_column for array of objects only for php 7+
+        // todo : this is for php 7+
         // $index = array_search($name, array_column($this->all($includeHiddens), 'name'), true);
 
         return $this->container->offsetGet($index);
+    }
+
+    /**
+     * it returns Column object by its index
+     *
+     * @param $index
+     * @param bool $includeHiddens
+     * @return \Ozdemir\Datatables\Column
+     */
+    public function getByIndex($index, $includeHiddens = false)
+    {
+        $columns = $this->all($includeHiddens);
+
+        return current(array_slice($columns, $index, 1));
     }
 
     /**
@@ -113,7 +127,7 @@ class Columns
 
         return array_values($names);
 
-        // todo : array_column for array of objects only for php 7+
+        // todo : this is for php 7+
         // return array_column($this->all(false), 'name');
     }
 

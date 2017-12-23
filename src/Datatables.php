@@ -100,7 +100,7 @@ class Datatables
 
     /**
      * @param $request
-     * @return array|string
+     * @return mixed
      */
     public function get($request)
     {
@@ -236,34 +236,26 @@ class Datatables
      */
     protected function orderby()
     {
-        $dtorders = $this->request->get('order');
-        $orders = ' ORDER BY ';
+        $orders = $this->request->get('order') ?: [];
 
-        $dir = ['asc' => 'asc', 'desc' => 'desc'];
+        $orders = array_filter($orders, function ($order) {
+            return in_array($order['dir'], ['asc', 'desc'], true);
+        });
 
-        if (! is_array($dtorders)) {
+        $o = [];
+
+        if (count($orders) === 0) {
             if ($this->query->hasDefaultOrder()) {
                 return '';
             }
-
-            return $orders.$this->columns->names()[0].' asc';
+            $o[] = $this->columns->getByIndex(0)->name.' asc';
         }
 
-        $takeorders = [];
-
-        foreach ($dtorders as $order) {
-            $name = $this->columns->names()[$order['column']];
-
-            if ($this->columns->get($name)->isOrderable()) {
-                $takeorders[] = $name.' '.$dir[$order['dir']];
-            }
+        foreach ($orders as $order) {
+            $o[] = $this->columns->getByIndex($order['column'])->name.' '.$order['dir'];
         }
 
-        if (count($takeorders) === 0) {
-            return '';
-        }
-
-        return $orders.implode(',', $takeorders);
+        return ' ORDER BY '.implode(',', $o);
     }
 
     /**
