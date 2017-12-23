@@ -10,7 +10,7 @@ class DatatablesSpec extends ObjectBehavior
 {
     private $request;
 
-    function let()
+    public function let()
     {
         $sqlconfig = realpath(dirname(__FILE__).'/test.db');
         $db = new SQLite($sqlconfig);
@@ -89,7 +89,7 @@ class DatatablesSpec extends ObjectBehavior
         $data['surname']->shouldReturn('Mar...');
     }
 
-    function customfunction($data)
+    public function customfunction($data)
     {
         return substr($data, 0, 3).'...';
     }
