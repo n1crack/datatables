@@ -239,7 +239,7 @@ class Datatables
         $orders = $this->request->get('order') ?: [];
 
         $orders = array_filter($orders, function ($order) {
-            return in_array($order['dir'], ['asc', 'desc'], true);
+            return in_array($order['dir'], ['asc', 'desc'], true) && $this->columns->getByIndex($order['column'])->isOrderable();
         });
 
         $o = [];
