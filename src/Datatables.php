@@ -33,7 +33,7 @@ class Datatables
     protected $recordsfiltered;
 
     /**
-     * @var \Ozdemir\Datatables\Columns
+     * @var \Ozdemir\Datatables\ColumnCollection
      */
     protected $columns;
 
@@ -67,7 +67,7 @@ class Datatables
     {
         $this->query = new Query($query);
 
-        $this->columns = new Columns($this->query->bare);
+        $this->columns = new ColumnCollection($this->query->bare);
 
         $this->query->set($this->columns->names());
 

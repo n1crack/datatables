@@ -5,11 +5,11 @@ namespace Ozdemir\Datatables;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class Columns
+ * Class ColumnCollection
  *
  * @package Ozdemir\Datatables
  */
-class Columns
+class ColumnCollection
 {
     use Explode;
 
@@ -22,7 +22,7 @@ class Columns
     private $container;
 
     /**
-     * Columns constructor.
+     * ColumnCollection constructor.
      *
      * @param $query
      */
