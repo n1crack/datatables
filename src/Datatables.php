@@ -110,11 +110,11 @@ class Datatables {
             return null;
         }
 
-        $search = [];
+        $search = array();
         $searchinput = preg_replace("/[^\wá-žÁ-Ž]+/", " ", $searchinput);
         foreach (explode(' ', $searchinput) as $word)
         {
-            $lookfor = [];
+            $lookfor = array();
             foreach ($this->columns as $key => $column)
             {
 				if(array_key_exists($key,$allcolumns)){
@@ -133,7 +133,7 @@ class Datatables {
         $allcolumns = $this->input('columns');
 
         $search = " (";
-        $lookfor = [];
+        $lookfor = array();
 
         if ( ! $allcolumns)
         {
@@ -226,7 +226,7 @@ class Datatables {
     public function generate($json = true)
     {
         $this->execute();
-        $formatted_data = [];
+        $formatted_data = array();
 
         foreach ($this->data as $key => $row)
         {
