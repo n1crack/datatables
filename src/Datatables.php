@@ -66,10 +66,7 @@ class Datatables
     public function query($query)
     {
         $this->query = new Query($query);
-
-        $this->columns = new ColumnCollection($this->query->bare);
-
-        $this->query->set($this->columns->names());
+        $this->columns = new ColumnCollection($this->query);
 
         return $this;
     }
@@ -81,7 +78,7 @@ class Datatables
      */
     public function add($column, $closure)
     {
-        $this->columns->add($column)->closure = $closure;
+        $this->columns->add($column, $closure);
 
         return $this;
     }
@@ -93,7 +90,7 @@ class Datatables
      */
     public function edit($column, $closure)
     {
-        $this->columns->get($column, false)->closure = $closure;
+        $this->columns->edit($column, $closure);
 
         return $this;
     }
@@ -118,7 +115,7 @@ class Datatables
      */
     public function hide($columns)
     {
-        if (! is_array($columns)) {
+        if (!is_array($columns)) {
             $columns = func_get_args();
         }
         foreach ($columns as $name) {
@@ -133,13 +130,13 @@ class Datatables
      */
     protected function execute()
     {
-        $this->columns->attr($this->request);
+        $this->columns->setAttr($this->request);
 
         $this->recordstotal = $this->db->count($this->query->base); // unfiltered data count is here.
         $where = $this->filter();
         $this->recordsfiltered = $this->db->count($this->query->base.$where);  // filtered data count is here.
 
-        $this->query->full = $this->query->base.$where.$this->orderby().$this->limit();
+        $this->query->full = $this->query->base.$where.$this->orderBy().$this->limit();
         $this->data = $this->db->query($this->query->full);
 
         return $this;
@@ -218,13 +215,13 @@ class Datatables
     protected function limit()
     {
         $take = 10;
-        $skip = (integer) $this->request->get('start');
+        $skip = (integer)$this->request->get('start');
 
         if ($this->request->get('length')) {
-            $take = (integer) $this->request->get('length');
+            $take = (integer)$this->request->get('length');
         }
 
-        if ($take === -1 || ! $this->request->get('draw')) {
+        if ($take === -1 || !$this->request->get('draw')) {
             return '';
         }
 
@@ -234,12 +231,13 @@ class Datatables
     /**
      * @return string
      */
-    protected function orderby()
+    protected function orderBy()
     {
         $orders = $this->request->get('order') ?: [];
 
         $orders = array_filter($orders, function ($order) {
-            return in_array($order['dir'], ['asc', 'desc'], true) && $this->columns->getByIndex($order['column'])->isOrderable();
+            return in_array($order['dir'], ['asc', 'desc'],
+                    true) && $this->columns->getByIndex($order['column'])->isOrderable();
         });
 
         $o = [];
@@ -304,7 +302,7 @@ class Datatables
     protected function response($data, $json = true)
     {
         $response = [];
-        $response['draw'] = (integer) $this->request->get('draw');
+        $response['draw'] = (integer)$this->request->get('draw');
         $response['recordsTotal'] = $this->recordstotal;
         $response['recordsFiltered'] = $this->recordsfiltered;
         $response['data'] = $data;

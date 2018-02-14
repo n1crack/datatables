@@ -14,6 +14,19 @@ class ColumnCollection
     use Explode;
 
     /**
+     * @var array
+     */
+    protected $pattern = [
+        // gets alias of the table -> 'table.column as col' or 'table.column col' to 'col'
+        "/(.*)\s+as\s+(.*)/is",
+        "/.+(\([^()]+\))?\s+(.+)/is",
+        // wipe unwanted characters => '`" and space
+        '/[\s"\'`]+/',
+        // if there is no alias, return column name -> table.column to column
+        "/([\w\-]*)\.([\w\-]*)/",
+    ];
+
+    /**
      * it contains all column objects
      *
      * @var \ArrayObject
@@ -24,50 +37,68 @@ class ColumnCollection
     /**
      * ColumnCollection constructor.
      *
-     * @param $query
+     * @param $query Query
      */
     public function __construct($query)
     {
         $this->container = new \ArrayObject();
 
-        $columns = $this->setColumns($query);
+        $columns = $this->setColumnNames($query->bare);
 
         foreach ($columns as $name) {
             $this->container->append(new Column($name));
         }
+
+        $query->set($this->names());
     }
 
     /**
      * It adds extra column for custom usage.
      *
      * @param $name
-     * @return \Ozdemir\Datatables\Column
+     * @param $closure callable
+     * @return Column
      */
-    public function add($name)
+    public function add($name, $closure)
     {
-        $this->container->append(new Column($name));
+        $column = new Column($name);
+        $column->closure = $closure;
+        $column->interaction = false;
 
-        return $this->get($name)->disableInteraction();
+        $this->container->append($column);
+
+        return $column;
+    }
+
+    /**
+     * It edit column
+     *
+     * @param $name
+     * @param $closure callable
+     * @return Column
+     */
+    public function edit($name, $closure)
+    {
+        $column = $this->get($name, false);
+        $column->closure = $closure;
+
+        return $column;
     }
 
     /**
      * it returns Column object by its name
      *
      * @param $name
-     * @param bool $includeHiddens
-     * @return \Ozdemir\Datatables\Column
+     * @param bool $includeHidden
+     * @return Column
      */
-    public function get($name, $includeHiddens = true)
+    public function get($name, $includeHidden = true)
     {
-        // php 5.6
         $names = array_map(function ($c) {
             return $c->name;
-        }, $this->all($includeHiddens));
+        }, $this->all($includeHidden));
 
         $index = array_search($name, $names, true);
-
-        // todo : this is for php 7+
-        // $index = array_search($name, array_column($this->all($includeHiddens), 'name'), true);
 
         return $this->container->offsetGet($index);
     }
@@ -76,12 +107,12 @@ class ColumnCollection
      * it returns Column object by its index
      *
      * @param $index
-     * @param bool $includeHiddens
-     * @return \Ozdemir\Datatables\Column
+     * @param bool $includeHidden
+     * @return Column
      */
-    public function getByIndex($index, $includeHiddens = false)
+    public function getByIndex($index, $includeHidden = false)
     {
-        $columns = $this->all($includeHiddens);
+        $columns = $this->all($includeHidden);
 
         return current(array_slice($columns, $index, 1));
     }
@@ -89,16 +120,16 @@ class ColumnCollection
     /**
      * it returns all column objects
      *
-     * @param bool $includeHiddens
-     * @return \Ozdemir\Datatables\Column[]
+     * @param bool $includeHidden
+     * @return Column[]
      */
-    public function all($includeHiddens = true)
+    public function all($includeHidden = true)
     {
         $activeColumns = array_filter($this->container->getArrayCopy(), function ($c) {
-            return ! $c->hidden;
+            return !$c->hidden;
         });
 
-        return $includeHiddens ? $this->container->getArrayCopy() : $activeColumns;
+        return $includeHidden ? $this->container->getArrayCopy() : $activeColumns;
     }
 
     /**
@@ -106,7 +137,7 @@ class ColumnCollection
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
      */
-    public function attr(Request $request)
+    public function setAttr(Request $request)
     {
         foreach ($this->names() as $index => $name) {
             $this->get($name)->attr = $request->get('columns')[$index];
@@ -120,25 +151,21 @@ class ColumnCollection
      */
     public function names()
     {
-        // php 5.6
         $names = array_map(function ($c) {
             return $c->name;
         }, $this->all(false));
 
         return array_values($names);
-
-        // todo : this is for php 7+
-        // return array_column($this->all(false), 'name');
     }
 
     /**
      *
-     * @return \Ozdemir\Datatables\Column[]
+     * @return Column[]
      */
     public function getSearchable()
     {
         $columns = array_filter($this->container->getArrayCopy(), function ($c) {
-            return ! $c->hidden && $c->interaction && $c->attr['searchable'];
+            return !$c->hidden && $c->interaction && $c->attr['searchable'];
         });
 
         return $columns;
@@ -146,7 +173,7 @@ class ColumnCollection
 
     /**
      *
-     * @return \Ozdemir\Datatables\Column[]
+     * @return Column[]
      */
     public function getSearchableWithSearchValue()
     {
@@ -161,21 +188,40 @@ class ColumnCollection
      * @param $query
      * @return array
      */
-    protected function setColumns($query)
+    protected function setColumnNames($query)
     {
-        $query = preg_replace("/\((?:[^()]+|(?R))*+\)/i", '', $query);
-        preg_match_all("/SELECT([\s\S]*?)((\s*)\bFROM\b(?![\s\S]*\)))([\s\S]*?)/i", $query, $columns);
+        $query = $this->removeAllEnclosedInParentheses($query);
+        $columns = $this->getColumnArray($query);
 
-        $columns = $this->explode(',', $columns[1][0]);
+        return $this->clearColumnNames($columns);
+    }
 
-        // gets alias of the table -> 'table.column as col' or 'table.column col' to 'col'
-        $regex[] = "/(.*)\s+as\s+(.*)/is";
-        $regex[] = "/.+(\([^()]+\))?\s+(.+)/is";
-        // wipe unwanted characters => '`" and space
-        $regex[] = '/[\s"\'`]+/';
-        // if there is no alias, return column name -> table.column to column
-        $regex[] = "/([\w\-]*)\.([\w\-]*)/";
+    /**
+     * @param $string
+     * @return string
+     */
+    protected function removeAllEnclosedInParentheses($string)
+    {
+        return preg_replace("/\((?:[^()]+|(?R))*+\)/i", '', $string);
+    }
 
-        return preg_replace($regex, '$2', $columns);
+    /**
+     * @param $string
+     * @return array
+     */
+    protected function getColumnArray($string)
+    {
+        preg_match_all("/SELECT([\s\S]*?)((\s*)\bFROM\b(?![\s\S]*\)))([\s\S]*?)/i", $string, $columns);
+
+        return $this->explode(',', $columns[1][0]);
+    }
+
+    /**
+     * @param $array
+     * @return string[]
+     */
+    protected function clearColumnNames($array)
+    {
+        return preg_replace($this->pattern, '$2', $array);
     }
 }

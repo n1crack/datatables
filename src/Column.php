@@ -53,7 +53,7 @@ class Column
     /**
      * @param $data
      * @param $field
-     * @return mixed
+     * @return string
      */
     public function closure($data, $field)
     {
@@ -83,16 +83,6 @@ class Column
     public function attr($value)
     {
         return $this->attr[$value];
-    }
-
-    /**
-     * @return $this
-     */
-    public function disableInteraction()
-    {
-        $this->interaction = false;
-
-        return $this;
     }
 
     /**

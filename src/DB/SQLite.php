@@ -1,4 +1,6 @@
-<?php namespace Ozdemir\Datatables\DB;
+<?php
+
+namespace Ozdemir\Datatables\DB;
 
 use PDO;
 use PDOException;
@@ -11,7 +13,7 @@ class SQLite implements DatabaseInterface
 
     protected $escape = [];
 
-    function __construct($config)
+    public function __construct($config)
     {
         $this->config = $config;
     }

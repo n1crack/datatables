@@ -1,4 +1,6 @@
-<?php namespace Ozdemir\Datatables\DB;
+<?php
+
+namespace Ozdemir\Datatables\DB;
 
 use DB;
 
@@ -6,7 +8,7 @@ class LaravelAdapter implements DatabaseInterface
 {
     protected $escape = [];
 
-    function __construct($config = null)
+    public function __construct($config = null)
     {
     }
 
@@ -21,7 +23,7 @@ class LaravelAdapter implements DatabaseInterface
         $row = [];
 
         foreach ($data as $item) {
-            $row[] = (array) $item;
+            $row[] = (array)$item;
         }
 
         return $row;

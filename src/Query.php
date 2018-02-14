@@ -45,7 +45,7 @@ class Query
 
     /**
      * @param $columns array
-     * @return \Ozdemir\Datatables\Query
+     * @return Query
      */
     public function set($columns)
     {
@@ -70,6 +70,6 @@ class Query
      */
     protected function isQueryWithOrderBy($query)
     {
-        return (bool) count(preg_grep("/(order\s+by)\s+(.+)$/i", explode("\n", $query)));
+        return (bool)count(preg_grep("/(order\s+by)\s+(.+)$/i", explode("\n", $query)));
     }
 }
