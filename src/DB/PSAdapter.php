@@ -26,7 +26,9 @@ class PSAdapter implements DatabaseInterface {
 
     public function count($query)
     {
-        return $this->Db->getValue($query);
+        $query = "Select count(*) as rowcount," . substr($query, 6);
+        $data = $this->Db->getRow($query);
+        return $data['rowcount'];
     }
 
     public function escape($value)
