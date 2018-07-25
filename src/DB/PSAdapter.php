@@ -31,9 +31,9 @@ class PSAdapter implements DatabaseInterface {
         return $data['rowcount'];
     }
 
-    public function escape($value)
+    public function escape($string)
     {
-        return pSQL($value);
+        return '"%' . pSQL($string) . '%"';
     }
 
 }
