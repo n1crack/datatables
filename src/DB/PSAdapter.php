@@ -16,13 +16,12 @@ class PSAdapter implements DatabaseInterface {
     public function connect()
     {
         $this->Db = Db::getInstance();
-
-        return $this->Db;
+        return $this;
     }
 
     public function query($query, $array = true, $user_cache = true)
     {
-        return $this->Db->executeS($query);
+        return $this->Db->executeS($query, $array, $user_cache);
     }
 
     public function count($query)
