@@ -7,11 +7,12 @@ use Ozdemir\Datatables\DB\SQLite;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
-class DatatablesSpec extends ObjectBehavior {
+class DatatablesSpec extends ObjectBehavior
+{
 
     function let()
     {
-        $sqlconfig = realpath(dirname(__FILE__) . '/test.db');
+        $sqlconfig = __DIR__ . '/../fixtures/test.db';
         $db = new SQLite($sqlconfig);
 
         $this->beConstructedWith($db);
@@ -20,8 +21,7 @@ class DatatablesSpec extends ObjectBehavior {
     public function getMatchers()
     {
         return [
-            'haveColumns' => function ($subject, $key)
-            {
+            'haveColumns' => function ($subject, $key) {
                 return (array_keys($subject) === $key);
             }
         ];
@@ -67,20 +67,17 @@ class DatatablesSpec extends ObjectBehavior {
 
         $data->shouldHaveCount(3); //  name, surname and age --
         $this->get('columns')->shouldReturn(['name', 'surname', 'age']);
-
     }
 
     public function it_returns_modified_data_via_closure_function()
     {
         $this->query("Select id as fid, name, surname, age from mytable");
 
-        $this->edit('name', function ($data)
-        {
+        $this->edit('name', function ($data) {
             return strtolower($data['name']);
         });
 
-        $this->edit('surname', function ($data)
-        {
+        $this->edit('surname', function ($data) {
             return $this->customfunction($data['surname']);
         });
 

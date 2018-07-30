@@ -3,13 +3,14 @@
 use PDO;
 use PDOException;
 
-class MySQL implements DatabaseInterface {
+class MySQL implements DatabaseInterface
+{
 
     protected $pdo;
     protected $config;
     protected $escape = [];
 
-    function __construct($config)
+    public function __construct($config)
     {
         $this->config = $config;
     }
@@ -25,7 +26,7 @@ class MySQL implements DatabaseInterface {
 
         try {
             $this->pdo = new PDO("mysql:host=$host;dbname=$database;port=$port;charset=$charset", "$user", "$pass");
-        } catch ( PDOException $e ){
+        } catch (PDOException $e) {
             print $e->getMessage();
         }
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
@@ -54,5 +55,4 @@ class MySQL implements DatabaseInterface {
 
         return ":escape" . (count($this->escape));
     }
-
 }

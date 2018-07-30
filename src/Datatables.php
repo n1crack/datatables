@@ -4,7 +4,8 @@ namespace Ozdemir\Datatables;
 
 use Ozdemir\Datatables\DB\DatabaseInterface;
 
-class Datatables {
+class Datatables
+{
 
     protected $db;
     protected $data;
@@ -18,7 +19,7 @@ class Datatables {
     protected $query;
     protected $hasOrderIn;
 
-    function __construct(DatabaseInterface $db)
+    public function __construct(DatabaseInterface $db)
     {
         $this->db = $db->connect();
         $this->input = isset($_POST["draw"]) ? $_POST : $_GET;
@@ -37,8 +38,7 @@ class Datatables {
 
     public function get($request)
     {
-        switch ($request)
-        {
+        switch ($request) {
             case 'columns':
                 return array_values(array_diff($this->columns, (array) $this->hide));
                 break;
@@ -53,8 +53,7 @@ class Datatables {
 
     public function hide($columns)
     {
-        if ( ! is_array($columns))
-        {
+        if (! is_array($columns)) {
             $columns = func_get_args();
         }
         $columns = array_intersect($this->columns, $columns);
@@ -82,15 +81,13 @@ class Datatables {
         $filterglobal = $this->filterglobal();
         $filterindividual = $this->filterindividual();
 
-        if ( ! $filterindividual && ! $filterglobal)
-        {
+        if (! $filterindividual && ! $filterglobal) {
             return null;
         }
 
         $search .= $filterglobal;
 
-        if ($filterindividual <> null && $filterglobal <> null)
-        {
+        if ($filterindividual <> null && $filterglobal <> null) {
             $search .= ' AND ';
         }
 
@@ -105,22 +102,20 @@ class Datatables {
         $searchinput = $this->input('search')['value'];
         $allcolumns = $this->input('columns');
 
-        if ($searchinput == '')
-        {
+        if ($searchinput == '') {
             return null;
         }
 
         $search = array();
         $searchinput = preg_replace("/[^\wá-žÁ-Ž]+/", " ", $searchinput);
-        foreach (explode(' ', $searchinput) as $word)
-        {
+        foreach (explode(' ', $searchinput) as $word) {
             $lookfor = array();
-            foreach ($this->columns as $key => $column)
-            {
-				if(array_key_exists($key,$allcolumns)){
-					if ($allcolumns[ $key ]['searchable'] == 'true')
-						$lookfor[] = $column . " LIKE " . $this->db->escape($word) . "";
-				}
+            foreach ($this->columns as $key => $column) {
+                if (array_key_exists($key, $allcolumns)) {
+                    if ($allcolumns[ $key ]['searchable'] == 'true') {
+                        $lookfor[] = $column . " LIKE " . $this->db->escape($word) . "";
+                    }
+                }
             }
             $search[] = "(" . implode(" OR ", $lookfor) . ")";
         }
@@ -135,21 +130,17 @@ class Datatables {
         $search = " (";
         $lookfor = array();
 
-        if ( ! $allcolumns)
-        {
+        if (! $allcolumns) {
             return null;
         }
 
-        foreach ($allcolumns as $key)
-        {
-            if ($key['search']['value'] <> "" and $key['searchable'] == 'true')
-            {
+        foreach ($allcolumns as $key) {
+            if ($key['search']['value'] <> "" and $key['searchable'] == 'true') {
                 $lookfor[] = $this->column($key['data']) . " LIKE " . $this->db->escape('%' . $key['search']['value'] . '%') . "";
             }
         }
 
-        if (count($lookfor) > 0)
-        {
+        if (count($lookfor) > 0) {
             $search .= implode(" AND ", $lookfor) . ")";
 
             return $search;
@@ -186,13 +177,11 @@ class Datatables {
         $take = 10;
         $skip = (integer) $this->input('start');
 
-        if ($this->input('length'))
-        {
+        if ($this->input('length')) {
             $take = (integer) $this->input('length');
         }
 
-        if ($take == - 1 || ! $this->input('draw'))
-        {
+        if ($take == - 1 || ! $this->input('draw')) {
             return null;
         }
 
@@ -205,18 +194,15 @@ class Datatables {
         $orders = " ORDER BY ";
         $dir = ['asc' => 'asc', 'desc' => 'desc'];
 
-        if ( ! is_array($dtorders))
-        {
-            if ($this->hasOrderIn)
-            {
+        if (! is_array($dtorders)) {
+            if ($this->hasOrderIn) {
                 return null;
             }
 
             return $orders . $this->columns[0] . " asc";  // default
         }
 
-        foreach ($dtorders as $order)
-        {
+        foreach ($dtorders as $order) {
             $takeorders[] = $this->columns[ $order['column'] ] . " " . $dir[ $order['dir'] ];
         }
 
@@ -228,22 +214,17 @@ class Datatables {
         $this->execute();
         $formatted_data = array();
 
-        foreach ($this->data as $key => $row)
-        {
+        foreach ($this->data as $key => $row) {
             // new columns..
-            if (null !== $this->add && count($this->add) > 0)
-            {
-                foreach ($this->add as $new_column => $closure)
-                {
+            if (null !== $this->add && count($this->add) > 0) {
+                foreach ($this->add as $new_column => $closure) {
                     $row[ $new_column ] = $closure($row);
                 }
             }
 
             // editing columns..
-            if (null !== $this->edit && count($this->edit) > 0)
-            {
-                foreach ($this->edit as $edit_column => $closure)
-                {
+            if (null !== $this->edit && count($this->edit) > 0) {
+                foreach ($this->edit as $edit_column => $closure) {
                     if (isset($row[ $edit_column ])) {
                         $row[ $edit_column ] = $closure($row);
                     }
@@ -280,8 +261,7 @@ class Datatables {
 
     public function input($input)
     {
-        if (isset($this->input[ $input ]))
-        {
+        if (isset($this->input[ $input ])) {
             return $this->input[ $input ];
         }
 
@@ -290,8 +270,7 @@ class Datatables {
 
     protected function column($input)
     {
-        if (is_numeric($input))
-        {
+        if (is_numeric($input)) {
             return $this->columns[ $input ];
         }
 
@@ -300,8 +279,7 @@ class Datatables {
 
     protected function response($data, $json = true)
     {
-        if ($json)
-        {
+        if ($json) {
             header('Content-type: application/json');
 
             return json_encode($data);
@@ -313,8 +291,7 @@ class Datatables {
     protected function isIndexed($row) // if data source uses associative keys or index number
     {
         $column = $this->input('columns');
-        if (is_numeric($column[0]['data']))
-        {
+        if (is_numeric($column[0]['data'])) {
             return array_values($row);
         }
 
@@ -336,19 +313,16 @@ class Datatables {
         $hold = array();
         $balance = 0;
         $parts = explode($delimiter, $str);
-        foreach ($parts as $part)
-        {
+        foreach ($parts as $part) {
             $hold[] = $part;
             $balance += $this->balanceChars($part, $open, $close);
-            if ($balance < 1)
-            {
+            if ($balance < 1) {
                 $retval[] = implode($delimiter, $hold);
                 $hold = array();
                 $balance = 0;
             }
         }
-        if (count($hold) > 0)
-        {
+        if (count($hold) > 0) {
             $retval[] = implode($delimiter, $hold);
         }
 
