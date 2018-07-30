@@ -2,11 +2,12 @@
 
 use DB;
 
-class LaravelAdapter implements DatabaseInterface {
+class LaravelAdapter implements DatabaseInterface
+{
 
     protected $escape = [];
 
-    function __construct($config = null)
+    public function __construct($config = null)
     {
     }
 
@@ -17,11 +18,10 @@ class LaravelAdapter implements DatabaseInterface {
 
     public function query($query)
     {
-        $data = DB::select( $query, $this->escape);
+        $data = DB::select($query, $this->escape);
         $row = [];
 
-        foreach ($data as $item)
-        {
+        foreach ($data as $item) {
             $row[] = (array) $item;
         }
 
@@ -31,7 +31,7 @@ class LaravelAdapter implements DatabaseInterface {
     public function count($query)
     {
         $query = "Select count(*) as rowcount," . substr($query, 6);
-        $data = DB::select( $query, $this->escape);
+        $data = DB::select($query, $this->escape);
 
         return $data[0]->rowcount;
     }
@@ -42,5 +42,4 @@ class LaravelAdapter implements DatabaseInterface {
 
         return ":escape" . (count($this->escape));
     }
-
 }

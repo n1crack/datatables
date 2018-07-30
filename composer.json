@@ -12,10 +12,21 @@
     }
   ],
   "autoload": {
-    "psr-4": {"Ozdemir\\Datatables\\": "src/"}
+    "psr-4": {
+      "Ozdemir\\Datatables\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Ozdemir\\Datatables\\Test\\": "src/tests/unit"
+    }
   },
   "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.5"
+  },
   "require-dev": {
-    "phpspec/phpspec": "~2.0"
+    "phpspec/phpspec": "^2.0",
+    "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5"
   }
 }

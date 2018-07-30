@@ -2,13 +2,14 @@
 
 use Db;
 
-class PSAdapter implements DatabaseInterface {
+class PSAdapter implements DatabaseInterface
+{
 
     protected $Db;
     protected $config;
     protected $escape = [];
 
-    function __construct($config)
+    public function __construct($config)
     {
         $this->config = $config;
     }
@@ -35,5 +36,4 @@ class PSAdapter implements DatabaseInterface {
     {
         return '"%' . pSQL($string) . '%"';
     }
-
 }

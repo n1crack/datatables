@@ -1,11 +1,12 @@
 <?php namespace Ozdemir\Datatables\DB;
 
-class CodeigniterAdapter implements DatabaseInterface {
+class CodeigniterAdapter implements DatabaseInterface
+{
 
     protected $escape = [];
     protected $CI;
 
-    function __construct($config = null)
+    public function __construct($config = null)
     {
         $this->CI =& get_instance();
         $this->CI->load->database();
@@ -37,5 +38,4 @@ class CodeigniterAdapter implements DatabaseInterface {
 
         return "?";
     }
-
 }
