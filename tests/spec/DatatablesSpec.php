@@ -156,4 +156,22 @@ class DatatablesSpec extends ObjectBehavior
         $datatables['data'][0]->shouldReturn(['Todd', 'Wycoff', '36']);
     }
 
+    public function it_sorts_excluding_hidden_columns()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => 1, 'dir' => 'asc']]); // age - asc
+
+        $this->request->query->set('columns', [
+            ['data' => 0, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->query('Select id as fid, name, surname, age from mytable');
+        $this->hide('fid');
+        $this->hide('surname');
+        $datatables = $this->generate(false); // only name and age visible
+
+        $datatables['data'][0]->shouldReturn(['Colin', '19']);
+    }
+
 }
