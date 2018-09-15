@@ -10,9 +10,11 @@ class DatatablesSpec extends ObjectBehavior
 {
     private $request;
 
+
     public function let()
     {
         $sqlconfig = realpath(dirname(__FILE__).'/test.db');
+
         $db = new SQLite($sqlconfig);
 
         $this->request = Request::create(null, 'GET', ['draw' => 1]);

@@ -4,6 +4,7 @@ namespace Ozdemir\Datatables\DB;
 
 use DB;
 
+
 class LaravelAdapter implements DatabaseInterface
 {
     protected $escape = [];
@@ -32,6 +33,7 @@ class LaravelAdapter implements DatabaseInterface
     public function count($query)
     {
         $query = "Select count(*) as rowcount,".substr($query, 6);
+
         $data = DB::select($query, $this->escape);
 
         return $data[0]->rowcount;
@@ -44,3 +46,4 @@ class LaravelAdapter implements DatabaseInterface
         return ":escape".(count($this->escape));
     }
 }
+

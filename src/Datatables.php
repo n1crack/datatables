@@ -287,8 +287,8 @@ class Datatables
                     $formatted_row[$column->name] = $column->closure($row, $column->name);
                 }
             }
-
             $formatted_data[] = $formatted_row;
+
         }
 
         return $formatted_data;
@@ -311,6 +311,7 @@ class Datatables
             header('Content-type: application/json');
 
             return json_encode($response);
+
         }
 
         return $response;

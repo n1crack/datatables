@@ -7,6 +7,7 @@ use PDOException;
 
 class SQLite implements DatabaseInterface
 {
+
     protected $pdo;
 
     protected $config;
@@ -32,6 +33,7 @@ class SQLite implements DatabaseInterface
 
     public function query($query)
     {
+        $this->pdo = new PDO('sqlite:' . $this->config);
         $sql = $this->pdo->prepare($query);
         $rows = $sql->execute($this->escape);
 

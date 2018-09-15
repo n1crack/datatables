@@ -15,13 +15,23 @@
     }
   ],
   "autoload": {
-    "psr-4": {"Ozdemir\\Datatables\\": "src/"}
+    "psr-4": {
+      "Ozdemir\\Datatables\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Ozdemir\\Datatables\\Test\\": "src/tests/unit"
+    }
   },
   "minimum-stability": "dev",
+
   "require":{
-    "symfony/http-foundation":"~3.4"
+    "symfony/http-foundation":"~3.4",
+    "php": ">=5.5"
   },
   "require-dev": {
-    "phpspec/phpspec": "~3.0"
+    "phpspec/phpspec": "~3.0",
+    "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5"
   }
 }

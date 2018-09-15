@@ -2,6 +2,7 @@
 
 namespace Ozdemir\Datatables\DB;
 
+
 class CodeigniterAdapter implements DatabaseInterface
 {
     protected $escape = [];
@@ -41,3 +42,4 @@ class CodeigniterAdapter implements DatabaseInterface
         return '?';
     }
 }
+

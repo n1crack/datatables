@@ -7,7 +7,8 @@ php:
   - 7.2
 
 before_script:
-  - travis_retry composer install --prefer-source --no-interaction
+  - travis_retry composer update --prefer-source --no-interaction
 
 script:
   - vendor/bin/phpspec run --config=phpspec.yml --no-interaction
+  - vendor/bin/phpunit

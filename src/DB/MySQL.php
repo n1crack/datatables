@@ -60,3 +60,4 @@ class MySQL implements DatabaseInterface
         return ":escape".(count($this->escape));
     }
 }
+
