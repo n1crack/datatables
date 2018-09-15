@@ -13,12 +13,12 @@ class DatatablesTest extends TestCase
 
     private function customfunction($data)
     {
-        return substr($data, 0, 3) . '...';
+        return substr($data, 0, 3).'...';
     }
 
     public function setUp()
     {
-        $sqlconfig = __DIR__ . '/../fixtures/test.db';
+        $sqlconfig = __DIR__.'/../fixtures/test.db';
 
         $this->db = new Datatables(new SQLite($sqlconfig));
     }
@@ -35,7 +35,7 @@ class DatatablesTest extends TestCase
 
     public function testReturnsRecordCounts()
     {
-        $this->db->query("select id as fid, name, surname, age from mytable where id > 3");
+        $this->db->query('select id as fid, name, surname, age from mytable where id > 3');
         $datatables = $this->db->generate(false);
 
         $this->assertSame(8, $datatables['recordsTotal']);
@@ -44,7 +44,7 @@ class DatatablesTest extends TestCase
 
     public function testReturnsDataFromABasicSql()
     {
-        $this->db->query("select id as fid, name, surname, age from mytable");
+        $this->db->query('select id as fid, name, surname, age from mytable');
 
         $data = $this->db->generate(false)['data'][0];
 
@@ -64,12 +64,12 @@ class DatatablesTest extends TestCase
                   film.length as mins
             from film");
 
-        $this->assertSame(['fid', 'title', 'info', 'r_year', 'rental_rate', 'mins'], $this->db->get('all_columns'));
+        $this->assertSame(['fid', 'title', 'info', 'r_year', 'rental_rate', 'mins'], $this->db->get('columns'));
     }
 
     public function testHidesUnnecessaryColumnsFromOutput()
     {
-        $this->db->query("select id as fid, name, surname, age from mytable");
+        $this->db->query('select id as fid, name, surname, age from mytable');
         $this->db->hide('fid');
         $data = $this->db->generate(false)['data']['2'];
 
@@ -79,7 +79,7 @@ class DatatablesTest extends TestCase
 
     public function testReturnsModifiedDataViaClosureFunction()
     {
-        $this->db->query("select id as fid, name, surname, age from mytable");
+        $this->db->query('select id as fid, name, surname, age from mytable');
 
         $this->db->edit('name', function ($data) {
             return strtolower($data['name']);
@@ -91,8 +91,8 @@ class DatatablesTest extends TestCase
 
         $data = $this->db->generate(false)['data']['2'];
 
-        $this->assertSame("george", $data['name']);
-        $this->assertSame("Mar...", $data['surname']);
+        $this->assertSame('george', $data['name']);
+        $this->assertSame('Mar...', $data['surname']);
     }
 
     public function testReturnsColumnNamesFromQueryThatIncludesASubqueryInSelectStatement()
