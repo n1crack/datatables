@@ -64,7 +64,7 @@ class DatatablesTest extends TestCase
                   film.length as mins
             from film");
 
-        $this->assertSame(['fid', 'title', 'info', 'r_year', 'rental_rate', 'mins'], $this->db->get('columns'));
+        $this->assertSame(['fid', 'title', 'info', 'r_year', 'rental_rate', 'mins'], $this->db->getColumns());
     }
 
     public function testHidesUnnecessaryColumnsFromOutput()
@@ -74,7 +74,7 @@ class DatatablesTest extends TestCase
         $data = $this->db->generate(false)['data']['2'];
 
         $this->assertCount(3, $data);
-        $this->assertSame(['name', 'surname', 'age'], $this->db->get('columns'));
+        $this->assertSame(['name', 'surname', 'age'], $this->db->getColumns());
     }
 
     public function testReturnsModifiedDataViaClosureFunction()
@@ -107,7 +107,7 @@ class DatatablesTest extends TestCase
             FROM COLUMNS
             WHERE table_schema = 'mysql' AND table_name = 'user';");
 
-        $this->assertSame(['column_name', 'privs'], $dt->get('columns'));
+        $this->assertSame(['column_name', 'privs'], $dt->getColumns());
     }
 
     public function testReturnsColumnNamesFromQueryThatIncludesASubqueryInWhereStatement()
@@ -120,7 +120,7 @@ class DatatablesTest extends TestCase
             WHERE cp.TABLE_SCHEMA = COLUMNS.TABLE_SCHEMA
             AND cp.TABLE_NAME = COLUMNS.TABLE_NAME
             AND cp.COLUMN_NAME = COLUMNS.COLUMN_NAME) is not null;");
-        $columns = $dt->get('columns');
+        $columns = $dt->getColumns();
 
         $this->assertSame($columns[0], 'column_name');
     }

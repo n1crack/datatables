@@ -2,22 +2,37 @@
 
 namespace Ozdemir\Datatables\DB;
 
+use Ozdemir\Datatables\Query;
 use PDO;
-use PDOException;
 
+/**
+ * Class MySQL
+ * @package Ozdemir\Datatables\DB
+ */
 class MySQL implements DatabaseInterface
 {
+    /**
+     * @var PDO
+     */
     protected $pdo;
 
+    /**
+     * @var array
+     */
     protected $config;
 
-    protected $escape = [];
-
+    /**
+     * MySQL constructor.
+     * @param $config
+     */
     public function __construct($config)
     {
         $this->config = $config;
     }
 
+    /**
+     * @return $this
+     */
     public function connect()
     {
         $host = $this->config['host'];
@@ -27,37 +42,46 @@ class MySQL implements DatabaseInterface
         $database = $this->config['database'];
         $charset = 'utf8';
 
-        try {
-            $this->pdo = new PDO("mysql:host=$host;dbname=$database;port=$port;charset=$charset", "$user", "$pass");
-        } catch (PDOException $e) {
-            print $e->getMessage();
-        }
+        $this->pdo = new PDO("mysql:host=$host;dbname=$database;port=$port;charset=$charset", "$user", "$pass");
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         return $this;
     }
 
-    public function query($query)
+    /**
+     * @param Query $query
+     * @return mixed
+     */
+    public function query(Query $query)
     {
         $sql = $this->pdo->prepare($query);
-        $rows = $sql->execute($this->escape);
+        $sql->execute($query->escape);
 
         return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function count($query)
+    /**
+     * @param Query $query
+     * @return mixed
+     */
+    public function count(Query $query)
     {
         $sql = $this->pdo->prepare($query);
-        $rows = $sql->execute($this->escape);
+        $sql->execute($query->escape);
 
         return $sql->rowCount();
     }
 
-    public function escape($string)
+    /**
+     * @param $string
+     * @param Query $query
+     * @return string
+     */
+    public function escape($string, Query $query)
     {
-        $this->escape[':escape'.(count($this->escape) + 1)] = '%'.$string.'%';
+        $query->escape[':binding_'.(count($query->escape) + 1)] = '%'.$string.'%';
 
-        return ":escape".(count($this->escape));
+        return ':binding_'.count($query->escape);
     }
 }
 

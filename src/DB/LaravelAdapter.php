@@ -3,24 +3,38 @@
 namespace Ozdemir\Datatables\DB;
 
 use DB;
+use Ozdemir\Datatables\Query;
 
 
+/**
+ * Class LaravelAdapter
+ * @package Ozdemir\Datatables\DB
+ */
 class LaravelAdapter implements DatabaseInterface
 {
-    protected $escape = [];
-
+    /**
+     * LaravelAdapter constructor.
+     * @param null $config
+     */
     public function __construct($config = null)
     {
     }
 
+    /**
+     * @return $this
+     */
     public function connect()
     {
         return $this;
     }
 
-    public function query($query)
+    /**
+     * @param Query $query
+     * @return array
+     */
+    public function query(Query $query)
     {
-        $data = DB::select($query, $this->escape);
+        $data = DB::select($query, $query->escape);
         $row = [];
 
         foreach ($data as $item) {
@@ -30,20 +44,29 @@ class LaravelAdapter implements DatabaseInterface
         return $row;
     }
 
-    public function count($query)
+    /**
+     * @param Query $query
+     * @return mixed
+     */
+    public function count(Query $query)
     {
-        $query = "Select count(*) as rowcount,".substr($query, 6);
+        $query = 'Select count(*) as rowcount,'.substr($query, 6);
 
-        $data = DB::select($query, $this->escape);
+        $data = DB::select($query, $query->escape);
 
         return $data[0]->rowcount;
     }
 
-    public function escape($string)
+    /**
+     * @param $string
+     * @param Query $query
+     * @return string
+     */
+    public function escape($string, Query $query)
     {
-        $this->escape[':escape'.(count($this->escape) + 1)] = '%'.$string.'%';
+        $this->escape[':binding_'.(count($query->escape) + 1)] = '%'.$string.'%';
 
-        return ":escape".(count($this->escape));
+        return ':binding_'.count($query->escape);
     }
 }
 

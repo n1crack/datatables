@@ -1,38 +1,70 @@
 <?php namespace Ozdemir\Datatables\DB;
 
 use Db;
+use Ozdemir\Datatables\Query;
 
+/**
+ * Class PSAdapter
+ * @package Ozdemir\Datatables\DB
+ */
 class PSAdapter implements DatabaseInterface
 {
 
+    /**
+     * @var
+     */
     protected $Db;
+    /**
+     * @var
+     */
     protected $config;
-    protected $escape = [];
 
+    /**
+     * PSAdapter constructor.
+     * @param $config
+     */
     public function __construct($config)
     {
         $this->config = $config;
     }
 
+    /**
+     * @return $this
+     */
     public function connect()
     {
         $this->Db = Db::getInstance();
         return $this;
     }
 
-    public function query($query, $array = true, $user_cache = true)
+    /**
+     * @param Query $query
+     * @param bool $array
+     * @param bool $user_cache
+     * @return mixed
+     */
+    public function query(Query $query, $array = true, $user_cache = true)
     {
         return $this->Db->executeS($query, $array, $user_cache);
     }
 
-    public function count($query)
+    /**
+     * @param Query $query
+     * @return mixed
+     */
+    public function count(Query $query)
     {
-        $query = "Select count(*) as rowcount," . substr($query, 6);
+        $query = 'Select count(*) as rowcount,'. substr($query, 6);
         $data = $this->Db->getRow($query);
         return $data['rowcount'];
     }
 
-    public function escape($string)
+    /**
+     * @param $string
+     * @param Query $query
+     * @return string
+     */
+    public function escape($string,Query $query)
     {
         return '"%' . pSQL($string) . '%"';
     }

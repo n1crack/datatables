@@ -37,19 +37,19 @@ class ColumnCollection
     /**
      * ColumnCollection constructor.
      *
-     * @param $query Query
+     * @param Builder $builder
      */
-    public function __construct($query)
+    public function __construct(Builder $builder)
     {
         $this->container = new \ArrayObject();
 
-        $columns = $this->setColumnNames($query->bare);
+        $columns = $this->setColumnNames($builder->bare);
 
         foreach ($columns as $name) {
             $this->container->append(new Column($name));
         }
 
-        $query->set($this->names());
+        $builder->init($this);
     }
 
     /**
@@ -137,7 +137,7 @@ class ColumnCollection
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
      */
-    public function setAttr(Request $request)
+    public function setAttributes(Request $request)
     {
         foreach ($this->names() as $index => $name) {
             $this->get($name)->attr = $request->get('columns')[$index];
@@ -162,7 +162,7 @@ class ColumnCollection
      *
      * @return Column[]
      */
-    public function getSearchable()
+    public function getSearchableColumns()
     {
         $columns = array_filter($this->container->getArrayCopy(), function ($c) {
             return !$c->hidden && $c->interaction && $c->attr['searchable'];
@@ -175,9 +175,9 @@ class ColumnCollection
      *
      * @return Column[]
      */
-    public function getSearchableWithSearchValue()
+    public function getSearchableColumnsWithSearchValue()
     {
-        $columns = array_filter($this->getSearchable(), function ($c) {
+        $columns = array_filter($this->getSearchableColumns(), function ($c) {
             return $c->attr['search']['value'] !== '';
         });
 

@@ -51,29 +51,26 @@ class Column
     }
 
     /**
-     * @param $data
-     * @param $field
+     * @param $row array
      * @return string
      */
-    public function closure($data, $field)
+    public function closure($row)
     {
         if ($this->closure) {
             $closure = $this->closure;
 
-            return $closure($data);
+            return $closure($row);
         }
 
-        return $data[$field];
+        return $row[$this->name];
     }
 
     /**
-     * @return $this
+     * Set visibility of the column.
      */
     public function hide()
     {
         $this->hidden = true;
-
-        return $this;
     }
 
     /**

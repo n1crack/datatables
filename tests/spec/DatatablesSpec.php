@@ -59,7 +59,7 @@ class DatatablesSpec extends ObjectBehavior
                   film.rental_rate,
                   film.length as mins
             from film");
-        $this->get('columns')->shouldReturn(['fid', 'title', 'info', 'r_year', 'rental_rate', 'mins']);
+        $this->getColumns()->shouldReturn(['fid', 'title', 'info', 'r_year', 'rental_rate', 'mins']);
     }
 
     public function it_hides_unnecessary_columns_from_output()
@@ -69,7 +69,7 @@ class DatatablesSpec extends ObjectBehavior
         $data = $this->generate(false)['data']['2'];
 
         $data->shouldHaveCount(3); //  name, surname and age --
-        $this->get('columns')->shouldReturn(['name', 'surname', 'age']);
+        $this->getColumns()->shouldReturn(['name', 'surname', 'age']);
     }
 
     public function it_returns_modified_data_via_closure_function()
@@ -107,7 +107,7 @@ class DatatablesSpec extends ObjectBehavior
             FROM COLUMNS
             WHERE table_schema = 'mysql' AND table_name = 'user';");
 
-        $dt->get('columns')->shouldReturn(['column_name', 'privs']);
+        $dt->getColumns()->shouldReturn(['column_name', 'privs']);
     }
 
     public function it_returns_column_names_from_query_that_includes_a_subquery_in_where_statement()
@@ -121,7 +121,7 @@ class DatatablesSpec extends ObjectBehavior
             AND cp.TABLE_NAME = COLUMNS.TABLE_NAME
             AND cp.COLUMN_NAME = COLUMNS.COLUMN_NAME) is not null;");
 
-        $dt->get('columns')->shouldReturn(['column_name']);
+        $dt->getColumns()->shouldReturn(['column_name']);
     }
 
     public function it_filters_data_via_global_search()

@@ -13,63 +13,40 @@ class Query
      * Bare query string, user input
      * @var
      */
-    public $bare;
+    public $escapes = [];
 
     /**
-     * Base sql query string without filters and orders
+     * Query string
      * @var
      */
-    public $base;
+    public $sql;
 
     /**
-     * Full sql query string
-     * @var
-     */
-    public $full;
-
-    /**
-     * the query has default ordering
-     * @var
-     */
-    protected $hasDefaultOrder = false;
-
-    /**
-     * Query constructor.
+     * Builder constructor.
      *
      * @param $query
      */
-    public function __construct($query)
+    public function __construct($query = '')
     {
-        $this->bare = rtrim($query, '; ');
+        $this->sql = $query;
     }
 
     /**
-     * @param $columns array
-     * @return Query
-     */
-    public function set($columns)
-    {
-
-        $this->base = 'Select '.implode(', ', $columns)." from ({$this->bare})t";
-        $this->hasDefaultOrder = $this->isQueryWithOrderBy($this->bare);
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasDefaultOrder()
-    {
-        return $this->hasDefaultOrder;
-    }
-
-    /**
+     * Builder constructor.
+     *
      * @param $query
-     * @return bool
      */
-    protected function isQueryWithOrderBy($query)
+    public function set($query)
     {
-        return (bool)count(preg_grep("/(order\s+by)\s+(.+)$/i", explode("\n", $query)));
+        $this->sql = $query;
     }
+
+    /**
+     *
+     */
+    public function __toString()
+    {
+        return $this->sql;
+    }
+
 }
