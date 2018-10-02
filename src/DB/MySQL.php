@@ -66,10 +66,10 @@ class MySQL implements DatabaseInterface
      */
     public function count(Query $query)
     {
-        $sql = $this->pdo->prepare($query);
+        $sql = $this->pdo->prepare('Select count(*) as rowcount,'.substr($query, 6));
         $sql->execute($query->escapes);
 
-        return $sql->rowCount();
+        return $sql->fetchColumn();
     }
 
     /**
