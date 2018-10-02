@@ -34,7 +34,7 @@ class LaravelAdapter implements DatabaseInterface
      */
     public function query(Query $query)
     {
-        $data = DB::select($query, $query->escape);
+        $data = DB::select($query, $query->escapes);
         $row = [];
 
         foreach ($data as $item) {
@@ -52,7 +52,7 @@ class LaravelAdapter implements DatabaseInterface
     {
         $query = 'Select count(*) as rowcount,'.substr($query, 6);
 
-        $data = DB::select($query, $query->escape);
+        $data = DB::select($query, $query->escapes);
 
         return $data[0]->rowcount;
     }
@@ -64,9 +64,9 @@ class LaravelAdapter implements DatabaseInterface
      */
     public function escape($string, Query $query)
     {
-        $this->escape[':binding_'.(count($query->escape) + 1)] = '%'.$string.'%';
+        $query->escapes[':binding_'.(count($query->escapes) + 1)] = '%'.$string.'%';
 
-        return ':binding_'.count($query->escape);
+        return ':binding_'.count($query->escapes);
     }
 }
 

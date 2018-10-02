@@ -38,7 +38,7 @@ class CodeigniterAdapter implements DatabaseInterface
      */
     public function query(Query $query)
     {
-        $data = $this->CI->db->query($query, $query->escape);
+        $data = $this->CI->db->query($query, $query->escapes);
 
         return $data->result_array();
     }
@@ -50,7 +50,7 @@ class CodeigniterAdapter implements DatabaseInterface
     public function count(Query $query)
     {
         $query = "Select count(*) as rowcount from ($query)t";
-        $data = $this->CI->db->query($query, $query->escape)->result_array();
+        $data = $this->CI->db->query($query, $query->escapes)->result_array();
 
         return $data[0]['rowcount'];
     }
@@ -62,7 +62,7 @@ class CodeigniterAdapter implements DatabaseInterface
      */
     public function escape($string, Query $query)
     {
-        $query->escape[] = '%'.$string.'%';
+        $query->escapes[] = '%'.$string.'%';
 
         return '?';
     }

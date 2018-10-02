@@ -55,7 +55,7 @@ class MySQL implements DatabaseInterface
     public function query(Query $query)
     {
         $sql = $this->pdo->prepare($query);
-        $sql->execute($query->escape);
+        $sql->execute($query->escapes);
 
         return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -67,7 +67,7 @@ class MySQL implements DatabaseInterface
     public function count(Query $query)
     {
         $sql = $this->pdo->prepare($query);
-        $sql->execute($query->escape);
+        $sql->execute($query->escapes);
 
         return $sql->rowCount();
     }
@@ -79,9 +79,9 @@ class MySQL implements DatabaseInterface
      */
     public function escape($string, Query $query)
     {
-        $query->escape[':binding_'.(count($query->escape) + 1)] = '%'.$string.'%';
+        $query->escapes[':binding_'.(count($query->escapes) + 1)] = '%'.$string.'%';
 
-        return ':binding_'.count($query->escape);
+        return ':binding_'.count($query->escapes);
     }
 }
 
