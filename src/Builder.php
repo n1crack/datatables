@@ -187,7 +187,7 @@ class Builder
                 $filter = $column->customFilter;
                 $customFilter = $filter(function($value) use ($query){
                     return $this->db->escape($value, $query);
-                });
+                }, $column->attr('search')['value']);
                 if ($customFilter) {
                     $look[] = $customFilter;
                 }
