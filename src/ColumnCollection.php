@@ -71,7 +71,7 @@ class ColumnCollection
     }
 
     /**
-     * It edit column
+     * It edits columns
      *
      * @param $name
      * @param $closure callable
@@ -81,6 +81,21 @@ class ColumnCollection
     {
         $column = $this->get($name, false);
         $column->closure = $closure;
+
+        return $column;
+    }
+
+    /**
+     * It filters columns
+     *
+     * @param $name
+     * @param $closure callable
+     * @return Column
+     */
+    public function filter($name, $closure)
+    {
+        $column = $this->get($name, false);
+        $column->customFilter = $closure;
 
         return $column;
     }
@@ -164,7 +179,7 @@ class ColumnCollection
      */
     public function getSearchableColumns()
     {
-        $columns = array_filter($this->container->getArrayCopy(), function ($c) {
+        $columns = array_filter($this->container->getArrayCopy(), function (Column $c) {
             return !$c->hidden && $c->interaction && $c->attr['searchable'];
         });
 
@@ -177,8 +192,8 @@ class ColumnCollection
      */
     public function getSearchableColumnsWithSearchValue()
     {
-        $columns = array_filter($this->getSearchableColumns(), function ($c) {
-            return $c->attr['search']['value'] !== '';
+        $columns = array_filter($this->getSearchableColumns(), function (Column $c) {
+            return $c->attr['search']['value'] !== '' || $c->customFilter;
         });
 
         return $columns;

@@ -74,16 +74,13 @@ class Builder
     }
 
     /**
-     * @param ColumnCollection $columns array
-     * @return Builder
+     * @param ColumnCollection $columns
      */
     public function init(ColumnCollection $columns)
     {
         $this->columns = $columns;
         $this->query = new Query('Select '.implode(', ', $this->columns->names())." from ({$this->bare})t");
         $this->hasDefaultOrder = $this->isQueryWithOrderBy($this->bare);
-
-        return $this;
     }
 
     /**
@@ -113,7 +110,7 @@ class Builder
     }
 
     /**
-     * @param $query
+     * @param string $query
      * @return bool
      */
     protected function isQueryWithOrderBy($query)
@@ -125,9 +122,12 @@ class Builder
      * @param $query
      * @return string
      */
-    public function filter($query)
+    protected function filter($query)
     {
-        $filter = array_filter([$this->filterGlobal($query), $this->filterIndividual($query)]);
+        $filter = array_filter([
+            $this->filterGlobal($query),
+            $this->filterIndividual($query),
+        ]);
 
         if (count($filter) > 0) {
             return ' WHERE '.implode(' AND ', $filter);
@@ -139,7 +139,7 @@ class Builder
     /**
      * @return string
      */
-    public function filterGlobal($query)
+    protected function filterGlobal($query)
     {
         $searchinput = $this->request->get('search')['value'];
 
@@ -172,7 +172,7 @@ class Builder
     /**
      * @return string
      */
-    public function filterIndividual($query)
+    protected function filterIndividual($query)
     {
         $columns = $this->columns->getSearchableColumnsWithSearchValue();
 
@@ -183,7 +183,14 @@ class Builder
         $look = [];
 
         foreach ($columns as $column) {
-            $look[] = $column->name.' LIKE '.$this->db->escape($column->searchValue(), $query);
+            if ($column->customFilter) {
+                $filter = $column->customFilter;
+                if ($filter()) {
+                    $look[] = $filter();
+                }
+            } else {
+                $look[] = $column->name.' LIKE '.$this->db->escape($column->searchValue(), $query);
+            }
         }
 
         return ' ('.implode(' AND ', $look).')';
@@ -192,7 +199,7 @@ class Builder
     /**
      * @return string
      */
-    public function limit()
+    protected function limit()
     {
         $take = 10;
         $skip = (integer)$this->request->get('start');
@@ -211,7 +218,7 @@ class Builder
     /**
      * @return string
      */
-    public function orderBy()
+    protected function orderBy()
     {
         $orders = $this->request->get('order') ?: [];
 

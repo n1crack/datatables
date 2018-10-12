@@ -47,7 +47,7 @@ class Datatables
 
     /**
      * @param $column
-     * @param $closure callable
+     * @param callable $closure
      * @return $this
      */
     public function add($column, $closure)
@@ -59,7 +59,7 @@ class Datatables
 
     /**
      * @param $column
-     * @param $closure callable
+     * @param callable $closure
      * @return $this
      */
     public function edit($column, $closure)
@@ -70,7 +70,19 @@ class Datatables
     }
 
     /**
-     * @return mixed
+     * @param $column
+     * @param callable $closure
+     * @return $this
+     */
+    public function filter($column, $closure)
+    {
+        $this->columns->filter($column, $closure);
+
+        return $this;
+    }
+
+    /**
+     * @return array
      */
     public function getColumns()
     {
@@ -78,7 +90,7 @@ class Datatables
     }
 
     /**
-     * @return mixed
+     * @return Query
      */
     public function getQuery()
     {
@@ -116,7 +128,7 @@ class Datatables
 
     /**
      * @param bool $json
-     * @return mixed
+     * @return JsonResponse | array
      */
     public function generate($json = true)
     {
@@ -152,7 +164,8 @@ class Datatables
         $columns = $this->columns->all(false);
 
         foreach ($columns as $column) {
-            $attr = $column->attr('data'); // this is column index or column name
+            // data gives the column index or column name
+            $attr = $column->attr('data');
             if (is_numeric($attr)) {
                 $formatted_row[] = $column->closure($row);
             } else {
@@ -166,7 +179,7 @@ class Datatables
     /**
      * @param $response
      * @param bool $json
-     * @return mixed
+     * @return JsonResponse | array
      */
     protected function response($response, $json = true)
     {

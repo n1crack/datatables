@@ -41,6 +41,12 @@ class Column
     public $interaction = true;
 
     /**
+     * Custom filter
+     * @var callable
+     */
+    public $customFilter;
+
+    /**
      * Column constructor.
      *
      * @param $name
