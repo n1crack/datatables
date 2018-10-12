@@ -64,7 +64,7 @@ class LaravelAdapter implements DatabaseInterface
      */
     public function escape($string, Query $query)
     {
-        $query->escapes[':binding_'.(count($query->escapes) + 1)] = '%'.$string.'%';
+        $query->escapes[':binding_'.(count($query->escapes) + 1)] = $string;
 
         return ':binding_'.count($query->escapes);
     }

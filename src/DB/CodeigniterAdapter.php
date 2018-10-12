@@ -62,7 +62,7 @@ class CodeigniterAdapter implements DatabaseInterface
      */
     public function escape($string, Query $query)
     {
-        $query->escapes[] = '%'.$string.'%';
+        $query->escapes[] = $string;
 
         return '?';
     }

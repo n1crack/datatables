@@ -160,7 +160,7 @@ class Builder
             $look = [];
 
             foreach ($columns as $column) {
-                $look[] = $column->name.' LIKE '.$this->db->escape($word, $query);
+                $look[] = $column->name.' LIKE '.$this->db->escape('%'. $word. '%', $query);
             }
 
             $search[] = '('.implode(' OR ', $look).')';
@@ -185,11 +185,14 @@ class Builder
         foreach ($columns as $column) {
             if ($column->customFilter) {
                 $filter = $column->customFilter;
-                if ($filter()) {
-                    $look[] = $filter();
+                $customFilter = $filter(function($value) use ($query){
+                    return $this->db->escape($value, $query);
+                });
+                if ($customFilter) {
+                    $look[] = $customFilter;
                 }
             } else {
-                $look[] = $column->name.' LIKE '.$this->db->escape($column->searchValue(), $query);
+                $look[] = $column->name.' LIKE '.$this->db->escape('%'. $column->searchValue() . '%', $query);
             }
         }
 
