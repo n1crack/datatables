@@ -80,15 +80,6 @@ class Column
     }
 
     /**
-     * @param $value
-     * @return mixed
-     */
-    public function attr($value)
-    {
-        return $this->attr[$value];
-    }
-
-    /**
      * @return bool
      */
     public function isSearchable()
@@ -102,6 +93,14 @@ class Column
     public function isOrderable()
     {
         return ($this->interaction && $this->attr['orderable']);
+    }
+
+    /**
+     * @return string
+     */
+    public function data()
+    {
+        return $this->attr['data'];
     }
 
     /**

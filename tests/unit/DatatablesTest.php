@@ -36,7 +36,7 @@ class DatatablesTest extends TestCase
     public function testReturnsRecordCounts()
     {
         $this->db->query('select id as fid, name, surname, age from mytable where id > 3');
-        $datatables = $this->db->generate(false);
+        $datatables = $this->db->generate()->toArray();
 
         $this->assertSame(8, $datatables['recordsTotal']);
         $this->assertSame(8, $datatables['recordsFiltered']);
@@ -46,7 +46,7 @@ class DatatablesTest extends TestCase
     {
         $this->db->query('select id as fid, name, surname, age from mytable');
 
-        $data = $this->db->generate(false)['data'][0];
+        $data = $this->db->generate()->toArray()['data'][0];
 
         $this->assertSame("1", $data['fid']);
         $this->assertSame("John", $data['name']);
@@ -71,7 +71,7 @@ class DatatablesTest extends TestCase
     {
         $this->db->query('select id as fid, name, surname, age from mytable');
         $this->db->hide('fid');
-        $data = $this->db->generate(false)['data']['2'];
+        $data = $this->db->generate()->toArray()['data']['2'];
 
         $this->assertCount(3, $data);
         $this->assertSame(['name', 'surname', 'age'], $this->db->getColumns());
@@ -89,7 +89,7 @@ class DatatablesTest extends TestCase
             return $this->customfunction($data['surname']);
         });
 
-        $data = $this->db->generate(false)['data']['2'];
+        $data = $this->db->generate()->toArray()['data']['2'];
 
         $this->assertSame('george', $data['name']);
         $this->assertSame('Mar...', $data['surname']);

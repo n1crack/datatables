@@ -33,7 +33,7 @@ class DatatablesSpec extends ObjectBehavior
     public function it_returns_record_counts()
     {
         $this->query("Select id as fid, name, surname, age from mytable where id > 3");
-        $datatables = $this->generate(false);
+        $datatables = $this->generate()->toArray();
         $datatables['recordsTotal']->shouldReturn(8);
         $datatables['recordsFiltered']->shouldReturn(8);
     }
@@ -42,7 +42,7 @@ class DatatablesSpec extends ObjectBehavior
     {
         $this->query("Select id as fid, name, surname, age from mytable");
 
-        $data = $this->generate(false)['data'][0];
+        $data = $this->generate()->toArray()['data'][0];
 
         $data['fid']->shouldReturn("1");
         $data['name']->shouldReturn("John");
@@ -64,9 +64,9 @@ class DatatablesSpec extends ObjectBehavior
 
     public function it_hides_unnecessary_columns_from_output()
     {
-        $this->query("Select id as fid, name, surname, age from mytable");
+        $this->query('Select id as fid, name, surname, age from mytable');
         $this->hide('fid');
-        $data = $this->generate(false)['data']['2'];
+        $data = $this->generate()->toArray()['data']['2'];
 
         $data->shouldHaveCount(3); //  name, surname and age --
         $this->getColumns()->shouldReturn(['name', 'surname', 'age']);
@@ -74,7 +74,7 @@ class DatatablesSpec extends ObjectBehavior
 
     public function it_returns_modified_data_via_closure_function()
     {
-        $this->query("Select id as fid, name, surname, age from mytable");
+        $this->query('Select id as fid, name, surname, age from mytable');
 
         $this->edit('name', function ($data) {
             return strtolower($data['name']);
@@ -84,7 +84,7 @@ class DatatablesSpec extends ObjectBehavior
             return $this->customfunction($data['surname']);
         });
 
-        $data = $this->generate(false)['data']['2'];
+        $data = $this->generate()->toArray()['data']['2'];
 
         $data['name']->shouldReturn('george');
         $data['surname']->shouldReturn('Mar...');
@@ -134,7 +134,7 @@ class DatatablesSpec extends ObjectBehavior
         ]);
 
         $this->query('Select name, surname from mytable');
-        $datatables = $this->generate(false);
+        $datatables = $this->generate()->toArray();
 
         $datatables['recordsTotal']->shouldReturn(11);
         $datatables['recordsFiltered']->shouldReturn(2);
@@ -152,7 +152,7 @@ class DatatablesSpec extends ObjectBehavior
         ]);
 
         $this->query('Select name, surname, age from mytable');
-        $datatables = $this->generate(false);
+        $datatables = $this->generate()->toArray();
 
         $datatables['data'][0]->shouldReturn(['Todd', 'Wycoff', '36']);
     }
@@ -170,7 +170,7 @@ class DatatablesSpec extends ObjectBehavior
         $this->query('Select id as fid, name, surname, age from mytable');
         $this->hide('fid');
         $this->hide('surname');
-        $datatables = $this->generate(false); // only name and age visible
+        $datatables = $this->generate()->toArray(); // only name and age visible
 
         $datatables['data'][0]->shouldReturn(['Colin', '19']);
     }

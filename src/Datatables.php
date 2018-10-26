@@ -34,6 +34,11 @@ class Datatables
     protected $request;
 
     /**
+     * @var array
+     */
+    protected $response;
+
+    /**
      * Datatables constructor.
      *
      * @param \Ozdemir\Datatables\DB\DatabaseInterface $db
@@ -48,7 +53,7 @@ class Datatables
     /**
      * @param $column
      * @param callable $closure
-     * @return $this
+     * @return Datatables
      */
     public function add($column, $closure)
     {
@@ -60,7 +65,7 @@ class Datatables
     /**
      * @param $column
      * @param callable $closure
-     * @return $this
+     * @return Datatables
      */
     public function edit($column, $closure)
     {
@@ -72,7 +77,7 @@ class Datatables
     /**
      * @param $column
      * @param callable $closure
-     * @return $this
+     * @return Datatables
      */
     public function filter($column, $closure)
     {
@@ -99,7 +104,7 @@ class Datatables
 
     /**
      * @param $columns
-     * @return $this
+     * @return Datatables
      */
     public function hide($columns)
     {
@@ -116,7 +121,7 @@ class Datatables
 
     /**
      * @param $query
-     * @return $this
+     * @return Datatables
      */
     public function query($query)
     {
@@ -127,22 +132,16 @@ class Datatables
     }
 
     /**
-     * @param bool $json
-     * @return JsonResponse | array
+     * @return Datatables
      */
-    public function generate($json = true)
+    public function generate()
     {
         $this->columns->setAttributes($this->request);
         $this->builder->setFilteredQuery();
         $this->builder->setFullQuery();
+        $this->setResponseData();
 
-        $response = [];
-        $response['draw'] = (integer)$this->request->get('draw');
-        $response['recordsTotal'] = $this->db->count($this->builder->query);
-        $response['recordsFiltered'] = $this->db->count($this->builder->filtered);
-        $response['data'] = $this->getData();
-
-        return $this->response($response, $json);
+        return $this;
     }
 
     /**
@@ -156,6 +155,17 @@ class Datatables
     }
 
     /**
+     *
+     */
+    public function setResponseData()
+    {
+        $this->response['draw'] = (integer)$this->request->get('draw');
+        $this->response['recordsTotal'] = $this->db->count($this->builder->query);
+        $this->response['recordsFiltered'] = $this->db->count($this->builder->filtered);
+        $this->response['data'] = $this->getData();
+    }
+
+    /**
      * @param $row
      * @return array
      */
@@ -164,9 +174,8 @@ class Datatables
         $columns = $this->columns->all(false);
 
         foreach ($columns as $column) {
-            // data gives the column index or column name
-            $attr = $column->attr('data');
-            if (is_numeric($attr)) {
+            // column data gives the column index or column name
+            if (is_numeric($column->data())) {
                 $formatted_row[] = $column->closure($row);
             } else {
                 $formatted_row[$column->name] = $column->closure($row);
@@ -177,18 +186,28 @@ class Datatables
     }
 
     /**
-     * @param $response
-     * @param bool $json
-     * @return JsonResponse | array
+     * @return string
      */
-    protected function response($response, $json = true)
+    public function __toString()
     {
-        if ($json) {
-            $response = new JsonResponse($response);
+        return $this->toJson();
+    }
 
-            return $response->send();
-        }
+    /**
+     * @return string
+     */
+    public function toJson()
+    {
+        $response = new JsonResponse($this->response);
 
-        return $response;
+        return $response->send();
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->response;
     }
 }

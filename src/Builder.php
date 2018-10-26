@@ -119,10 +119,10 @@ class Builder
     }
 
     /**
-     * @param $query
+     * @param Query $query
      * @return string
      */
-    protected function filter($query)
+    protected function filter(Query $query)
     {
         $filter = array_filter([
             $this->filterGlobal($query),
@@ -137,9 +137,10 @@ class Builder
     }
 
     /**
+     * @param Query $query
      * @return string
      */
-    protected function filterGlobal($query)
+    protected function filterGlobal(Query $query)
     {
         $searchinput = $this->request->get('search')['value'];
 
@@ -170,9 +171,10 @@ class Builder
     }
 
     /**
+     * @param Query $query
      * @return string
      */
-    protected function filterIndividual($query)
+    protected function filterIndividual(Query $query)
     {
         $columns = $this->columns->getSearchableColumnsWithSearchValue();
 
@@ -186,8 +188,9 @@ class Builder
             if ($column->customFilter) {
                 $filter = $column->customFilter;
                 $customFilter = $filter(function($value) use ($query){
-                    return $this->db->escape($value, $query);
-                }, $column->attr('search')['value']);
+                        return $this->db->escape($value, $query);
+                 }, $column->searchValue());
+
                 if ($customFilter) {
                     $look[] = $customFilter;
                 }
