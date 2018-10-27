@@ -1,50 +1,80 @@
-<?php namespace Ozdemir\Datatables\DB;
+<?php
 
+namespace Ozdemir\Datatables\DB;
+
+use Ozdemir\Datatables\Query;
 use PDO;
-use PDOException;
 
+/**
+ * Class SQLite
+ * @package Ozdemir\Datatables\DB
+ */
 class SQLite implements DatabaseInterface
 {
 
+    /**
+     * @var PDO
+     */
     protected $pdo;
-    protected $config;
-    protected $escape = [];
 
+    /**
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * SQLite constructor.
+     * @param $config
+     */
     public function __construct($config)
     {
         $this->config = $config;
     }
 
+    /**
+     * @return $this
+     */
     public function connect()
     {
-        try {
-            $this->pdo = new PDO('sqlite:' . $this->config);
-        } catch (PDOException $e) {
-            echo $e->getMessage();
-        }
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->pdo = new PDO('sqlite:'.$this->config);
+        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         return $this;
     }
 
-    public function query($query)
+    /**
+     * @param Query $query
+     * @return mixed
+     */
+    public function query(Query $query)
     {
-        $this->pdo = new PDO('sqlite:' . $this->config);
         $sql = $this->pdo->prepare($query);
-        $rows=$sql->execute($this->escape);
+        $sql->execute($query->escapes);
+
         return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function count($query)
+    /**
+     * @param Query $query
+     * @return int
+     */
+    public function count(Query $query)
     {
-        $sql = $this->pdo->prepare($query);
-        $rows = $sql->execute($this->escape);
-        return count($sql->fetchAll());
+        $sql = $this->pdo->prepare('Select count(*) as rowcount,'.substr($query, 6));
+        $sql->execute($query->escapes);
+
+        return (int)$sql->fetchColumn();
     }
 
-    public function escape($string)
+    /**
+     * @param $string
+     * @param Query $query
+     * @return string
+     */
+    public function escape($string, Query $query)
     {
-        $this->escape[':escape' . (count($this->escape) + 1) ] = '%' . $string . '%';
-        return ":escape" . (count($this->escape));
+        $query->escapes[':binding_'.(count($query->escapes) + 1)] = $string;
+
+        return ':binding_'.count($query->escapes);
     }
 }

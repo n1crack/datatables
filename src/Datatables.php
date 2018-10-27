@@ -3,329 +3,211 @@
 namespace Ozdemir\Datatables;
 
 use Ozdemir\Datatables\DB\DatabaseInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * Class Datatables
+ *
+ * @package Ozdemir\Datatables
+ */
 class Datatables
 {
-
+    /**
+     * @var \Ozdemir\Datatables\DB\DatabaseInterface
+     */
     protected $db;
-    protected $data;
-    protected $recordstotal;
-    protected $recordsfiltered;
-    protected $columns;
-    protected $add;
-    protected $edit;
-    protected $hide;
-    protected $sql;
-    protected $query;
-    protected $hasOrderIn;
 
-    public function __construct(DatabaseInterface $db)
+    /**
+     * @var \Ozdemir\Datatables\ColumnCollection
+     */
+    protected $columns;
+
+    /**
+     * @var \Ozdemir\Datatables\Builder
+     */
+    protected $builder;
+
+    /**
+     * @var \Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
+
+    /**
+     * @var array
+     */
+    protected $response;
+
+    /**
+     * Datatables constructor.
+     *
+     * @param \Ozdemir\Datatables\DB\DatabaseInterface $db
+     * @param \Symfony\Component\HttpFoundation\Request|null $request
+     */
+    public function __construct(DatabaseInterface $db, Request $request = null)
     {
         $this->db = $db->connect();
-        $this->input = isset($_POST["draw"]) ? $_POST : $_GET;
+        $this->request = $request ?: Request::createFromGlobals();
     }
 
-    public function query($query)
+    /**
+     * @param $column
+     * @param callable $closure
+     * @return Datatables
+     */
+    public function add($column, $closure)
     {
-        $this->hasOrderIn = $this->isQueryWithOrderBy($query);
-        $this->columns = $this->setcolumns($query);
-        $columns = implode(", ", $this->columns);
-        $query = rtrim($query, "; ");
-        $this->sql = "Select $columns from ($query)t";
+        $this->columns->add($column, $closure);
 
         return $this;
     }
 
-    public function get($request)
-    {
-        switch ($request) {
-            case 'columns':
-                return array_values(array_diff($this->columns, (array) $this->hide));
-                break;
-            case 'all_columns':
-                return $this->columns;
-                break;
-            case 'sql':
-                return $this->query;
-                break;
-        }
-    }
-
-    public function hide($columns)
-    {
-        if (! is_array($columns)) {
-            $columns = func_get_args();
-        }
-        $columns = array_intersect($this->columns, $columns);
-        $this->hide = array_merge((array) $this->hide, array_combine($columns, $columns));
-
-        return $this;
-    }
-
-    protected function execute()
-    {
-        $this->recordstotal = $this->db->count($this->sql); // unfiltered data count is here.
-        $where = $this->filter();
-        $this->recordsfiltered = $this->db->count($this->sql . $where);  // filtered data count is here.
-        $this->query = $this->sql . $where . $this->orderby() . $this->limit();
-
-        $this->data = $this->db->query($this->query);
-
-        return $this;
-    }
-
-    protected function filter()
-    {
-        $search = '';
-
-        $filterglobal = $this->filterglobal();
-        $filterindividual = $this->filterindividual();
-
-        if (! $filterindividual && ! $filterglobal) {
-            return null;
-        }
-
-        $search .= $filterglobal;
-
-        if ($filterindividual <> null && $filterglobal <> null) {
-            $search .= ' AND ';
-        }
-
-        $search .= $filterindividual;
-        $search = " WHERE " . $search;
-
-        return $search;
-    }
-
-    protected function filterglobal()
-    {
-        $searchinput = $this->input('search')['value'];
-        $allcolumns = $this->input('columns');
-
-        if ($searchinput == '') {
-            return null;
-        }
-
-        $search = array();
-        $searchinput = preg_replace("/[^\wá-žÁ-Ž]+/", " ", $searchinput);
-        foreach (explode(' ', $searchinput) as $word) {
-            $lookfor = array();
-            foreach ($this->columns as $key => $column) {
-                if (array_key_exists($key, $allcolumns)) {
-                    if ($allcolumns[ $key ]['searchable'] == 'true') {
-                        $lookfor[] = $column . " LIKE " . $this->db->escape($word) . "";
-                    }
-                }
-            }
-            $search[] = "(" . implode(" OR ", $lookfor) . ")";
-        }
-
-        return implode(" AND ", $search);
-    }
-
-    protected function filterindividual()
-    {
-        $allcolumns = $this->input('columns');
-
-        $search = " (";
-        $lookfor = array();
-
-        if (! $allcolumns) {
-            return null;
-        }
-
-        foreach ($allcolumns as $key) {
-            if ($key['search']['value'] <> "" and $key['searchable'] == 'true') {
-                $lookfor[] = $this->column($key['data']) . " LIKE " . $this->db->escape('%' . $key['search']['value'] . '%') . "";
-            }
-        }
-
-        if (count($lookfor) > 0) {
-            $search .= implode(" AND ", $lookfor) . ")";
-
-            return $search;
-        }
-
-        return null;
-    }
-
-    protected function setcolumns($query)
-    {
-        $query = preg_replace("/\((?:[^()]+|(?R))*+\)/is", "", $query);
-        preg_match_all("/SELECT([\s\S]*?)((\s*)\bFROM\b(?![\s\S]*\)))([\s\S]*?)/is", $query, $columns);
-
-        $columns = $this->explode(",", $columns[1][0]);
-
-        // gets alias of the table -> 'table.column as col' or 'table.column col' to 'col'
-        $regex[] = "/(.*)\s+as\s+(.*)/is";
-        $regex[] = "/.+(\([^()]+\))?\s+(.+)/is";
-        // wipe unwanted characters => '`" and space
-        $regex[] = '/[\s"\'`]+/';
-        // if there is no alias, return column name -> table.column to column
-        $regex[] = "/([\w\-]*)\.([\w\-]*)/";
-
-        return preg_replace($regex, "$2", $columns);
-    }
-
-    protected function isQueryWithOrderBy($query)
-    {
-        return (bool) count(preg_grep("/(order\s+by)\s+(.+)$/i", explode("\n", $query)));
-    }
-
-    protected function limit()
-    {
-        $take = 10;
-        $skip = (integer) $this->input('start');
-
-        if ($this->input('length')) {
-            $take = (integer) $this->input('length');
-        }
-
-        if ($take == - 1 || ! $this->input('draw')) {
-            return null;
-        }
-
-        return " LIMIT $take OFFSET $skip";
-    }
-
-    protected function orderby()
-    {
-        $dtorders = $this->input('order');
-        $orders = " ORDER BY ";
-        $dir = ['asc' => 'asc', 'desc' => 'desc'];
-
-        if (! is_array($dtorders)) {
-            if ($this->hasOrderIn) {
-                return null;
-            }
-
-            return $orders . $this->columns[0] . " asc";  // default
-        }
-
-        foreach ($dtorders as $order) {
-            $takeorders[] = $this->columns[ $order['column'] ] . " " . $dir[ $order['dir'] ];
-        }
-
-        return $orders . implode(",", $takeorders);
-    }
-
-    public function generate($json = true)
-    {
-        $this->execute();
-        $formatted_data = array();
-
-        foreach ($this->data as $key => $row) {
-            // new columns..
-            if (null !== $this->add && count($this->add) > 0) {
-                foreach ($this->add as $new_column => $closure) {
-                    $row[ $new_column ] = $closure($row);
-                }
-            }
-
-            // editing columns..
-            if (null !== $this->edit && count($this->edit) > 0) {
-                foreach ($this->edit as $edit_column => $closure) {
-                    if (isset($row[ $edit_column ])) {
-                        $row[ $edit_column ] = $closure($row);
-                    }
-                }
-            }
-
-            // hide unwanted columns from output
-            $row = array_diff_key($row, (array) $this->hide);
-
-            $formatted_data[] = $this->isIndexed($row);
-        }
-
-        $response['draw'] = $this->input('draw');
-        $response['recordsTotal'] = $this->recordstotal;
-        $response['recordsFiltered'] = $this->recordsfiltered;
-        $response['data'] = $formatted_data;
-
-        return $this->response($response, $json);
-    }
-
-    public function add($newColumn, $closure)
-    {
-        $this->add[ $newColumn ] =  $closure;
-
-        return $this;
-    }
-
+    /**
+     * @param $column
+     * @param callable $closure
+     * @return Datatables
+     */
     public function edit($column, $closure)
     {
-        $this->edit[ $column ] = $closure;
+        $this->columns->edit($column, $closure);
 
         return $this;
     }
 
-    public function input($input)
+    /**
+     * @param $column
+     * @param callable $closure
+     * @return Datatables
+     */
+    public function filter($column, $closure)
     {
-        if (isset($this->input[ $input ])) {
-            return $this->input[ $input ];
+        $this->columns->filter($column, $closure);
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getColumns()
+    {
+        return $this->columns->names();
+    }
+
+    /**
+     * @return Query
+     */
+    public function getQuery()
+    {
+        return $this->builder->full;
+    }
+
+    /**
+     * @param $columns
+     * @return Datatables
+     */
+    public function hide($columns)
+    {
+        if (!is_array($columns)) {
+            $columns = func_get_args();
         }
 
-        return false;
-    }
-
-    protected function column($input)
-    {
-        if (is_numeric($input)) {
-            return $this->columns[ $input ];
+        foreach ($columns as $name) {
+            $this->columns->get($name)->hide();
         }
 
-        return $input;
+        return $this;
     }
 
-    protected function response($data, $json = true)
+    /**
+     * @param $query
+     * @return Datatables
+     */
+    public function query($query)
     {
-        if ($json) {
-            header('Content-type: application/json');
+        $this->builder = new Builder($query, $this->request, $this->db);
+        $this->columns = $this->builder->columns();
 
-            return json_encode($data);
-        }
-
-        return $data;
+        return $this;
     }
 
-    protected function isIndexed($row) // if data source uses associative keys or index number
+    /**
+     * @return Datatables
+     */
+    public function generate()
     {
-        $column = $this->input('columns');
-        if (is_numeric($column[0]['data'])) {
-            return array_values($row);
-        }
+        $this->columns->setAttributes($this->request);
+        $this->builder->setFilteredQuery();
+        $this->builder->setFullQuery();
+        $this->setResponseData();
 
-        return $row;
+        return $this;
     }
 
-    protected function balanceChars($str, $open, $close)
+    /**
+     * @return array
+     */
+    protected function getData()
     {
-        $openCount = substr_count($str, $open);
-        $closeCount = substr_count($str, $close);
-        $retval = $openCount - $closeCount;
+        $data = $this->db->query($this->builder->full);
 
-        return $retval;
+        return array_map([$this, 'prepareRowData'], $data);
     }
 
-    protected function explode($delimiter, $str, $open = '(', $close = ')')
+    /**
+     *
+     */
+    public function setResponseData()
     {
-        $retval = array();
-        $hold = array();
-        $balance = 0;
-        $parts = explode($delimiter, $str);
-        foreach ($parts as $part) {
-            $hold[] = $part;
-            $balance += $this->balanceChars($part, $open, $close);
-            if ($balance < 1) {
-                $retval[] = implode($delimiter, $hold);
-                $hold = array();
-                $balance = 0;
+        $this->response['draw'] = (integer)$this->request->get('draw');
+        $this->response['recordsTotal'] = $this->db->count($this->builder->query);
+        $this->response['recordsFiltered'] = $this->db->count($this->builder->filtered);
+        $this->response['data'] = $this->getData();
+    }
+
+    /**
+     * @param $row
+     * @return array
+     */
+    protected function prepareRowData($row)
+    {
+        $columns = $this->columns->all(false);
+
+        foreach ($columns as $column) {
+            // column data gives the column index or column name
+            if (is_numeric($column->data())) {
+                $formatted_row[] = $column->closure($row);
+            } else {
+                $formatted_row[$column->name] = $column->closure($row);
             }
         }
-        if (count($hold) > 0) {
-            $retval[] = implode($delimiter, $hold);
-        }
 
-        return $retval;
+        return $formatted_row;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toJson();
+    }
+
+    /**
+     * @return string
+     */
+    public function toJson()
+    {
+        $response = new JsonResponse($this->response);
+
+        return $response->send();
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->response;
     }
 }

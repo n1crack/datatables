@@ -2,41 +2,70 @@
 
 namespace Ozdemir\Datatables\DB;
 
+use Ozdemir\Datatables\Query;
 use \Phalcon\Db;
 
+/**
+ * Class PhalconAdapter
+ * @package Ozdemir\Datatables\DB
+ */
 class PhalconAdapter implements DatabaseInterface
 {
+    /**
+     * @var
+     */
     protected $db;
-    protected $escape = [];
 
-    public function __construct($di, $serviceName = "db")
+    /**
+     * PhalconAdapter constructor.
+     * @param $di
+     * @param string $serviceName
+     */
+    public function __construct($di, $serviceName = 'db')
     {
         $this->db = $di->get($serviceName);
     }
 
+    /**
+     * @return $this
+     */
     public function connect()
     {
         return $this;
     }
 
-    public function query($query)
+    /**
+     * @param Query $query
+     * @return mixed
+     */
+    public function query(Query $query)
     {
-        $data = $this->db->query($query, $this->escape);
+        $data = $this->db->query($query, $query->escapes);
+
         return $data->fetchAll(Db::FETCH_ASSOC);
     }
 
-    public function count($query)
+    /**
+     * @param Query $query
+     * @return mixed
+     */
+    public function count(Query $query)
     {
         $query = "Select count(*) as rowcount from ($query)t";
-        $data = $this->db->query($query, $this->escape)->fetchAll();
+        $data = $this->db->query($query, $query->escapes)->fetchAll();
 
         return $data[0]->rowcount;
     }
 
-    public function escape($string)
+    /**
+     * @param $string
+     * @param Query $query
+     * @return string
+     */
+    public function escape($string, Query $query)
     {
-        $this->escape[':escape' . (count($this->escape) + 1)] = '%' . $string . '%';
+        $query->escapes[':binding_'.(count($query->escapes) + 1)] = $string;
 
-        return ":escape" . (count($this->escape));
+        return ':binding_'.count($query->escapes);
     }
 }
