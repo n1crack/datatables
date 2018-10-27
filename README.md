@@ -71,6 +71,9 @@ You're now ready to begin using the Datatables php library.
     echo $dt->generate();
 ```
 
+> **NOTE:** version 2.0 requires php 7.1.3+   
+> for php 5.6+, install 1.7.1 :`composer require ozdemir/datatables:1.7.1`  
+
 ## Methods
 This is the list of available public methods.
 
