@@ -5,11 +5,13 @@ namespace Ozdemir\Datatables\Test;
 use Ozdemir\Datatables\DB\SQLite;
 use Ozdemir\Datatables\Datatables;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 class DatatablesTest extends TestCase
 {
 
     protected $db;
+    protected $request;
 
     private function customfunction($data)
     {
@@ -19,8 +21,9 @@ class DatatablesTest extends TestCase
     public function setUp()
     {
         $sqlconfig = __DIR__.'/../fixtures/test.db';
+        $this->request = Request::create(null, 'GET', ['draw' => 1]);
 
-        $this->db = new Datatables(new SQLite($sqlconfig));
+        $this->db = new Datatables(new SQLite($sqlconfig), $this->request);
     }
 
     public function tearDown()
@@ -123,5 +126,57 @@ class DatatablesTest extends TestCase
         $columns = $dt->getColumns();
 
         $this->assertSame($columns[0], 'column_name');
+    }
+
+    public function testFiltersDataViaGlobalSearch()
+    {
+        $this->request->query->set('search', ['value' => 'doe']);
+
+        $this->request->query->set('columns', [
+            ['data' => 0, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->db->query('Select name, surname from mytable');
+        $datatables = $this->db->generate()->toArray();
+
+        $this->assertSame(11, $datatables['recordsTotal']);
+        $this->assertSame(2, $datatables['recordsFiltered']);
+
+    }
+
+    public function testSortsDataViaSorting()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => 1, 'dir' => 'desc']]); //surname-desc
+
+        $this->request->query->set('columns', [
+            ['data' => 0, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 2, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->db->query('Select name, surname, age from mytable');
+        $datatables = $this->db->generate()->toArray();
+
+        $this->assertSame(['Todd', 'Wycoff', '36'], $datatables['data'][0]);
+    }
+
+    public function testSortsExcludingHiddenColumns()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => 1, 'dir' => 'asc']]); // age - asc
+
+        $this->request->query->set('columns', [
+            ['data' => 0, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->db->query('Select id as fid, name, surname, age from mytable');
+        $this->db->hide('fid');
+        $this->db->hide('surname');
+        $datatables = $this->db->generate()->toArray(); // only name and age visible
+
+        $this->assertSame(['Colin', '19'], $datatables['data'][0]);
     }
 }
