@@ -1,4 +1,5 @@
 <?php
+
 namespace Ozdemir\Datatables\DB;
 
 use Ozdemir\Datatables\Query;

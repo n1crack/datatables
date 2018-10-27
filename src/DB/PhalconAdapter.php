@@ -62,7 +62,7 @@ class PhalconAdapter implements DatabaseInterface
      * @param Query $query
      * @return string
      */
-    public function escape($string,Query $query)
+    public function escape($string, Query $query)
     {
         $query->escapes[':binding_'.(count($query->escapes) + 1)] = $string;
 

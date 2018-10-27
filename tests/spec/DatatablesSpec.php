@@ -13,7 +13,7 @@ class DatatablesSpec extends ObjectBehavior
 
     public function let()
     {
-        $sqlconfig = __DIR__ . '/../fixtures/test.db';
+        $sqlconfig = __DIR__.'/../fixtures/test.db';
         $db = new SQLite($sqlconfig);
 
         $this->request = Request::create(null, 'GET', ['draw' => 1]);

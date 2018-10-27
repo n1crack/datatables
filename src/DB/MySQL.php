@@ -69,7 +69,7 @@ class MySQL implements DatabaseInterface
         $sql = $this->pdo->prepare('Select count(*) as rowcount,'.substr($query, 6));
         $sql->execute($query->escapes);
 
-        return (int) $sql->fetchColumn();
+        return (int)$sql->fetchColumn();
     }
 
     /**
@@ -79,7 +79,7 @@ class MySQL implements DatabaseInterface
      */
     public function escape($string, Query $query)
     {
-        $query->escapes[':binding_'.(count($query->escapes) + 1)] =  $string;
+        $query->escapes[':binding_'.(count($query->escapes) + 1)] = $string;
 
         return ':binding_'.count($query->escapes);
     }

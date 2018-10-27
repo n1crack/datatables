@@ -6,7 +6,7 @@ use Ozdemir\Datatables\DB\DatabaseInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class Builder
+ * Class Query Builder
  *
  * @package Ozdemir\Datatables
  */
@@ -71,16 +71,19 @@ class Builder
         $this->db = $db;
 
         $this->bare = rtrim($query, '; ');
+
+        $this->columns = new ColumnCollection($this);
     }
 
     /**
-     * @param ColumnCollection $columns
+     * @return ColumnCollection
      */
-    public function init(ColumnCollection $columns)
+    public function columns()
     {
-        $this->columns = $columns;
         $this->query = new Query('Select '.implode(', ', $this->columns->names())." from ({$this->bare})t");
-        $this->hasDefaultOrder = $this->isQueryWithOrderBy($this->bare);
+        $this->hasDefaultOrder = $this->hasOrderBy($this->bare);
+
+        return $this->columns;
     }
 
     /**
@@ -113,7 +116,7 @@ class Builder
      * @param string $query
      * @return bool
      */
-    protected function isQueryWithOrderBy($query)
+    protected function hasOrderBy($query)
     {
         return (bool)\count(preg_grep("/(order\s+by)\s+(.+)$/i", explode("\n", $query)));
     }
@@ -161,7 +164,7 @@ class Builder
             $look = [];
 
             foreach ($columns as $column) {
-                $look[] = $column->name.' LIKE '.$this->db->escape('%'. $word. '%', $query);
+                $look[] = $column->name.' LIKE '.$this->db->escape('%'.$word.'%', $query);
             }
 
             $search[] = '('.implode(' OR ', $look).')';
@@ -187,15 +190,15 @@ class Builder
         foreach ($columns as $column) {
             if ($column->customFilter) {
                 $filter = $column->customFilter;
-                $customFilter = $filter(function($value) use ($query){
-                        return $this->db->escape($value, $query);
-                 }, $column->searchValue());
+                $customFilter = $filter(function ($value) use ($query) {
+                    return $this->db->escape($value, $query);
+                }, $column->searchValue());
 
                 if ($customFilter) {
                     $look[] = $customFilter;
                 }
             } else {
-                $look[] = $column->name.' LIKE '.$this->db->escape('%'. $column->searchValue() . '%', $query);
+                $look[] = $column->name.' LIKE '.$this->db->escape('%'.$column->searchValue().'%', $query);
             }
         }
 

@@ -34,6 +34,7 @@ class PSAdapter implements DatabaseInterface
     public function connect()
     {
         $this->Db = Db::getInstance();
+
         return $this;
     }
 
@@ -54,8 +55,9 @@ class PSAdapter implements DatabaseInterface
      */
     public function count(Query $query)
     {
-        $query = 'Select count(*) as rowcount,'. substr($query, 6);
+        $query = 'Select count(*) as rowcount,'.substr($query, 6);
         $data = $this->Db->getRow($query);
+
         return $data['rowcount'];
     }
 
@@ -64,8 +66,8 @@ class PSAdapter implements DatabaseInterface
      * @param Query $query
      * @return string
      */
-    public function escape($string,Query $query)
+    public function escape($string, Query $query)
     {
-        return  pSQL($string);
+        return pSQL($string);
     }
 }

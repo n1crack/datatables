@@ -48,8 +48,6 @@ class ColumnCollection
         foreach ($columns as $name) {
             $this->container->append(new Column($name));
         }
-
-        $builder->init($this);
     }
 
     /**
