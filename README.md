@@ -143,7 +143,7 @@ This is the list of available public methods.
 ## Requirements
 Composer  
 DataTables > 1.10  
-PHP > 5.6  
+PHP > 7.1.3
 
 ## License
 Copyright (c) 2015 Yusuf ÖZDEMİR, released under [the MIT license](https://github.com/n1crack/Datatables/blob/master/LICENCE)
