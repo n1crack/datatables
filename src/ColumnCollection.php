@@ -37,13 +37,13 @@ class ColumnCollection
     /**
      * ColumnCollection constructor.
      *
-     * @param Builder $builder
+     * @param string $query
      */
-    public function __construct(Builder $builder)
+    public function __construct($query)
     {
         $this->container = new \ArrayObject();
 
-        $columns = $this->setColumnNames($builder->bare);
+        $columns = $this->setColumnNames($query);
 
         foreach ($columns as $name) {
             $this->container->append(new Column($name));
@@ -107,10 +107,7 @@ class ColumnCollection
      */
     public function get($name, $includeHidden = true)
     {
-        $names = array_map(function ($c) {
-            return $c->name;
-        }, $this->all($includeHidden));
-
+        $names = array_column($this->all($includeHidden), 'name');
         $index = array_search($name, $names, true);
 
         return $this->container->offsetGet($index);
@@ -127,7 +124,7 @@ class ColumnCollection
     {
         $columns = $this->all($includeHidden);
 
-        return current(array_slice($columns, $index, 1));
+        return current(\array_slice($columns, $index, 1));
     }
 
     /**
@@ -164,11 +161,7 @@ class ColumnCollection
      */
     public function names()
     {
-        $names = array_map(function ($c) {
-            return $c->name;
-        }, $this->all(false));
-
-        return array_values($names);
+        return array_column($this->all(false), 'name');
     }
 
     /**

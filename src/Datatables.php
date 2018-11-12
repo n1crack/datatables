@@ -103,24 +103,23 @@ class Datatables
     }
 
     /**
-     * @param $columns
+     * @param array $columns
      * @return Datatables
      */
-    public function hide($columns)
+    public function hide(...$columns)
     {
-        if (!is_array($columns)) {
-            $columns = func_get_args();
+        foreach ($columns as $column) {
+            if (\is_array($column)) {
+                $this->hide(...$column);
+            } else {
+                $this->columns->get($column)->hide();
+            }
         }
-
-        foreach ($columns as $name) {
-            $this->columns->get($name)->hide();
-        }
-
         return $this;
     }
 
     /**
-     * @param $query
+     * @param string $query
      * @return Datatables
      */
     public function query($query)

@@ -13,12 +13,6 @@ use Symfony\Component\HttpFoundation\Request;
 class Builder
 {
     /**
-     * Bare query string, user input
-     * @var string
-     */
-    public $bare;
-
-    /**
      * Base sql query string
      * @var Query $query
      */
@@ -61,18 +55,20 @@ class Builder
     /**
      * Builder constructor.
      *
-     * @param $query
+     * @param string $query
      * @param Request $request
      * @param DatabaseInterface $db
      */
     public function __construct($query, Request $request, DatabaseInterface $db)
     {
+        $query = rtrim($query, '; ');
+
         $this->request = $request;
         $this->db = $db;
+        $this->columns = new ColumnCollection($query);
 
-        $this->bare = rtrim($query, '; ');
-
-        $this->columns = new ColumnCollection($this);
+        $this->query = new Query('Select '.implode(', ', $this->columns->names())." from ($query)t");
+        $this->hasDefaultOrder = $this->hasOrderBy($query);
     }
 
     /**
@@ -80,9 +76,6 @@ class Builder
      */
     public function columns()
     {
-        $this->query = new Query('Select '.implode(', ', $this->columns->names())." from ({$this->bare})t");
-        $this->hasDefaultOrder = $this->hasOrderBy($this->bare);
-
         return $this->columns;
     }
 
