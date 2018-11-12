@@ -150,7 +150,11 @@ class ColumnCollection
     public function setAttributes(Request $request)
     {
         foreach ($this->names() as $index => $name) {
-            $this->get($name)->attr = $request->get('columns')[$index];
+            if (isset($request->get('columns')[$index])) {
+                $this->get($name)->attr = $request->get('columns')[$index];
+            } else {
+                $this->get($name)->interaction = false;
+            }
         }
     }
 
