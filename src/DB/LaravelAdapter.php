@@ -50,9 +50,7 @@ class LaravelAdapter implements DatabaseInterface
      */
     public function count(Query $query)
     {
-        $query = 'Select count(*) as rowcount,'.substr($query, 6);
-
-        $data = DB::select($query, $query->escapes);
+        $data = DB::select("Select count(*) as rowcount from ($query)t", $query->escapes);
 
         return $data[0]->rowcount;
     }

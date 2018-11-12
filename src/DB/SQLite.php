@@ -60,7 +60,7 @@ class SQLite implements DatabaseInterface
      */
     public function count(Query $query)
     {
-        $sql = $this->pdo->prepare('Select count(*) as rowcount,'.substr($query, 6));
+        $sql = $this->pdo->prepare("Select count(*) as rowcount from ($query)t");
         $sql->execute($query->escapes);
 
         return (int)$sql->fetchColumn();

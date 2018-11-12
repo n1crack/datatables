@@ -50,8 +50,7 @@ class CodeigniterAdapter implements DatabaseInterface
      */
     public function count(Query $query)
     {
-        $query = "Select count(*) as rowcount from ($query)t";
-        $data = $this->CI->db->query($query, $query->escapes)->result_array();
+        $data = $this->CI->db->query("Select count(*) as rowcount from ($query)t", $query->escapes)->result_array();
 
         return $data[0]['rowcount'];
     }

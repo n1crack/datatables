@@ -51,8 +51,7 @@ class PhalconAdapter implements DatabaseInterface
      */
     public function count(Query $query)
     {
-        $query = "Select count(*) as rowcount from ($query)t";
-        $data = $this->db->query($query, $query->escapes)->fetchAll();
+        $data = $this->db->query("Select count(*) as rowcount from ($query)t", $query->escapes)->fetchAll();
 
         return $data[0]->rowcount;
     }
