@@ -15,7 +15,7 @@ trait Explode
      * @param $close
      * @return int
      */
-    protected function balanceChars($str, $open, $close)
+    protected function balanceChars($str, $open, $close): int
     {
         $openCount = substr_count($str, $open);
         $closeCount = substr_count($str, $close);
@@ -31,7 +31,7 @@ trait Explode
      * @param string $close
      * @return array
      */
-    protected function explode($delimiter, $str, $open = '(', $close = ')')
+    protected function explode($delimiter, $str, $open = '(', $close = ')'): array
     {
         $retval = [];
         $hold = [];

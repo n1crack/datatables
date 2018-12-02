@@ -74,7 +74,7 @@ class Builder
     /**
      * @return ColumnCollection
      */
-    public function columns()
+    public function columns(): ColumnCollection
     {
         return $this->columns;
     }
@@ -82,7 +82,7 @@ class Builder
     /**
      * @return bool
      */
-    public function hasDefaultOrder()
+    public function hasDefaultOrder(): bool
     {
         return $this->hasDefaultOrder;
     }
@@ -90,7 +90,7 @@ class Builder
     /**
      *
      */
-    public function setFilteredQuery()
+    public function setFilteredQuery(): void
     {
         $this->filtered = new Query();
         $this->filtered->set($this->query.$this->filter($this->filtered));
@@ -99,7 +99,7 @@ class Builder
     /**
      *
      */
-    public function setFullQuery()
+    public function setFullQuery(): void
     {
         $this->full = clone $this->filtered;
         $this->full->set($this->filtered.$this->orderBy().$this->limit());
@@ -109,7 +109,7 @@ class Builder
      * @param string $query
      * @return bool
      */
-    protected function hasOrderBy($query)
+    protected function hasOrderBy($query): bool
     {
         return (bool)\count(preg_grep("/(order\s+by)\s+(.+)$/i", explode("\n", $query)));
     }
@@ -118,14 +118,14 @@ class Builder
      * @param Query $query
      * @return string
      */
-    protected function filter(Query $query)
+    protected function filter(Query $query): string
     {
         $filter = array_filter([
             $this->filterGlobal($query),
             $this->filterIndividual($query),
         ]);
 
-        if (count($filter) > 0) {
+        if (\count($filter) > 0) {
             return ' WHERE '.implode(' AND ', $filter);
         }
 
@@ -136,7 +136,7 @@ class Builder
      * @param Query $query
      * @return string
      */
-    protected function filterGlobal(Query $query)
+    protected function filterGlobal(Query $query): string
     {
         $searchinput = $this->request->get('search')['value'];
 
@@ -146,7 +146,7 @@ class Builder
 
         $columns = $this->columns->getSearchableColumns();
 
-        if (count($columns) === 0) {
+        if (\count($columns) === 0) {
             return '';
         }
 
@@ -170,7 +170,7 @@ class Builder
      * @param Query $query
      * @return string
      */
-    protected function filterIndividual(Query $query)
+    protected function filterIndividual(Query $query): string
     {
         $columns = $this->columns->getSearchableColumnsWithSearchValue();
 
@@ -201,7 +201,7 @@ class Builder
     /**
      * @return string
      */
-    protected function limit()
+    protected function limit(): string
     {
         $take = 10;
         $skip = (integer)$this->request->get('start');
@@ -220,7 +220,7 @@ class Builder
     /**
      * @return string
      */
-    protected function orderBy()
+    protected function orderBy(): string
     {
         $orders = $this->request->get('order') ?: [];
 
@@ -231,7 +231,7 @@ class Builder
 
         $o = [];
 
-        if (count($orders) === 0) {
+        if (\count($orders) === 0) {
             if ($this->hasDefaultOrder()) {
                 return '';
             }

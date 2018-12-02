@@ -60,7 +60,7 @@ class Column
      * @param $row array
      * @return string
      */
-    public function closure($row)
+    public function closure($row): ?string
     {
         if ($this->closure) {
             $closure = $this->closure;
@@ -74,7 +74,7 @@ class Column
     /**
      * Set visibility of the column.
      */
-    public function hide()
+    public function hide(): void
     {
         $this->hidden = true;
     }
@@ -82,7 +82,7 @@ class Column
     /**
      * @return bool
      */
-    public function isSearchable()
+    public function isSearchable(): bool
     {
         return ($this->interaction && $this->attr['searchable']);
     }
@@ -90,7 +90,7 @@ class Column
     /**
      * @return bool
      */
-    public function isOrderable()
+    public function isOrderable(): bool
     {
         return ($this->interaction && $this->attr['orderable']);
     }
@@ -98,7 +98,7 @@ class Column
     /**
      * @return string
      */
-    public function data()
+    public function data(): ?string
     {
         return $this->attr['data'];
     }
@@ -106,7 +106,7 @@ class Column
     /**
      * @return string
      */
-    public function searchValue()
+    public function searchValue(): string
     {
         return $this->attr['search']['value'];
     }

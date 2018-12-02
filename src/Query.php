@@ -36,7 +36,7 @@ class Query
      *
      * @param $query
      */
-    public function set($query)
+    public function set($query): void
     {
         $this->sql = $query;
     }

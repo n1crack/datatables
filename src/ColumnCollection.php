@@ -57,7 +57,7 @@ class ColumnCollection
      * @param $closure callable
      * @return Column
      */
-    public function add($name, $closure)
+    public function add($name, $closure): Column
     {
         $column = new Column($name);
         $column->closure = $closure;
@@ -75,9 +75,9 @@ class ColumnCollection
      * @param $closure callable
      * @return Column
      */
-    public function edit($name, $closure)
+    public function edit($name, $closure): Column
     {
-        $column = $this->get($name, false);
+        $column = $this->get($name);
         $column->closure = $closure;
 
         return $column;
@@ -90,9 +90,9 @@ class ColumnCollection
      * @param $closure callable
      * @return Column
      */
-    public function filter($name, $closure)
+    public function filter($name, $closure): Column
     {
-        $column = $this->get($name, false);
+        $column = $this->get($name);
         $column->customFilter = $closure;
 
         return $column;
@@ -102,12 +102,11 @@ class ColumnCollection
      * it returns Column object by its name
      *
      * @param $name
-     * @param bool $includeHidden
      * @return Column
      */
-    public function get($name, $includeHidden = true)
+    public function get($name): Column
     {
-        $names = array_column($this->all($includeHidden), 'name');
+        $names = array_column($this->all(true), 'name');
         $index = array_search($name, $names, true);
 
         return $this->container->offsetGet($index);
@@ -117,12 +116,11 @@ class ColumnCollection
      * it returns Column object by its index
      *
      * @param $index
-     * @param bool $includeHidden
      * @return Column
      */
-    public function getByIndex($index, $includeHidden = false)
+    public function getByIndex($index): Column
     {
-        $columns = $this->all($includeHidden);
+        $columns = $this->all(false);
 
         return current(\array_slice($columns, $index, 1));
     }
@@ -133,7 +131,7 @@ class ColumnCollection
      * @param bool $includeHidden
      * @return Column[]
      */
-    public function all($includeHidden = true)
+    public function all($includeHidden = true): array
     {
         $activeColumns = array_filter($this->container->getArrayCopy(), function ($c) {
             return !$c->hidden;
@@ -147,7 +145,7 @@ class ColumnCollection
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
      */
-    public function setAttributes(Request $request)
+    public function setAttributes(Request $request): void
     {
         foreach ($this->names() as $index => $name) {
             if (isset($request->get('columns')[$index])) {
@@ -163,7 +161,7 @@ class ColumnCollection
      *
      * @return array
      */
-    public function names()
+    public function names(): array
     {
         return array_column($this->all(false), 'name');
     }
@@ -172,7 +170,7 @@ class ColumnCollection
      *
      * @return Column[]
      */
-    public function getSearchableColumns()
+    public function getSearchableColumns(): array
     {
         $columns = array_filter($this->container->getArrayCopy(), function (Column $c) {
             return !$c->hidden && $c->interaction && $c->attr['searchable'];
@@ -185,7 +183,7 @@ class ColumnCollection
      *
      * @return Column[]
      */
-    public function getSearchableColumnsWithSearchValue()
+    public function getSearchableColumnsWithSearchValue(): array
     {
         $columns = array_filter($this->getSearchableColumns(), function (Column $c) {
             return $c->attr['search']['value'] !== '' || $c->customFilter;
@@ -198,7 +196,7 @@ class ColumnCollection
      * @param $query
      * @return array
      */
-    protected function setColumnNames($query)
+    protected function setColumnNames($query): array
     {
         $query = $this->removeAllEnclosedInParentheses($query);
         $columns = $this->getColumnArray($query);
@@ -210,7 +208,7 @@ class ColumnCollection
      * @param $string
      * @return string
      */
-    protected function removeAllEnclosedInParentheses($string)
+    protected function removeAllEnclosedInParentheses($string): string
     {
         return preg_replace("/\((?:[^()]+|(?R))*+\)/i", '', $string);
     }
@@ -219,7 +217,7 @@ class ColumnCollection
      * @param $string
      * @return array
      */
-    protected function getColumnArray($string)
+    protected function getColumnArray($string): array
     {
         preg_match_all("/SELECT([\s\S]*?)((\s*)\bFROM\b(?![\s\S]*\)))([\s\S]*?)/i", $string, $columns);
 
@@ -230,7 +228,7 @@ class ColumnCollection
      * @param $array
      * @return string[]
      */
-    protected function clearColumnNames($array)
+    protected function clearColumnNames($array): array
     {
         return preg_replace($this->pattern, '$2', $array);
     }
