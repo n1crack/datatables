@@ -55,7 +55,7 @@ class Datatables
      * @param callable $closure
      * @return Datatables
      */
-    public function add($column, $closure)
+    public function add($column, $closure): Datatables
     {
         $this->columns->add($column, $closure);
 
@@ -67,7 +67,7 @@ class Datatables
      * @param callable $closure
      * @return Datatables
      */
-    public function edit($column, $closure)
+    public function edit($column, $closure): Datatables
     {
         $this->columns->edit($column, $closure);
 
@@ -79,7 +79,7 @@ class Datatables
      * @param callable $closure
      * @return Datatables
      */
-    public function filter($column, $closure)
+    public function filter($column, $closure): Datatables
     {
         $this->columns->filter($column, $closure);
 
@@ -89,7 +89,7 @@ class Datatables
     /**
      * @return array
      */
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns->names();
     }
@@ -97,7 +97,7 @@ class Datatables
     /**
      * @return Query
      */
-    public function getQuery()
+    public function getQuery(): Query
     {
         return $this->builder->full;
     }
@@ -106,7 +106,7 @@ class Datatables
      * @param array $columns
      * @return Datatables
      */
-    public function hide(...$columns)
+    public function hide(...$columns): Datatables
     {
         foreach ($columns as $column) {
             if (\is_array($column)) {
@@ -115,6 +115,7 @@ class Datatables
                 $this->columns->get($column)->hide();
             }
         }
+
         return $this;
     }
 
@@ -122,7 +123,7 @@ class Datatables
      * @param string $query
      * @return Datatables
      */
-    public function query($query)
+    public function query($query): Datatables
     {
         $this->builder = new Builder($query, $this->request, $this->db);
         $this->columns = $this->builder->columns();
@@ -133,7 +134,7 @@ class Datatables
     /**
      * @return Datatables
      */
-    public function generate()
+    public function generate(): Datatables
     {
         $this->columns->setAttributes($this->request);
         $this->builder->setFilteredQuery();
@@ -146,7 +147,7 @@ class Datatables
     /**
      * @return array
      */
-    protected function getData()
+    protected function getData(): array
     {
         $data = $this->db->query($this->builder->full);
 
@@ -156,7 +157,7 @@ class Datatables
     /**
      *
      */
-    public function setResponseData()
+    public function setResponseData(): void
     {
         $this->response['draw'] = (integer)$this->request->get('draw');
         $this->response['recordsTotal'] = $this->db->count($this->builder->query);
@@ -168,7 +169,7 @@ class Datatables
      * @param $row
      * @return array
      */
-    protected function prepareRowData($row)
+    protected function prepareRowData($row): array
     {
         $columns = $this->columns->all(false);
 
@@ -195,7 +196,7 @@ class Datatables
     /**
      * @return string
      */
-    public function toJson()
+    public function toJson(): string
     {
         $response = new JsonResponse($this->response);
 
@@ -205,7 +206,7 @@ class Datatables
     /**
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->response;
     }

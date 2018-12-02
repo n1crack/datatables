@@ -183,9 +183,7 @@ class Builder
         foreach ($columns as $column) {
             if ($column->customFilter) {
                 $filter = $column->customFilter;
-                $customFilter = $filter(function ($value) use ($query) {
-                    return $this->db->escape($value, $query);
-                }, $column->searchValue());
+                $customFilter = $filter(new FilterHelper($query, $column, $this->db));
 
                 if ($customFilter) {
                     $look[] = $customFilter;
@@ -193,6 +191,9 @@ class Builder
             } else {
                 $look[] = $column->name.' LIKE '.$this->db->escape('%'.$column->searchValue().'%', $query);
             }
+        }
+        if (empty($look)) {
+            return '';
         }
 
         return ' ('.implode(' AND ', $look).')';
