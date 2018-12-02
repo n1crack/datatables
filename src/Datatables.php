@@ -39,6 +39,16 @@ class Datatables
     protected $response;
 
     /**
+     * @var array
+     */
+    protected $distinctColumn = [];
+
+    /**
+     * @var array
+     */
+    protected $distinctData = [];
+
+    /**
      * Datatables constructor.
      *
      * @param \Ozdemir\Datatables\DB\DatabaseInterface $db
@@ -82,6 +92,28 @@ class Datatables
     public function filter($column, $closure): Datatables
     {
         $this->columns->filter($column, $closure);
+
+        return $this;
+    }
+
+    /**
+     * @param $name
+     * @return Datatables
+     */
+    public function setDistinctResponseFrom($name): Datatables
+    {
+        $this->distinctColumn[] = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param $array
+     * @return Datatables
+     */
+    public function setDistinctResponse($array): Datatables
+    {
+        $this->distinctData = $array;
 
         return $this;
     }
@@ -155,6 +187,21 @@ class Datatables
     }
 
     /**
+     * @return array
+     */
+    private function getDistinctData(): array
+    {
+        foreach ($this->distinctColumn as $column) {
+            $distinct = clone $this->builder->query;
+            $distinct->set("SELECT $column FROM ({$this->builder->query})t GROUP BY $column");
+
+            $output[$column] = array_column($this->db->query($distinct), $column);
+        }
+
+        return $output;
+    }
+
+    /**
      *
      */
     public function setResponseData(): void
@@ -163,6 +210,9 @@ class Datatables
         $this->response['recordsTotal'] = $this->db->count($this->builder->query);
         $this->response['recordsFiltered'] = $this->db->count($this->builder->filtered);
         $this->response['data'] = $this->getData();
+        if (\count($this->distinctColumn) > 0 || \count($this->distinctData) > 0) {
+            $this->response['distinctData'] =array_merge($this->response['distinctData']??[], $this->getDistinctData(), $this->distinctData);
+        }
     }
 
     /**
