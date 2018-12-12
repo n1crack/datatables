@@ -4,7 +4,7 @@ namespace Ozdemir\Datatables;
 
 /**
  * Trait Explode
- *
+
  * @package Ozdemir\Datatables
  */
 trait Explode
@@ -15,7 +15,7 @@ trait Explode
      * @param $close
      * @return int
      */
-    protected function balanceChars($str, $open, $close): int
+    protected static function balanceChars($str, $open, $close): int
     {
         $openCount = substr_count($str, $open);
         $closeCount = substr_count($str, $close);
@@ -31,7 +31,7 @@ trait Explode
      * @param string $close
      * @return array
      */
-    protected function explode($delimiter, $str, $open = '(', $close = ')'): array
+    protected static function explode($delimiter, $str, $open = '(', $close = ')'): array
     {
         $retval = [];
         $hold = [];
@@ -39,7 +39,7 @@ trait Explode
         $parts = explode($delimiter, $str);
         foreach ($parts as $part) {
             $hold[] = $part;
-            $balance += $this->balanceChars($part, $open, $close);
+            $balance += self::balanceChars($part, $open, $close);
             if ($balance < 1) {
                 $retval[] = implode($delimiter, $hold);
                 $hold = [];

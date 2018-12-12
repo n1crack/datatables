@@ -2,6 +2,7 @@
 
 namespace Ozdemir\Datatables\Test;
 
+use Ozdemir\Datatables\ColumnNameList;
 use Ozdemir\Datatables\DB\SQLite;
 use Ozdemir\Datatables\Datatables;
 use PHPUnit\Framework\TestCase;
@@ -51,9 +52,9 @@ class DatatablesTest extends TestCase
 
         $data = $this->db->generate()->toArray()['data'][0];
 
-        $this->assertSame("1", $data['fid']);
-        $this->assertSame("John", $data['name']);
-        $this->assertContains('Doe', $data['surname']);
+        $this->assertSame("1", $data[0]);
+        $this->assertSame("John", $data[1]);
+        $this->assertContains('Doe', $data[2]);
     }
 
     public function testSetsColumnNamesFromAliases()
@@ -94,8 +95,8 @@ class DatatablesTest extends TestCase
 
         $data = $this->db->generate()->toArray()['data']['2'];
 
-        $this->assertSame('george', $data['name']);
-        $this->assertSame('Mar...', $data['surname']);
+        $this->assertSame('george', $data[1]);
+        $this->assertSame('Mar...', $data[2]);
     }
 
     public function testReturnsColumnNamesFromQueryThatIncludesASubqueryInSelectStatement()
@@ -133,8 +134,8 @@ class DatatablesTest extends TestCase
         $this->request->query->set('search', ['value' => 'doe']);
 
         $this->request->query->set('columns', [
-            ['data' => 0, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
-            ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '0', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '1', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
         ]);
 
         $this->db->query('Select name, surname from mytable');
@@ -148,12 +149,12 @@ class DatatablesTest extends TestCase
     public function testSortsDataViaSorting()
     {
         $this->request->query->set('search', ['value' => '']);
-        $this->request->query->set('order', [['column' => 1, 'dir' => 'desc']]); //surname-desc
+        $this->request->query->set('order', [['column' => '1', 'dir' => 'desc']]); //surname-desc
 
         $this->request->query->set('columns', [
-            ['data' => 0, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
-            ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
-            ['data' => 2, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '0', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '1', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '2', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
         ]);
 
         $this->db->query('Select name, surname, age from mytable');
@@ -165,11 +166,11 @@ class DatatablesTest extends TestCase
     public function testSortsExcludingHiddenColumns()
     {
         $this->request->query->set('search', ['value' => '']);
-        $this->request->query->set('order', [['column' => 1, 'dir' => 'asc']]); // age - asc
+        $this->request->query->set('order', [['column' => '1', 'dir' => 'asc']]); // age - asc
 
         $this->request->query->set('columns', [
-            ['data' => 0, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
-            ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '0', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '1', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
         ]);
 
         $this->db->query('Select id as fid, name, surname, age from mytable');
@@ -178,5 +179,77 @@ class DatatablesTest extends TestCase
         $datatables = $this->db->generate()->toArray(); // only name and age visible
 
         $this->assertSame(['Colin', '19'], $datatables['data'][0]);
+    }
+
+    public function testSortsExcludingHiddenColumnsObjectData()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => '1', 'dir' => 'asc']]); // age - asc
+
+        $this->request->query->set('columns', [
+            ['data' => 'name', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 'age', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->db->query('Select id as fid, name, surname, age from mytable');
+        $this->db->hide('fid');
+        $this->db->hide('surname');
+        $datatables = $this->db->generate()->toArray(); // only name and age visible
+
+        $this->assertSame(['name' => 'Colin', 'age' => '19'], $datatables['data'][0]);
+    }
+
+
+    public function testReorderingColumnsDoesNotAffectOrdering()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]); // age - asc
+
+        $this->request->query->set('columns', [
+            ['data' => 'age', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 'surname', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 'name', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->db->query('Select id as fid, name, surname, age from mytable');
+        $this->db->hide('fid');
+        $datatables = $this->db->generate()->toArray();
+
+        $this->assertSame(['name' => 'Colin', 'surname' => 'McCoy', 'age' => '19'], $datatables['data'][0]);
+    }
+
+    public function testReorderingColumnsDoesNotAffectGlobalSearching()
+    {
+        $this->request->query->set('search', ['value' => 'Stephanie']);
+        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]); // age - asc
+
+        $this->request->query->set('columns', [
+            ['data' => '2', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '0', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '1', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->db->query('Select id as fid, name, surname, age from mytable');
+        $this->db->hide('fid');
+        $datatables = $this->db->generate()->toArray();
+
+        $this->assertSame([ 'Stephanie',  'Skinner', '45'], $datatables['data'][0]);
+    }
+    public function testReorderingColumnsDoesNotAffectIndividualSearching()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]); // age - asc
+
+        $this->request->query->set('columns', [
+            ['data' => 'surname', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => 'McCoy']],
+            ['data' => 'age', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '19']],
+            ['data' => 'name', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => 'Colin']],
+        ]);
+
+        $this->db->query('Select id as fid, name, surname, age from mytable');
+        $this->db->hide('fid');
+        $datatables = $this->db->generate()->toArray();
+
+        $this->assertSame(['name' => 'Colin', 'surname' => 'McCoy', 'age' => '19'], $datatables['data'][0]);
     }
 }

@@ -7,7 +7,7 @@ use Ozdemir\Datatables\DB\DatabaseInterface;
 
 /**
  * Class FilterHelper
- *
+
  * @package Ozdemir\Datatables
  */
 class FilterHelper

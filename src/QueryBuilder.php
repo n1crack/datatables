@@ -3,6 +3,7 @@
 namespace Ozdemir\Datatables;
 
 use Ozdemir\Datatables\DB\DatabaseInterface;
+use Ozdemir\Datatables\Iterators\ColumnCollection;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -10,11 +11,11 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @package Ozdemir\Datatables
  */
-class Builder
+class QueryBuilder
 {
     /**
      * Base sql query string
-     * @var Query $query
+     * @var Query
      */
     public $query;
 
@@ -32,7 +33,7 @@ class Builder
 
     /**
      * the query has default ordering
-     * @var
+     * @var boolean
      */
     protected $hasDefaultOrder = false;
 
@@ -53,7 +54,11 @@ class Builder
     private $db;
 
     /**
-     * Builder constructor.
+     * @var boolean
+     */
+    private $dataObject = false;
+
+    /**
      *
      * @param string $query
      * @param Request $request
@@ -61,14 +66,56 @@ class Builder
      */
     public function __construct($query, Request $request, DatabaseInterface $db)
     {
-        $query = rtrim($query, '; ');
-
         $this->request = $request;
         $this->db = $db;
-        $this->columns = new ColumnCollection($query);
 
-        $this->query = new Query('Select '.implode(', ', $this->columns->names())." from ($query)t");
-        $this->hasDefaultOrder = $this->hasOrderBy($query);
+        $columnNames = ColumnNameList::from($query);
+        $this->setDataObject($columnNames);
+
+        $this->columns = new ColumnCollection();
+
+        foreach ($columnNames as $name) {
+            $this->columns->append(new Column($name));
+        }
+
+        $this->setQuery($query);
+    }
+
+    /**
+     * Assign column attributes
+     *
+     */
+    public function setColumnAttributes(): void
+    {
+        $columns = $this->request->get('columns');
+
+        if ($columns) {
+            $attributes = array_column($columns, null, 'data');
+
+            foreach ($attributes as $index => $attr) {
+                $this->columns->getOnlyVisibles()->get($index)->attr = $attr;
+            }
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDataObject(): bool
+    {
+        return $this->dataObject;
+    }
+
+    /**
+     * @param array $columns
+     */
+    public function setDataObject(array $columns): void
+    {
+        if ($this->request->get('columns')) {
+            $data = array_column($this->request->get('columns'), 'data');
+            $rangeSet = array_map('strval', array_keys($columns));
+            $this->dataObject = array_intersect($data, $rangeSet) !== $data;
+        }
     }
 
     /**
@@ -88,6 +135,15 @@ class Builder
     }
 
     /**
+     * @param $query
+     */
+    public function setQuery($query): void
+    {
+        $this->query = new Query('Select '.implode(', ', $this->columns->names())." from ($query)t");
+        $this->hasDefaultOrder = $this->hasOrderBy($query);
+    }
+
+    /**
      *
      */
     public function setFilteredQuery(): void
@@ -103,6 +159,18 @@ class Builder
     {
         $this->full = clone $this->filtered;
         $this->full->set($this->filtered.$this->orderBy().$this->limit());
+    }
+
+    /**
+     * @param $column
+     * @return Query
+     */
+    public function getDistinctQuery($column): Query
+    {
+        $distinct = clone $this->query;
+        $distinct->set("SELECT $column FROM ({$this->query})t GROUP BY $column");
+
+        return $distinct;
     }
 
     /**
@@ -227,23 +295,34 @@ class Builder
 
         $orders = array_filter($orders, function ($order) {
             return \in_array($order['dir'], ['asc', 'desc'],
-                    true) && $this->columns->getByIndex($order['column'])->isOrderable();
+                    true) && $this->columns->getOnlyVisibles()->offsetGet($order['column'])->isOrderable();
         });
 
         $o = [];
 
-        if (\count($orders) === 0) {
+        foreach ($orders as $order) {
+            $id = $this->request->get('columns')[$order['column']]['data'];
+
+            if ($this->columns->getOnlyVisibles()->isExists($id)) {
+                $o[] = $this->columns->getOnlyVisibles()->get($id)->name.' '.$order['dir'];
+            }
+        }
+
+        if (\count($o) === 0) {
             if ($this->hasDefaultOrder()) {
                 return '';
             }
-            $o[] = $this->columns->getByIndex(0)->name.' asc';
-        }
-
-        foreach ($orders as $order) {
-            $o[] = $this->columns->getByIndex($order['column'])->name.' '.$order['dir'];
+            $o[] = $this->defaultOrder();
         }
 
         return ' ORDER BY '.implode(',', $o);
     }
 
+    /**
+     * @return string
+     */
+    public function defaultOrder(): string
+    {
+        return $this->columns->getOnlyVisibles()->offsetGet(0)->name.' asc';
+    }
 }

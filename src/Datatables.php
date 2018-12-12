@@ -19,12 +19,12 @@ class Datatables
     protected $db;
 
     /**
-     * @var \Ozdemir\Datatables\ColumnCollection
+     * @var \Ozdemir\Datatables\Iterators\ColumnCollection
      */
     protected $columns;
 
     /**
-     * @var \Ozdemir\Datatables\Builder
+     * @var \Ozdemir\Datatables\QueryBuilder
      */
     protected $builder;
 
@@ -67,7 +67,10 @@ class Datatables
      */
     public function add($column, $closure): Datatables
     {
-        $this->columns->add($column, $closure);
+        $column = new Column($column);
+        $column->closure = $closure;
+        $column->interaction = false;
+        $this->columns->append($column);
 
         return $this;
     }
@@ -79,7 +82,8 @@ class Datatables
      */
     public function edit($column, $closure): Datatables
     {
-        $this->columns->edit($column, $closure);
+        $column = $this->columns->getByName($column);
+        $column->closure = $closure;
 
         return $this;
     }
@@ -91,7 +95,8 @@ class Datatables
      */
     public function filter($column, $closure): Datatables
     {
-        $this->columns->filter($column, $closure);
+        $column = $this->columns->getByName($column);
+        $column->customFilter = $closure;
 
         return $this;
     }
@@ -144,7 +149,7 @@ class Datatables
             if (\is_array($column)) {
                 $this->hide(...$column);
             } else {
-                $this->columns->get($column)->hide();
+                $this->columns->getByName($column)->hide();
             }
         }
 
@@ -157,7 +162,7 @@ class Datatables
      */
     public function query($query): Datatables
     {
-        $this->builder = new Builder($query, $this->request, $this->db);
+        $this->builder = new QueryBuilder($query, $this->request, $this->db);
         $this->columns = $this->builder->columns();
 
         return $this;
@@ -168,7 +173,7 @@ class Datatables
      */
     public function generate(): Datatables
     {
-        $this->columns->setAttributes($this->request);
+        $this->builder->setColumnAttributes();
         $this->builder->setFilteredQuery();
         $this->builder->setFullQuery();
         $this->setResponseData();
@@ -192,10 +197,7 @@ class Datatables
     private function getDistinctData(): array
     {
         foreach ($this->distinctColumn as $column) {
-            $distinct = clone $this->builder->query;
-            $distinct->set("SELECT $column FROM ({$this->builder->query})t GROUP BY $column");
-
-            $output[$column] = array_column($this->db->query($distinct), $column);
+            $output[$column] = array_column($this->db->query($this->builder->getDistinctQuery($column)), $column);
         }
 
         return $output;
@@ -210,8 +212,10 @@ class Datatables
         $this->response['recordsTotal'] = $this->db->count($this->builder->query);
         $this->response['recordsFiltered'] = $this->db->count($this->builder->filtered);
         $this->response['data'] = $this->getData();
+
         if (\count($this->distinctColumn) > 0 || \count($this->distinctData) > 0) {
-            $this->response['distinctData'] =array_merge($this->response['distinctData']??[], $this->getDistinctData(), $this->distinctData);
+            $this->response['distinctData'] = array_merge($this->response['distinctData'] ?? [],
+                $this->getDistinctData(), $this->distinctData);
         }
     }
 
@@ -221,18 +225,13 @@ class Datatables
      */
     protected function prepareRowData($row): array
     {
-        $columns = $this->columns->all(false);
+        $keys = $this->builder->isDataObject() ? $this->columns->names() : array_keys($this->columns->names());
 
-        foreach ($columns as $column) {
-            // column data gives the column index or column name
-            if (is_numeric($column->data())) {
-                $formatted_row[] = $column->closure($row);
-            } else {
-                $formatted_row[$column->name] = $column->closure($row);
-            }
-        }
+        $values = array_map(function (Column $column) use ($row) {
+            return $column->value($row);
+        }, $this->columns->getOnlyVisibles()->getArrayCopy());
 
-        return $formatted_row;
+        return array_combine($keys, $values);
     }
 
     /**

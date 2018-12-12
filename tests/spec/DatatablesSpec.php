@@ -44,9 +44,9 @@ class DatatablesSpec extends ObjectBehavior
 
         $data = $this->generate()->toArray()['data'][0];
 
-        $data['fid']->shouldReturn("1");
-        $data['name']->shouldReturn("John");
-        $data['surname']->shouldContain('Doe');
+        $data[0]->shouldReturn("1");
+        $data[1]->shouldReturn("John");
+        $data[2]->shouldContain('Doe');
     }
 
     public function it_sets_column_names_from_aliases()
@@ -86,8 +86,8 @@ class DatatablesSpec extends ObjectBehavior
 
         $data = $this->generate()->toArray()['data']['2'];
 
-        $data['name']->shouldReturn('george');
-        $data['surname']->shouldReturn('Mar...');
+        $data[1]->shouldReturn('george');
+        $data[2]->shouldReturn('Mar...');
     }
 
     public function customfunction($data)
@@ -129,8 +129,8 @@ class DatatablesSpec extends ObjectBehavior
         $this->request->query->set('search', ['value' => 'doe']);
 
         $this->request->query->set('columns', [
-            ['data' => 0, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
-            ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '0', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '1', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
         ]);
 
         $this->query('Select name, surname from mytable');
@@ -143,12 +143,12 @@ class DatatablesSpec extends ObjectBehavior
     public function it_sorts_data_via_sorting()
     {
         $this->request->query->set('search', ['value' => '']);
-        $this->request->query->set('order', [['column' => 1, 'dir' => 'desc']]); //surname-desc
+        $this->request->query->set('order', [['column' => '1', 'dir' => 'desc']]); //surname-desc
 
         $this->request->query->set('columns', [
-            ['data' => 0, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
-            ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
-            ['data' => 2, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '0', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '1', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '2', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
         ]);
 
         $this->query('Select name, surname, age from mytable');
@@ -160,11 +160,11 @@ class DatatablesSpec extends ObjectBehavior
     public function it_sorts_excluding_hidden_columns()
     {
         $this->request->query->set('search', ['value' => '']);
-        $this->request->query->set('order', [['column' => 1, 'dir' => 'asc']]); // age - asc
+        $this->request->query->set('order', [['column' => '1', 'dir' => 'asc']]); // age - asc
 
         $this->request->query->set('columns', [
-            ['data' => 0, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
-            ['data' => 1, 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '0', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '1', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
         ]);
 
         $this->query('Select id as fid, name, surname, age from mytable');
@@ -173,6 +173,77 @@ class DatatablesSpec extends ObjectBehavior
         $datatables = $this->generate()->toArray(); // only name and age visible
 
         $datatables['data'][0]->shouldReturn(['Colin', '19']);
+    }
+
+    public function it_sorts_excluding_hidden_columns_object_data()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => '1', 'dir' => 'asc']]); // age - asc
+
+        $this->request->query->set('columns', [
+            ['data' => 'name', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 'age', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->query('Select id as fid, name, surname, age from mytable');
+        $this->hide('fid');
+        $this->hide('surname');
+        $datatables = $this->generate()->toArray(); // only name and age visible
+
+        $datatables['data'][0]->shouldReturn(['name' => 'Colin', 'age' => '19']);
+    }
+
+
+    public function it_does_not_affect_ordering_when_reordering_oolumns()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]); // age - asc
+
+        $this->request->query->set('columns', [
+            ['data' => 'age', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 'surname', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => 'name', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->query('Select id as fid, name, surname, age from mytable');
+        $this->hide('fid');
+        $datatables = $this->generate()->toArray();
+
+        $datatables['data'][0]->shouldReturn(['name' => 'Colin', 'surname' => 'McCoy', 'age' => '19']);
+    }
+    public function it_does_not_affect_global_searching_when_reordering_oolumns()
+    {
+        $this->request->query->set('search', ['value' => 'Stephanie']);
+        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]); // age - asc
+
+        $this->request->query->set('columns', [
+            ['data' => '2', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '0', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '1', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->query('Select id as fid, name, surname, age from mytable');
+        $this->hide('fid');
+        $datatables = $this->generate()->toArray();
+
+        $datatables['data'][0]->shouldReturn([ 'Stephanie',  'Skinner', '45']);
+    }
+    public function it_does_not_affect_individual_searching_when_reordering_oolumns()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]); // age - asc
+
+        $this->request->query->set('columns', [
+            ['data' => 'surname', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => 'McCoy']],
+            ['data' => 'age', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '19']],
+            ['data' => 'name', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => 'Colin']],
+        ]);
+
+        $this->query('Select id as fid, name, surname, age from mytable');
+        $this->hide('fid');
+        $datatables = $this->generate()->toArray();
+
+        $datatables['data'][0]->shouldReturn(['name' => 'Colin', 'surname' => 'McCoy', 'age' => '19']);
     }
 
 }
