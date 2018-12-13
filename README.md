@@ -10,14 +10,14 @@ PHP Library to handle server-side processing for Datatables, in a fast and simpl
 * Can handle most complicated queries.
 * Supports mysql and sqlite for native php.
 * Works with :
-    - [Laravel](https://github.com/n1crack/datatables-examples/blob/master/other_examples/laravel.php)
-    - [CodeIgniter 3](https://github.com/n1crack/datatables-examples/blob/master/other_examples/codeigniter.php)
-    - [Phalcon 3+](https://github.com/n1crack/datatables-examples/blob/master/other_examples/phalcon.php)
-    - [Prestashop](https://github.com/n1crack/datatables-examples/blob/master/other_examples/prestashop.php)
+    - [Laravel](https://datatables.ozdemir.be/laravel)
+    - [CodeIgniter 3](https://datatables.ozdemir.be/codeigniter)
+    - [Phalcon 3+](https://datatables.ozdemir.be/phalcon)
+    - [Prestashop](https://datatables.ozdemir.be/prestashop)
 
 ## Installation
 
-> **NOTE:** version 2.0 requires php 7.1.3+ ([php supported versions](http://php.net/supported-versions.php))
+> **NOTE:** version 2.0+ requires php 7.1.3+ ([php supported versions](http://php.net/supported-versions.php))
 
 The recommended way to install the library is with [Composer](https://getcomposer.org/)
 
@@ -74,20 +74,69 @@ You're now ready to begin using the Datatables php library.
 ```
 
 ## Methods
-This is the list of available public methods.
+* This is the list of available public methods.
 
-| Methods  | Parameters | Usages |
-| ------------- | ------------- | ------------- |
-| `query($query)`  | $query: string  | *- required*<br>- sets the sql query   |
-| `generate()`  | -  | *- required*<br>- runs the queries and build outputs  <br/>- returns the output as json,same as *generate()->toJson()* |
-| `toJson()`  | -  | *- optional*<br>- returns the output as json |
-| `toArray()`  | -  | *- optional*<br>- returns the output as array |
-| `add($column,$function)` | $column:string,<br/>$function:callback  |  *- optional*<br>- allows adding extra columns for custom usage| 
-| `edit($column,$function)` | $column:string,<br/>$function:callback  | *- optional*<br> - allows column editing | 
-| `filter($column,$function)` | $column:string,<br/>$function:callback  | *- optional*<br> - allows custom filtering| 
-| `hide($columns)` | $column:array/string | *- optional*<br>- removes the column from output, It is useful when you only need to use the data in add() and edit() methods.| 
-| `getColumns()` | - |  *- optional*<br>- returns column names (for dev purpose) | 
-| `getQuery()` | - |  *- optional*<br>- returns the sql query string that is created by the library (for dev purpose)| 
+__query($query)__ *required*
+
+* sets the sql query
+
+__generate()__  *required*
+
+* runs the queries and build outputs
+* returns the output as json
+* same as generate()->toJson()
+
+__toJson()__
+
+* returns the output as json
+* should be called after generate()
+
+__toArray()__
+
+* returns the output as array
+* should be called after generate()
+
+__add($column, function( $row ){})__
+
+* adds extra columns for custom usage
+
+__edit($column, function($row){})__
+
+* allows column editing
+
+__filter($column, function( \Ozdemir\Datatables\FilterHelper $filter ){})__
+
+* allows custom filtering
+* FilterHelper Class has the methods below
+    - escape($value)
+    - searchValue()
+    - defaultFilter()
+    - between($low, $high)
+    - whereIn($array)
+    - greaterThan($value)
+    - lessThan($value)
+
+__hide($columns)__
+
+* removes the column from output
+* It is useful when you only need to use the data in add() or edit() methods.
+
+__setDistinctResponseFrom($column)__
+
+* executes the query with the given column name and adds the returned data to the output with the distinctData key.
+
+__setDistinctResponse($output)__
+
+* adds the given data to the output with the distinctData key.
+
+__getColumns()__
+
+* returns column names (for dev purpose)
+
+__getQuery()__
+
+* returns the sql query string that is created by the library (for dev purpose)
+
 
 ## Example
 
@@ -130,13 +179,9 @@ This is the list of available public methods.
         return "<a href='user.php?id=" . $data['id'] . "'>edit</a>";
     });
 
-    $datatables->filter('age', function ($escape, $search){
-        // apply custom filtering.
-        // ignore individual search value($search) for the column.
-        // if you want to escape user inputs, you can use $escape($input)
-        $val1 = 15;
-        $val2 = 30;
-        return "age BETWEEN $val1 AND $val2";
+    $datatables->filter('age', function ( \Ozdemir\Datatables\FilterHelper $filter ){
+        // applies custom filtering.
+        return $filter->between(15, 30);
     });
 
     echo $dt->generate()->toJson(); // same as 'echo $dt->generate()';

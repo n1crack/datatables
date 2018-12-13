@@ -192,6 +192,21 @@ class Datatables
     }
 
     /**
+     * @param $row
+     * @return array
+     */
+    protected function prepareRowData($row): array
+    {
+        $keys = $this->builder->isDataObject() ? $this->columns->names() : array_keys($this->columns->names());
+
+        $values = array_map(function (Column $column) use ($row) {
+            return $column->value($row);
+        }, $this->columns->getOnlyVisibles()->getArrayCopy());
+
+        return array_combine($keys, $values);
+    }
+
+    /**
      * @return array
      */
     private function getDistinctData(): array
@@ -217,21 +232,6 @@ class Datatables
             $this->response['distinctData'] = array_merge($this->response['distinctData'] ?? [],
                 $this->getDistinctData(), $this->distinctData);
         }
-    }
-
-    /**
-     * @param $row
-     * @return array
-     */
-    protected function prepareRowData($row): array
-    {
-        $keys = $this->builder->isDataObject() ? $this->columns->names() : array_keys($this->columns->names());
-
-        $values = array_map(function (Column $column) use ($row) {
-            return $column->value($row);
-        }, $this->columns->getOnlyVisibles()->getArrayCopy());
-
-        return array_combine($keys, $values);
     }
 
     /**
