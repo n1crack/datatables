@@ -194,7 +194,7 @@ class DatatablesSpec extends ObjectBehavior
     }
 
 
-    public function it_does_not_affect_ordering_when_reordering_oolumns()
+    public function it_does_not_affect_ordering_when_reordering_columns()
     {
         $this->request->query->set('search', ['value' => '']);
         $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]); // age - asc
@@ -211,7 +211,7 @@ class DatatablesSpec extends ObjectBehavior
 
         $datatables['data'][0]->shouldReturn(['name' => 'Colin', 'surname' => 'McCoy', 'age' => '19']);
     }
-    public function it_does_not_affect_global_searching_when_reordering_oolumns()
+    public function it_does_not_affect_global_searching_when_reordering_columns()
     {
         $this->request->query->set('search', ['value' => 'Stephanie']);
         $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]); // age - asc
@@ -228,7 +228,7 @@ class DatatablesSpec extends ObjectBehavior
 
         $datatables['data'][0]->shouldReturn([ 'Stephanie',  'Skinner', '45']);
     }
-    public function it_does_not_affect_individual_searching_when_reordering_oolumns()
+    public function it_does_not_affect_individual_searching_when_reordering_columns()
     {
         $this->request->query->set('search', ['value' => '']);
         $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]); // age - asc
