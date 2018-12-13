@@ -74,7 +74,7 @@ You're now ready to begin using the Datatables php library.
 ```
 
 ## Methods
-* This is the list of available public methods.
+This is the list of available public methods.
 
 __query($query)__ *required*
 
@@ -179,7 +179,7 @@ __getQuery()__
         return "<a href='user.php?id=" . $data['id'] . "'>edit</a>";
     });
 
-    $datatables->filter('age', function ( \Ozdemir\Datatables\FilterHelper $filter ){
+    $dt->filter('age', function ( \Ozdemir\Datatables\FilterHelper $filter ){
         // applies custom filtering.
         return $filter->between(15, 30);
     });
