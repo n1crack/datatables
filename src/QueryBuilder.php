@@ -70,7 +70,7 @@ class QueryBuilder
         $this->db = $db;
 
         $columnNames = ColumnNameList::from($query);
-        $this->setDataObject($columnNames);
+        $this->setDataObject();
 
         $this->columns = new ColumnCollection();
 
@@ -107,13 +107,13 @@ class QueryBuilder
     }
 
     /**
-     * @param array $columns
+     *
      */
-    public function setDataObject(array $columns): void
+    public function setDataObject(): void
     {
         if ($this->request->get('columns')) {
             $data = array_column($this->request->get('columns'), 'data');
-            $rangeSet = array_map('strval', array_keys($columns));
+            $rangeSet = array_map('strval', array_keys($data));
             $this->dataObject = array_intersect($data, $rangeSet) !== $data;
         }
     }
