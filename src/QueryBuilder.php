@@ -93,7 +93,9 @@ class QueryBuilder
             $attributes = array_column($columns, null, 'data');
 
             foreach ($attributes as $index => $attr) {
-                $this->columns->getOnlyVisibles()->get($index)->attr = $attr;
+                if ($this->columns->getOnlyVisibles()->isExists($index)) {
+                    $this->columns->getOnlyVisibles()->get($index)->attr = $attr;
+                }
             }
         }
     }
