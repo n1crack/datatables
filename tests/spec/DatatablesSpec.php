@@ -21,7 +21,7 @@ class DatatablesSpec extends ObjectBehavior
         $this->beConstructedWith($db, $this->request);
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveColumns' => function ($subject, $key) {

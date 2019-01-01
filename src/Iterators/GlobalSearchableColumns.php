@@ -17,6 +17,6 @@ class GlobalSearchableColumns extends FilterIterator
      */
     public function accept()
     {
-        return !$this->current()->hidden && $this->current()->interaction && $this->current()->attr['searchable'];
+        return !$this->current()->hidden && $this->current()->isSearchable();
     }
 }

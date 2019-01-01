@@ -49,6 +49,6 @@ class ColumnNameList
      */
     protected static function clearColumnNames($array): array
     {
-        return preg_replace("/.*\b(\w+)[''`\"\s]*$/s", '$1', $array);
+        return preg_replace("/.*\b(\w+)['`\"\s]*$/s", '$1', $array);
     }
 }

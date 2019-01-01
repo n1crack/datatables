@@ -201,7 +201,7 @@ class Datatables
 
         $values = array_map(function (Column $column) use ($row) {
             return $column->value($row);
-        }, $this->columns->getOnlyVisibles()->getArrayCopy());
+        }, $this->columns->visible()->getArrayCopy());
 
         return array_combine($keys, $values);
     }
@@ -215,7 +215,7 @@ class Datatables
             $output[$column] = array_column($this->db->query($this->builder->getDistinctQuery($column)), $column);
         }
 
-        return $output;
+        return $output ?? [];
     }
 
     /**

@@ -93,8 +93,8 @@ class QueryBuilder
             $attributes = array_column($columns, null, 'data');
 
             foreach ($attributes as $index => $attr) {
-                if ($this->columns->getOnlyVisibles()->isExists($index)) {
-                    $this->columns->getOnlyVisibles()->get($index)->attr = $attr;
+                if ($this->columns->visible()->isExists($index)) {
+                    $this->columns->visible()->get($index)->attr = $attr;
                 }
             }
         }
@@ -214,7 +214,7 @@ class QueryBuilder
             return '';
         }
 
-        $columns = $this->columns->getSearchableColumns();
+        $columns = $this->columns->searchable();
 
         if (\count($columns) === 0) {
             return '';
@@ -242,7 +242,7 @@ class QueryBuilder
      */
     protected function filterIndividual(Query $query): string
     {
-        $columns = $this->columns->getSearchableColumnsWithSearchValue();
+        $columns = $this->columns->individualSearchable();
 
         if (\count($columns) === 0) {
             return '';
@@ -297,7 +297,7 @@ class QueryBuilder
 
         $orders = array_filter($orders, function ($order) {
             return \in_array($order['dir'], ['asc', 'desc'],
-                    true) && $this->columns->getOnlyVisibles()->offsetGet($order['column'])->isOrderable();
+                    true) && $this->columns->visible()->offsetGet($order['column'])->isOrderable();
         });
 
         $o = [];
@@ -305,8 +305,8 @@ class QueryBuilder
         foreach ($orders as $order) {
             $id = $this->request->get('columns')[$order['column']]['data'];
 
-            if ($this->columns->getOnlyVisibles()->isExists($id)) {
-                $o[] = $this->columns->getOnlyVisibles()->get($id)->name.' '.$order['dir'];
+            if ($this->columns->visible()->isExists($id)) {
+                $o[] = $this->columns->visible()->get($id)->name.' '.$order['dir'];
             }
         }
 
@@ -325,6 +325,6 @@ class QueryBuilder
      */
     public function defaultOrder(): string
     {
-        return $this->columns->getOnlyVisibles()->offsetGet(0)->name.' asc';
+        return $this->columns->visible()->offsetGet(0)->name.' asc';
     }
 }

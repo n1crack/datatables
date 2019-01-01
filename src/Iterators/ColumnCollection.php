@@ -16,7 +16,7 @@ class ColumnCollection extends ArrayIterator
     /**
      * @return ColumnCollection
      */
-    public function getOnlyVisibles(): ColumnCollection
+    public function visible(): ColumnCollection
     {
         $array = array_values(iterator_to_array(new VisibleColumns($this)));
 
@@ -26,7 +26,7 @@ class ColumnCollection extends ArrayIterator
     /**
      * @return ColumnCollection
      */
-    public function getSearchableColumns(): ColumnCollection
+    public function searchable(): ColumnCollection
     {
         $array = iterator_to_array(new GlobalSearchableColumns($this));
 
@@ -37,7 +37,7 @@ class ColumnCollection extends ArrayIterator
      *
      * @return  ColumnCollection
      */
-    public function getSearchableColumnsWithSearchValue(): ColumnCollection
+    public function individualSearchable(): ColumnCollection
     {
         $array = iterator_to_array(new IndividualSearchableColumns(new GlobalSearchableColumns($this)));
 
@@ -67,9 +67,7 @@ class ColumnCollection extends ArrayIterator
             return $this->offsetGet($id);
         }
 
-        if (in_array($id, $this->names(), true)) {
-            return $this->getByName($id);
-        }
+        return $this->getByName($id);
     }
 
     /**
@@ -87,6 +85,6 @@ class ColumnCollection extends ArrayIterator
      */
     public function names(): array
     {
-        return array_column($this->getOnlyVisibles()->getArrayCopy(), 'name');
+        return array_column($this->visible()->getArrayCopy(), 'name');
     }
 }

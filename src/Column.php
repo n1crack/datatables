@@ -60,7 +60,7 @@ class Column
      * @param $row array
      * @return string
      */
-    public function value($row): ?string
+    public function value($row): string
     {
         if ($this->closure) {
             $closure = $this->closure;
