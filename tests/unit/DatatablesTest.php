@@ -2,7 +2,6 @@
 
 namespace Ozdemir\Datatables\Test;
 
-use Ozdemir\Datatables\ColumnNameList;
 use Ozdemir\Datatables\DB\SQLite;
 use Ozdemir\Datatables\Datatables;
 use PHPUnit\Framework\TestCase;
@@ -184,7 +183,7 @@ class DatatablesTest extends TestCase
     public function testSortsExcludingHiddenColumnsObjectData()
     {
         $this->request->query->set('search', ['value' => '']);
-        $this->request->query->set('order', [['column' => '1', 'dir' => 'asc']]); // age - asc
+        $this->request->query->set('order', [['column' => '1', 'dir' => 'asc']]);
 
         $this->request->query->set('columns', [
             ['data' => 'name', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
@@ -203,7 +202,7 @@ class DatatablesTest extends TestCase
     public function testReorderingColumnsDoesNotAffectOrdering()
     {
         $this->request->query->set('search', ['value' => '']);
-        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]); // age - asc
+        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]);
 
         $this->request->query->set('columns', [
             ['data' => 'age', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
@@ -221,7 +220,7 @@ class DatatablesTest extends TestCase
     public function testReorderingColumnsDoesNotAffectGlobalSearching()
     {
         $this->request->query->set('search', ['value' => 'Stephanie']);
-        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]); // age - asc
+        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]);
 
         $this->request->query->set('columns', [
             ['data' => '2', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
@@ -238,7 +237,7 @@ class DatatablesTest extends TestCase
     public function testReorderingColumnsDoesNotAffectIndividualSearching()
     {
         $this->request->query->set('search', ['value' => '']);
-        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]); // age - asc
+        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]);
 
         $this->request->query->set('columns', [
             ['data' => 'surname', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => 'McCoy']],
@@ -251,5 +250,73 @@ class DatatablesTest extends TestCase
         $datatables = $this->db->generate()->toArray();
 
         $this->assertSame(['name' => 'Colin', 'surname' => 'McCoy', 'age' => '19'], $datatables['data'][0]);
+    }
+
+    public function testCustomFilteringBetween()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]);
+
+        $this->request->query->set('columns', [
+            ['data' => '0', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '1', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '2', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->db->query('Select id as fid, name, surname, age from mytable');
+        $this->db->filter('fid', function(){
+            return $this->between(4,6);
+        });
+
+        $datatables = $this->db->generate()->toArray();
+
+        $this->assertSame(11, $datatables['recordsTotal']);
+        $this->assertSame(3, $datatables['recordsFiltered']);
+    }
+
+    public function testCustomFilteringWhereIn()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]);
+
+        $this->request->query->set('columns', [
+            ['data' => '0', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '1', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '2', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->db->query('Select id as fid, name, surname, age from mytable');
+        $this->db->filter('fid', function(){
+            return $this->whereIn([5]);
+        });
+
+        $datatables = $this->db->generate()->toArray();
+
+        $this->assertSame(11, $datatables['recordsTotal']);
+        $this->assertSame(1, $datatables['recordsFiltered']);
+        $this->assertSame(['5', 'Ruby', 'Pickett', '28'], $datatables['data'][0]);
+    }
+
+    public function testReturnDefaultSearchWhenNull()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]);
+
+        $this->request->query->set('columns', [
+            ['data' => '0', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '5']],
+            ['data' => '1', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+            ['data' => '2', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '']],
+        ]);
+
+        $this->db->query('Select id as fid, name, surname, age from mytable');
+        $this->db->filter('fid', function(){
+            //return $this->defaultFilter(); // when it is not defined, returns defaultFilter
+        });
+
+        $datatables = $this->db->generate()->toArray();
+
+        $this->assertSame(11, $datatables['recordsTotal']);
+        $this->assertSame(1, $datatables['recordsFiltered']);
+        $this->assertSame(['5', 'Ruby', 'Pickett', '28'], $datatables['data'][0]);
     }
 }
