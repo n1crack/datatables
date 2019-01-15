@@ -15,8 +15,8 @@ class IndividualSearchableColumns extends FilterIterator
     /**
      * @return bool
      */
-    public function accept()
+    public function accept(): bool
     {
-        return $this->current()->attr['search']['value'] !== '' || $this->current()->customFilter;
+        return $this->current()->searchValue() !== '' || $this->current()->hasFilter();
     }
 }

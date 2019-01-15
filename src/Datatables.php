@@ -2,6 +2,7 @@
 
 namespace Ozdemir\Datatables;
 
+use Closure;
 use Ozdemir\Datatables\DB\DatabaseInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -62,10 +63,10 @@ class Datatables
 
     /**
      * @param $column
-     * @param callable $closure
+     * @param Closure $closure
      * @return Datatables
      */
-    public function add($column, $closure): Datatables
+    public function add($column, Closure $closure): Datatables
     {
         $column = new Column($column);
         $column->closure = $closure;
@@ -77,10 +78,10 @@ class Datatables
 
     /**
      * @param $column
-     * @param callable $closure
+     * @param Closure $closure
      * @return Datatables
      */
-    public function edit($column, $closure): Datatables
+    public function edit($column, Closure $closure): Datatables
     {
         $column = $this->columns->getByName($column);
         $column->closure = $closure;
@@ -90,10 +91,10 @@ class Datatables
 
     /**
      * @param $column
-     * @param callable $closure
+     * @param Closure $closure
      * @return Datatables
      */
-    public function filter($column, $closure): Datatables
+    public function filter($column, Closure $closure): Datatables
     {
         $column = $this->columns->getByName($column);
         $column->customFilter = $closure;

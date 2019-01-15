@@ -12,7 +12,7 @@ class ColumnNameList
     use Explode;
 
     /**
-     * @param $query
+     * @param string $query
      * @return array
      */
     public static function from($query): array
@@ -24,7 +24,7 @@ class ColumnNameList
     }
 
     /**
-     * @param $string
+     * @param string $string
      * @return string
      */
     protected static function removeAllEnclosedInParentheses($string): string
@@ -33,7 +33,7 @@ class ColumnNameList
     }
 
     /**
-     * @param $string
+     * @param string $string
      * @return array
      */
     protected static function getColumnArray($string): array
@@ -44,7 +44,7 @@ class ColumnNameList
     }
 
     /**
-     * @param $array
+     * @param array $array
      * @return array
      */
     protected static function clearColumnNames($array): array
