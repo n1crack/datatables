@@ -104,10 +104,10 @@ __edit($column, function($row){})__
 
 * allows column editing
 
-__filter($column, function( \Ozdemir\Datatables\FilterHelper $filter ){})__
+__filter($column, function(){})__
 
 * allows custom filtering
-* FilterHelper Class has the methods below
+* it has the methods below
     - escape($value)
     - searchValue()
     - defaultFilter()
@@ -179,9 +179,9 @@ __getQuery()__
         return "<a href='user.php?id=" . $data['id'] . "'>edit</a>";
     });
 
-    $dt->filter('age', function ( \Ozdemir\Datatables\FilterHelper $filter ){
+    $dt->filter('age', function (){
         // applies custom filtering.
-        return $filter->between(15, 30);
+        return $this->between(15, 30);
     });
 
     echo $dt->generate()->toJson(); // same as 'echo $dt->generate()';

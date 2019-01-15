@@ -209,19 +209,14 @@ class QueryBuilder
     protected function filterGlobal(Query $query): string
     {
         $searchinput = $this->request->get('search')['value'];
-
-        if ($searchinput === null || $searchinput === '') {
-            return '';
-        }
-
+        $searchinput = preg_replace("/\W+/u", ' ', $searchinput);
         $columns = $this->columns->searchable();
 
-        if (\count($columns) === 0) {
+        if ($searchinput === null || $searchinput === '' || \count($columns) === 0) {
             return '';
         }
 
         $search = [];
-        $searchinput = preg_replace("/\W+/u", ' ', $searchinput);
 
         foreach (explode(' ', $searchinput) as $word) {
             $look = [];
@@ -243,30 +238,13 @@ class QueryBuilder
     protected function filterIndividual(Query $query): string
     {
         $columns = $this->columns->individualSearchable();
-
-        if (\count($columns) === 0) {
-            return '';
-        }
-
         $look = [];
 
         foreach ($columns as $column) {
-            if ($column->customFilter) {
-                $filter = $column->customFilter;
-                $customFilter = $filter(new FilterHelper($query, $column, $this->db));
-
-                if ($customFilter) {
-                    $look[] = $customFilter;
-                }
-            } else {
-                $look[] = $column->name.' LIKE '.$this->db->escape('%'.$column->searchValue().'%', $query);
-            }
-        }
-        if (empty($look)) {
-            return '';
+            $look[] = $this->columnFilter($column, new FilterHelper($query, $column, $this->db));
         }
 
-        return ' ('.implode(' AND ', $look).')';
+        return implode(' AND ', $look);
     }
 
     /**
@@ -326,5 +304,19 @@ class QueryBuilder
     public function defaultOrder(): string
     {
         return $this->columns->visible()->offsetGet(0)->name.' asc';
+    }
+
+    /**
+     * @param Column $column
+     * @param FilterHelper $helper
+     * @return string
+     */
+    public function columnFilter(Column $column, FilterHelper $helper): string
+    {
+        if ($column->hasFilter()) {
+            return $column->customFilter->call($helper) ?? $helper->defaultFilter();
+        }
+
+        return $helper->defaultFilter();
     }
 }

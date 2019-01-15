@@ -26,7 +26,7 @@ class Column
     /**
      * Callback function
      *
-     * @var callable
+     * @var \Closure
      */
     public $closure;
 
@@ -42,7 +42,7 @@ class Column
 
     /**
      * Custom filter
-     * @var callable
+     * @var \Closure
      */
     public $customFilter;
 
@@ -62,13 +62,11 @@ class Column
      */
     public function value($row): string
     {
-        if ($this->closure) {
-            $closure = $this->closure;
-
-            return $closure($row);
+        if ($this->closure instanceof \Closure) {
+            return call_user_func($this->closure, $row);
         }
 
-        return $row[$this->name];
+        return $row[$this->name] ?? '';
     }
 
     /**
@@ -77,6 +75,15 @@ class Column
     public function hide(): void
     {
         $this->hidden = true;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function hasFilter(): bool
+    {
+        return $this->customFilter instanceof \Closure;
     }
 
     /**
