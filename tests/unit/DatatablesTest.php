@@ -5,7 +5,7 @@ namespace Ozdemir\Datatables\Test;
 use Ozdemir\Datatables\DB\SQLite;
 use Ozdemir\Datatables\Datatables;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
+use Ozdemir\Datatables\Http\Request;
 
 class DatatablesTest extends TestCase
 {
@@ -21,7 +21,7 @@ class DatatablesTest extends TestCase
     public function setUp()
     {
         $sqlconfig = __DIR__.'/../fixtures/test.db';
-        $this->request = Request::create(null, 'GET', ['draw' => 1]);
+        $this->request = Request::create(array() ,['draw' => 1] );
 
         $this->db = new Datatables(new SQLite($sqlconfig), $this->request);
     }

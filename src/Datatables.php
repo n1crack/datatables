@@ -4,8 +4,7 @@ namespace Ozdemir\Datatables;
 
 use Closure;
 use Ozdemir\Datatables\DB\DatabaseInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Ozdemir\Datatables\Http\Request;
 
 /**
  * Class Datatables
@@ -30,7 +29,7 @@ class Datatables
     protected $builder;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request
+     * @var Request
      */
     protected $request;
 
@@ -53,7 +52,7 @@ class Datatables
      * Datatables constructor.
      *
      * @param \Ozdemir\Datatables\DB\DatabaseInterface $db
-     * @param \Symfony\Component\HttpFoundation\Request|null $request
+     * @param Request $request
      */
     public function __construct(DatabaseInterface $db, Request $request = null)
     {
@@ -248,9 +247,9 @@ class Datatables
      */
     public function toJson(): string
     {
-        $response = new JsonResponse($this->response);
+        header('Content-type: application/json;');
 
-        return $response->send();
+        return json_encode($this->response, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
     }
 
     /**

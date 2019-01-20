@@ -4,7 +4,7 @@ namespace spec\Ozdemir\Datatables;
 
 use Ozdemir\Datatables\DB\SQLite;
 use PhpSpec\ObjectBehavior;
-use Symfony\Component\HttpFoundation\Request;
+use Ozdemir\Datatables\Http\Request;
 
 class DatatablesSpec extends ObjectBehavior
 {
@@ -16,7 +16,7 @@ class DatatablesSpec extends ObjectBehavior
         $sqlconfig = __DIR__.'/../fixtures/test.db';
         $db = new SQLite($sqlconfig);
 
-        $this->request = Request::create(null, 'GET', ['draw' => 1]);
+        $this->request = Request::create(array(), ['draw' => 1]);
 
         $this->beConstructedWith($db, $this->request);
     }
@@ -211,6 +211,7 @@ class DatatablesSpec extends ObjectBehavior
 
         $datatables['data'][0]->shouldReturn(['name' => 'Colin', 'surname' => 'McCoy', 'age' => '19']);
     }
+
     public function it_does_not_affect_global_searching_when_reordering_columns()
     {
         $this->request->query->set('search', ['value' => 'Stephanie']);
@@ -226,7 +227,7 @@ class DatatablesSpec extends ObjectBehavior
         $this->hide('fid');
         $datatables = $this->generate()->toArray();
 
-        $datatables['data'][0]->shouldReturn([ 'Stephanie',  'Skinner', '45']);
+        $datatables['data'][0]->shouldReturn(['Stephanie', 'Skinner', '45']);
     }
 
     public function it_does_not_affect_individual_searching_when_reordering_columns()
@@ -235,9 +236,21 @@ class DatatablesSpec extends ObjectBehavior
         $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]);
 
         $this->request->query->set('columns', [
-            ['data' => 'surname', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => 'McCoy']],
+            [
+                'data' => 'surname',
+                'name' => '',
+                'searchable' => true,
+                'orderable' => true,
+                'search' => ['value' => 'McCoy'],
+            ],
             ['data' => 'age', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => '19']],
-            ['data' => 'name', 'name' => '', 'searchable' => true, 'orderable' => true, 'search' => ['value' => 'Colin']],
+            [
+                'data' => 'name',
+                'name' => '',
+                'searchable' => true,
+                'orderable' => true,
+                'search' => ['value' => 'Colin'],
+            ],
         ]);
 
         $this->query('Select id as fid, name, surname, age from mytable');
@@ -259,8 +272,8 @@ class DatatablesSpec extends ObjectBehavior
         ]);
 
         $this->query('Select id as fid, name, surname, age from mytable');
-        $this->filter('fid', function(){
-            return $this->between(4,6);
+        $this->filter('fid', function () {
+            return $this->between(4, 6);
         });
 
         $datatables = $this->generate()->toArray();
@@ -281,7 +294,7 @@ class DatatablesSpec extends ObjectBehavior
         ]);
 
         $this->query('Select id as fid, name, surname, age from mytable');
-        $this->filter('fid', function(){
+        $this->filter('fid', function () {
             return $this->whereIn([5]);
         });
 
@@ -304,7 +317,7 @@ class DatatablesSpec extends ObjectBehavior
         ]);
 
         $this->query('Select id as fid, name, surname, age from mytable');
-        $this->filter('fid', function(){
+        $this->filter('fid', function () {
             //return $this->defaultFilter(); // when it is not defined, returns defaultFilter
         });
 

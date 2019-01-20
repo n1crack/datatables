@@ -4,7 +4,7 @@ namespace Ozdemir\Datatables;
 
 use Ozdemir\Datatables\DB\DatabaseInterface;
 use Ozdemir\Datatables\Iterators\ColumnCollection;
-use Symfony\Component\HttpFoundation\Request;
+use Ozdemir\Datatables\Http\Request;
 
 /**
  * Class Query Builder
