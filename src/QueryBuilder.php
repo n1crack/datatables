@@ -70,7 +70,7 @@ class QueryBuilder
         $this->db = $db;
 
         $columnNames = ColumnNameList::from($query);
-        $this->setDataObject();
+        $this->dataObject = $this->checkAssoc();
 
         $this->columns = new ColumnCollection();
 
@@ -79,6 +79,7 @@ class QueryBuilder
         }
 
         $this->setQuery($query);
+        $this->hasDefaultOrder = $this->hasOrderBy($query);
     }
 
     /**
@@ -109,15 +110,18 @@ class QueryBuilder
     }
 
     /**
-     *
+     * @return bool
      */
-    public function setDataObject(): void
+    public function checkAssoc(): bool
     {
-        if ($this->request->get('columns')) {
-            $data = array_column($this->request->get('columns'), 'data');
-            $rangeSet = array_map('strval', array_keys($data));
-            $this->dataObject = array_intersect($data, $rangeSet) !== $data;
+        if (!$this->request->get('columns')) {
+            return false;
         }
+
+        $data = array_column($this->request->get('columns'), 'data');
+        $rangeSet = array_map('strval', array_keys($data));
+
+        return array_intersect($data, $rangeSet) !== $data;
     }
 
     /**
@@ -142,7 +146,6 @@ class QueryBuilder
     public function setQuery($query): void
     {
         $this->query = new Query('Select '.implode(', ', $this->columns->names())." from ($query)t");
-        $this->hasDefaultOrder = $this->hasOrderBy($query);
     }
 
     /**
@@ -208,8 +211,7 @@ class QueryBuilder
      */
     protected function filterGlobal(Query $query): string
     {
-        $searchinput = $this->request->get('search')['value'];
-        $searchinput = preg_replace("/\W+/u", ' ', $searchinput);
+        $searchinput = preg_replace("/\W+/u", ' ', $this->request->get('search')['value']);
         $columns = $this->columns->searchable();
 
         if ($searchinput === null || $searchinput === '' || \count($columns) === 0) {
