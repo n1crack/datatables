@@ -67,6 +67,6 @@ class PSAdapter implements DatabaseInterface
      */
     public function escape($string, Query $query)
     {
-        return pSQL($string);
+        return "'".pSQL($string)."'";
     }
 }
