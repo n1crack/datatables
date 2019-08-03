@@ -40,7 +40,7 @@ class PhalconAdapter implements DatabaseInterface
      */
     public function query(Query $query)
     {
-        $data = $this->db->query($query, $query->escapes);
+        $data = $this->db->query($query->sql, $query->escapes);
 
         return $data->fetchAll(Db::FETCH_ASSOC);
     }
@@ -51,9 +51,9 @@ class PhalconAdapter implements DatabaseInterface
      */
     public function count(Query $query)
     {
-        $data = $this->db->query("Select count(*) as rowcount from ($query)t", $query->escapes)->fetchAll();
+        $data = $this->db->query("Select count(*) as rowcount from ($query->sql)t", $query->escapes)->fetchAll();
 
-        return $data[0]->rowcount;
+        return $data[0]['rowcount'];
     }
 
     /**
