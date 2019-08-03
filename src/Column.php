@@ -91,7 +91,7 @@ class Column
      */
     public function isSearchable(): bool
     {
-        return ($this->interaction && $this->attr['searchable']);
+        return ($this->interaction && $this->attr['searchable'] === 'true');
     }
 
     /**
@@ -99,7 +99,7 @@ class Column
      */
     public function isOrderable(): bool
     {
-        return ($this->interaction && $this->attr['orderable']);
+        return ($this->interaction && $this->attr['orderable'] === 'true');
     }
 
     /**
