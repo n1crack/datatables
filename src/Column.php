@@ -28,7 +28,7 @@ class Column
      *
      * @var bool
      */
-    public $triggerSearch = false;
+    public $forceSearch = false;
 
     /**
      * Callback function
@@ -79,17 +79,10 @@ class Column
     /**
      * Set visibility of the column.
      */
-    public function hide(): void
+    public function hide($searchable = false): void
     {
         $this->hidden = true;
-    }
-
-    /**
-     * Set seachable of the column.
-     */
-    public function triggerSearch(): void
-    {
-        $this->triggerSearch = true;
+        $this->forceSearch = $searchable;
     }
 
     /**

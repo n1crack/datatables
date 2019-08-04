@@ -143,30 +143,13 @@ class Datatables
      * @param array $columns
      * @return Datatables
      */
-    public function hide(...$columns): Datatables
+    public function hide($searchable = false, ...$columns): Datatables
     {
         foreach ($columns as $column) {
             if (\is_array($column)) {
-                $this->hide(...$column);
+                $this->hide($searchable, ...$column);
             } else {
-                $this->columns->getByName($column)->hide();
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param array $columns
-     * @return Datatables
-     */
-    public function triggerSearch(...$columns): Datatables
-    {
-        foreach ($columns as $column) {
-            if (\is_array($column)) {
-                $this->triggerSearch(...$column);
-            } else {
-                $this->columns->getByName($column)->triggerSearch();
+                $this->columns->getByName($column)->hide($searchable);
             }
         }
 
