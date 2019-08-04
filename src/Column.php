@@ -24,6 +24,13 @@ class Column
     public $hidden = false;
 
     /**
+     * Column seachable
+     *
+     * @var bool
+     */
+    public $forceSearch = false;
+
+    /**
      * Callback function
      *
      * @var \Closure
@@ -72,11 +79,11 @@ class Column
     /**
      * Set visibility of the column.
      */
-    public function hide(): void
+    public function hide($searchable = false): void
     {
         $this->hidden = true;
+        $this->forceSearch = $searchable;
     }
-
 
     /**
      * @return bool
@@ -115,6 +122,6 @@ class Column
      */
     public function searchValue(): string
     {
-        return $this->attr['search']['value'];
+        return $this->attr['search']['value'] ?? '';
     }
 }
