@@ -24,6 +24,13 @@ class Column
     public $hidden = false;
 
     /**
+     * Column seachable
+     *
+     * @var bool
+     */
+    public $triggerSearch = false;
+
+    /**
      * Callback function
      *
      * @var \Closure
@@ -77,6 +84,13 @@ class Column
         $this->hidden = true;
     }
 
+    /**
+     * Set seachable of the column.
+     */
+    public function triggerSearch(): void
+    {
+        $this->triggerSearch = true;
+    }
 
     /**
      * @return bool
@@ -115,6 +129,6 @@ class Column
      */
     public function searchValue(): string
     {
-        return $this->attr['search']['value'];
+        return $this->attr['search']['value'] ?? '';
     }
 }

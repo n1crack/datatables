@@ -157,6 +157,23 @@ class Datatables
     }
 
     /**
+     * @param array $columns
+     * @return Datatables
+     */
+    public function triggerSearch(...$columns): Datatables
+    {
+        foreach ($columns as $column) {
+            if (\is_array($column)) {
+                $this->triggerSearch(...$column);
+            } else {
+                $this->columns->getByName($column)->triggerSearch();
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @param string $query
      * @return Datatables
      */
