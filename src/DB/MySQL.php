@@ -11,6 +11,8 @@ use PDO;
  */
 class MySQL implements DatabaseInterface
 {
+    use QueryStringTrait;
+
     /**
      * @var PDO
      */

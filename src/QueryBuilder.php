@@ -145,7 +145,7 @@ class QueryBuilder
      */
     public function setQuery($query): void
     {
-        $this->query = new Query('Select '.implode(', ', $this->columns->names())." from ($query)t");
+        $this->query = new Query($this->db->makeQueryString($query, $this->columns));
     }
 
     /**
@@ -173,7 +173,7 @@ class QueryBuilder
     public function getDistinctQuery($column): Query
     {
         $distinct = clone $this->query;
-        $distinct->set("SELECT $column FROM ({$this->query})t GROUP BY $column");
+        $distinct->set($this->db->makeDistinctQueryString($this->query, $column));
 
         return $distinct;
     }
@@ -199,7 +199,7 @@ class QueryBuilder
         ]);
 
         if (\count($filter) > 0) {
-            return ' WHERE '.implode(' AND ', $filter);
+            return $this->db->makeWhereString($filter);
         }
 
         return '';
@@ -224,7 +224,7 @@ class QueryBuilder
             $look = [];
 
             foreach ($columns as $column) {
-                $look[] = $column->name.' LIKE '.$this->db->escape('%'.$word.'%', $query);
+                $look[] = $this->db->makeLikeString($query, $column, $word);
             }
 
             $search[] = '('.implode(' OR ', $look).')';
@@ -265,7 +265,7 @@ class QueryBuilder
             return '';
         }
 
-        return " LIMIT $take OFFSET $skip";
+        return $this->db->makeLimitString($take, $skip);
     }
 
     /**
@@ -297,7 +297,7 @@ class QueryBuilder
             $o[] = $this->defaultOrder();
         }
 
-        return ' ORDER BY '.implode(',', $o);
+        return $this->db->makeOrderByString($o);
     }
 
     /**

@@ -11,6 +11,7 @@ use PDO;
  */
 class SQLite implements DatabaseInterface
 {
+    use QueryStringTrait;
 
     /**
      * @var PDO

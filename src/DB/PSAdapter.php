@@ -9,6 +9,7 @@ use Ozdemir\Datatables\Query;
  */
 class PSAdapter implements DatabaseInterface
 {
+    use QueryStringTrait;
 
     /**
      * @var

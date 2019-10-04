@@ -2,6 +2,8 @@
 
 namespace Ozdemir\Datatables\DB;
 
+use Ozdemir\Datatables\Column;
+use Ozdemir\Datatables\Iterators\ColumnCollection;
 use Ozdemir\Datatables\Query;
 
 interface DatabaseInterface
@@ -31,4 +33,45 @@ interface DatabaseInterface
      * @return string
      */
     public function escape($string, Query $query);
+
+    /**
+     * @param string $query
+     * @param ColumnCollection $columns
+     * @return mixed
+     */
+    public function makeQueryString(string $query, ColumnCollection $columns);
+
+    /**
+     * @param Query $query
+     * @param string $column
+     * @return mixed
+     */
+    public function makeDistinctQueryString(Query $query, string $column);
+
+    /**
+     * @param string $filter
+     * @return mixed
+     */
+    public function makeWhereString(string $filter);
+
+    /**
+     * @param Query $query
+     * @param Column $column
+     * @param string $word
+     * @return mixed
+     */
+    public function makeLikeString(Query $query, Column $column, string $word);
+
+    /**
+     * @param string $o
+     * @return mixed
+     */
+    public function makeOrderByString(string $o);
+
+    /**
+     * @param $take
+     * @param $skip
+     * @return mixed
+     */
+    public function makeLimitString(integer $take, integer $skip);
 }

@@ -12,6 +12,8 @@ use Ozdemir\Datatables\Query;
  */
 class LaravelAdapter implements DatabaseInterface
 {
+    use QueryStringTrait;
+
     /**
      * LaravelAdapter constructor.
      * @param null $config

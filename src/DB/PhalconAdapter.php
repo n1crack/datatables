@@ -11,6 +11,8 @@ use \Phalcon\Db;
  */
 class PhalconAdapter implements DatabaseInterface
 {
+    use QueryStringTrait;
+
     /**
      * @var
      */

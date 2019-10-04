@@ -7,7 +7,6 @@ use Ozdemir\Datatables\DB\DatabaseInterface;
 
 /**
  * Class FilterHelper
-
  * @package Ozdemir\Datatables
  */
 class FilterHelper
@@ -60,7 +59,7 @@ class FilterHelper
      */
     public function defaultFilter(): string
     {
-        return $this->column->name.' LIKE '.$this->escape('%'.$this->searchValue().'%');
+        return $this->db->makeLikeString($this->query, $this->column, $this->searchValue());
     }
 
     /**

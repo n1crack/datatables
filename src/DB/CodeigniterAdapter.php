@@ -10,6 +10,8 @@ use Ozdemir\Datatables\Query;
  */
 class CodeigniterAdapter implements DatabaseInterface
 {
+    use QueryStringTrait;
+
     /**
      * @var
      */
