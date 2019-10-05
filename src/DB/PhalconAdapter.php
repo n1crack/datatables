@@ -9,10 +9,8 @@ use \Phalcon\Db;
  * Class PhalconAdapter
  * @package Ozdemir\Datatables\DB
  */
-class PhalconAdapter implements DatabaseInterface
+class PhalconAdapter extends DBAdapter
 {
-    use QueryStringTrait;
-
     /**
      * @var
      */

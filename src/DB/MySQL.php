@@ -9,10 +9,8 @@ use PDO;
  * Class MySQL
  * @package Ozdemir\Datatables\DB
  */
-class MySQL implements DatabaseInterface
+class MySQL extends DBAdapter
 {
-    use QueryStringTrait;
-
     /**
      * @var PDO
      */

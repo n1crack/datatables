@@ -8,10 +8,8 @@ use Ozdemir\Datatables\Query;
  * Class CodeigniterAdapter
  * @package Ozdemir\Datatables\DB
  */
-class CodeigniterAdapter implements DatabaseInterface
+class CodeigniterAdapter extends DBAdapter
 {
-    use QueryStringTrait;
-
     /**
      * @var
      */

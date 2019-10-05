@@ -10,10 +10,8 @@ use Ozdemir\Datatables\Query;
  * Class LaravelAdapter
  * @package Ozdemir\Datatables\DB
  */
-class LaravelAdapter implements DatabaseInterface
+class LaravelAdapter extends DBAdapter
 {
-    use QueryStringTrait;
-
     /**
      * LaravelAdapter constructor.
      * @param null $config

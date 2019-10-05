@@ -7,10 +7,8 @@ use Ozdemir\Datatables\Query;
  * Class PSAdapter
  * @package Ozdemir\Datatables\DB
  */
-class PSAdapter implements DatabaseInterface
+class PSAdapter extends DBAdapter
 {
-    use QueryStringTrait;
-
     /**
      * @var
      */

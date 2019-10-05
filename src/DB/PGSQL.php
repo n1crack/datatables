@@ -7,13 +7,11 @@ use Ozdemir\Datatables\Query;
 use PDO;
 
 /**
- * Class PGSQL
+ * Class PGSQL // PostgreSql Adapter
  * @package Ozdemir\Datatables\DB
  */
-class PGSQL implements DatabaseInterface
+class PGSQL extends DBAdapter
 {
-    use QueryStringTrait;
-
     /**
      * @var PDO
      */

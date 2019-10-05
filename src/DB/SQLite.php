@@ -9,10 +9,8 @@ use PDO;
  * Class SQLite
  * @package Ozdemir\Datatables\DB
  */
-class SQLite implements DatabaseInterface
+class SQLite extends DBAdapter
 {
-    use QueryStringTrait;
-
     /**
      * @var PDO
      */

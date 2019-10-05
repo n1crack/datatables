@@ -49,10 +49,10 @@ interface DatabaseInterface
     public function makeDistinctQueryString(Query $query, string $column);
 
     /**
-     * @param string $filter
+     * @param array $filter
      * @return mixed
      */
-    public function makeWhereString(string $filter);
+    public function makeWhereString(array $filter);
 
     /**
      * @param Query $query
@@ -63,15 +63,15 @@ interface DatabaseInterface
     public function makeLikeString(Query $query, Column $column, string $word);
 
     /**
-     * @param string $o
+     * @param array $o
      * @return mixed
      */
-    public function makeOrderByString(string $o);
+    public function makeOrderByString(array $o);
 
     /**
      * @param $take
      * @param $skip
      * @return mixed
      */
-    public function makeLimitString(integer $take, integer $skip);
+    public function makeLimitString(int $take, int $skip);
 }
