@@ -5,3 +5,4 @@
 /nbproject
 composer.lock
 .DS_Store
+*.cache

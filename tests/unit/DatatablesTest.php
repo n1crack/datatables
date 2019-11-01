@@ -18,15 +18,15 @@ class DatatablesTest extends TestCase
         return substr($data, 0, 3).'...';
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $sqlconfig = __DIR__.'/../fixtures/test.db';
-        $this->request = Request::create(array() ,['draw' => 1] );
+        $this->request = Request::create(array(), ['draw' => 1]);
 
         $this->db = new Datatables(new SQLite($sqlconfig), $this->request);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->db);
     }
@@ -53,7 +53,7 @@ class DatatablesTest extends TestCase
 
         $this->assertSame("1", $data[0]);
         $this->assertSame("John", $data[1]);
-        $this->assertContains('Doe', $data[2]);
+        $this->assertStringContainsString('Doe', $data[2]);
     }
 
     public function testSetsColumnNamesFromAliases()
@@ -186,7 +186,13 @@ class DatatablesTest extends TestCase
         $this->request->query->set('order', [['column' => '1', 'dir' => 'asc']]);
 
         $this->request->query->set('columns', [
-            ['data' => 'name', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => '']],
+            [
+                'data' => 'name',
+                'name' => '',
+                'searchable' => 'true',
+                'orderable' => 'true',
+                'search' => ['value' => ''],
+            ],
             ['data' => 'age', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => '']],
         ]);
 
@@ -206,8 +212,20 @@ class DatatablesTest extends TestCase
 
         $this->request->query->set('columns', [
             ['data' => 'age', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => '']],
-            ['data' => 'surname', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => '']],
-            ['data' => 'name', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => '']],
+            [
+                'data' => 'surname',
+                'name' => '',
+                'searchable' => 'true',
+                'orderable' => 'true',
+                'search' => ['value' => ''],
+            ],
+            [
+                'data' => 'name',
+                'name' => '',
+                'searchable' => 'true',
+                'orderable' => 'true',
+                'search' => ['value' => ''],
+            ],
         ]);
 
         $this->db->query('Select id as fid, name, surname, age from mytable');
@@ -232,17 +250,36 @@ class DatatablesTest extends TestCase
         $this->db->hide('fid');
         $datatables = $this->db->generate()->toArray();
 
-        $this->assertSame([ 'Stephanie',  'Skinner', '45'], $datatables['data'][0]);
+        $this->assertSame(['Stephanie', 'Skinner', '45'], $datatables['data'][0]);
     }
+
     public function testReorderingColumnsDoesNotAffectIndividualSearching()
     {
         $this->request->query->set('search', ['value' => '']);
         $this->request->query->set('order', [['column' => '0', 'dir' => 'asc']]);
 
         $this->request->query->set('columns', [
-            ['data' => 'surname', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => 'McCoy']],
-            ['data' => 'age', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => '19']],
-            ['data' => 'name', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => 'Colin']],
+            [
+                'data' => 'surname',
+                'name' => '',
+                'searchable' => 'true',
+                'orderable' => 'true',
+                'search' => ['value' => 'McCoy'],
+            ],
+            [
+                'data' => 'age',
+                'name' => '',
+                'searchable' => 'true',
+                'orderable' => 'true',
+                'search' => ['value' => '19'],
+            ],
+            [
+                'data' => 'name',
+                'name' => '',
+                'searchable' => 'true',
+                'orderable' => 'true',
+                'search' => ['value' => 'Colin'],
+            ],
         ]);
 
         $this->db->query('Select id as fid, name, surname, age from mytable');
@@ -264,8 +301,8 @@ class DatatablesTest extends TestCase
         ]);
 
         $this->db->query('Select id as fid, name, surname, age from mytable');
-        $this->db->filter('fid', function(){
-            return $this->between(4,6);
+        $this->db->filter('fid', function () {
+            return $this->between(4, 6);
         });
 
         $datatables = $this->db->generate()->toArray();
@@ -286,7 +323,7 @@ class DatatablesTest extends TestCase
         ]);
 
         $this->db->query('Select id as fid, name, surname, age from mytable');
-        $this->db->filter('fid', function(){
+        $this->db->filter('fid', function () {
             return $this->whereIn([5]);
         });
 
@@ -309,7 +346,7 @@ class DatatablesTest extends TestCase
         ]);
 
         $this->db->query('Select id as fid, name, surname, age from mytable');
-        $this->db->filter('fid', function(){
+        $this->db->filter('fid', function () {
             //return $this->defaultFilter(); // when it is not defined, returns defaultFilter
         });
 
