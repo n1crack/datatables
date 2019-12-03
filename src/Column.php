@@ -40,7 +40,7 @@ class Column
     /**
      * @var array
      */
-    public $attr;
+    public $attr = [];
 
     /**
      * @var bool
@@ -61,6 +61,9 @@ class Column
     public function __construct($name)
     {
         $this->name = $name;
+        $this->attr['searchable'] = false;
+        $this->attr['orderable'] = false;
+        $this->attr['search'] = ['value' => ''];
     }
 
     /**

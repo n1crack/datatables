@@ -4,7 +4,6 @@ namespace Ozdemir\Datatables;
 
 use Ozdemir\Datatables\DB\DatabaseInterface;
 use Ozdemir\Datatables\Iterators\ColumnCollection;
-use Ozdemir\Datatables\Http\Request;
 
 /**
  * Class Query Builder
@@ -44,9 +43,9 @@ class QueryBuilder
     private $columns;
 
     /**
-     * @var Request
+     * @var Option
      */
-    private $request;
+    private $options;
 
     /**
      * @var DatabaseInterface
@@ -61,12 +60,12 @@ class QueryBuilder
     /**
      *
      * @param string $query
-     * @param Request $request
+     * @param Option $options
      * @param DatabaseInterface $db
      */
-    public function __construct($query, Request $request, DatabaseInterface $db)
+    public function __construct($query, Option $options, DatabaseInterface $db)
     {
-        $this->request = $request;
+        $this->options = $options;
         $this->db = $db;
 
         $columnNames = ColumnNameList::from($query);
@@ -88,8 +87,7 @@ class QueryBuilder
      */
     public function setColumnAttributes(): void
     {
-        $columns = $this->request->get('columns');
-
+        $columns = $this->options->columns();
         if ($columns) {
             $attributes = array_column($columns, null, 'data');
 
@@ -114,11 +112,11 @@ class QueryBuilder
      */
     public function checkAssoc(): bool
     {
-        if (!$this->request->get('columns')) {
+        if (!$this->options->columns()) {
             return false;
         }
 
-        $data = array_column($this->request->get('columns'), 'data');
+        $data = array_column($this->options->columns(), 'data');
         $rangeSet = array_map('strval', array_keys($data));
 
         return array_intersect($data, $rangeSet) !== $data;
@@ -211,7 +209,7 @@ class QueryBuilder
      */
     protected function filterGlobal(Query $query): string
     {
-        $searchinput = preg_replace("/\W+/u", ' ', $this->request->get('search')['value']);
+        $searchinput = preg_replace("/\W+/u", ' ', $this->options->searchValue());
         $columns = $this->columns->searchable();
 
         if ($searchinput === null || $searchinput === '' || \count($columns) === 0) {
@@ -254,14 +252,10 @@ class QueryBuilder
      */
     protected function limit(): string
     {
-        $take = 10;
-        $skip = (integer)$this->request->get('start');
+        $skip = $this->options->start();
+        $take = $this->options->length() ?: 10;
 
-        if ($this->request->get('length')) {
-            $take = (integer)$this->request->get('length');
-        }
-
-        if ($take === -1 || !$this->request->get('draw')) {
+        if ($take === -1 || !$this->options->draw()) {
             return '';
         }
 
@@ -273,7 +267,7 @@ class QueryBuilder
      */
     protected function orderBy(): string
     {
-        $orders = $this->request->get('order') ?: [];
+        $orders = $this->options->order();
 
         $orders = array_filter($orders, function ($order) {
             return \in_array($order['dir'], ['asc', 'desc'],
@@ -283,7 +277,7 @@ class QueryBuilder
         $o = [];
 
         foreach ($orders as $order) {
-            $id = $this->request->get('columns')[$order['column']]['data'];
+            $id = $this->options->columns()[$order['column']]['data'];
 
             if ($this->columns->visible()->isExists($id)) {
                 $o[] = $this->columns->visible()->get($id)->name.' '.$order['dir'];

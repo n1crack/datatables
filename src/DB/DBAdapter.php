@@ -70,7 +70,7 @@ abstract class DBAdapter implements DatabaseInterface
      * @param $word
      * @return string
      */
-    public function makeLikeString(Query $query, Column $column,string $word)
+    public function makeLikeString(Query $query, Column $column, string $word)
     {
         return $column->name.' LIKE '.$this->escape('%'.$word.'%', $query);
     }

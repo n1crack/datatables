@@ -4,7 +4,6 @@ namespace Ozdemir\Datatables;
 
 /**
  * Trait Explode
-
  * @package Ozdemir\Datatables
  */
 trait Explode

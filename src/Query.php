@@ -4,7 +4,6 @@ namespace Ozdemir\Datatables;
 
 /**
  * Class Query
-
  * @package Ozdemir\Datatables
  */
 class Query

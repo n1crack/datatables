@@ -29,9 +29,9 @@ class Datatables
     protected $builder;
 
     /**
-     * @var Request
+     * @var Option
      */
-    protected $request;
+    public $options;
 
     /**
      * @var array
@@ -57,7 +57,7 @@ class Datatables
     public function __construct(DatabaseInterface $db, Request $request = null)
     {
         $this->db = $db->connect();
-        $this->request = $request ?: Request::createFromGlobals();
+        $this->options = new Option($request ?: Request::createFromGlobals());
     }
 
     /**
@@ -146,6 +146,7 @@ class Datatables
     public function hide(string $column, $searchable = false): Datatables
     {
         $this->columns->getByName($column)->hide($searchable);
+
         return $this;
     }
 
@@ -155,7 +156,7 @@ class Datatables
      */
     public function query($query): Datatables
     {
-        $this->builder = new QueryBuilder($query, $this->request, $this->db);
+        $this->builder = new QueryBuilder($query, $this->options, $this->db);
         $this->columns = $this->builder->columns();
 
         return $this;
@@ -216,7 +217,7 @@ class Datatables
      */
     public function setResponseData(): void
     {
-        $this->response['draw'] = (integer)$this->request->get('draw');
+        $this->response['draw'] = $this->options->draw();
         $this->response['recordsTotal'] = $this->db->count($this->builder->query);
         $this->response['recordsFiltered'] = $this->db->count($this->builder->filtered);
         $this->response['data'] = $this->getData();

@@ -8,7 +8,6 @@ namespace Ozdemir\Datatables\Http;
  */
 class Request
 {
-
     /**
      * @var ParameterBag
      */
