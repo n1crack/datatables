@@ -10,5 +10,4 @@ before_script:
   - travis_retry composer update --prefer-source --no-interaction
 
 script:
-  - vendor/bin/phpspec run --config=phpspec.yml --no-interaction
   - vendor/bin/phpunit

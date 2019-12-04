@@ -12,7 +12,7 @@
          stopOnFailure="false">
 
     <testsuites>
-        <testsuite name="League Datatables Test Suite">
+        <testsuite name="Datatables Test Suite">
             <directory>tests/unit</directory>
         </testsuite>
     </testsuites>
