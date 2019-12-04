@@ -54,9 +54,7 @@ class Option
      */
     public function searchValue(): string
     {
-        $search = $this->request->get('search') ?? [];
-
-        return array_key_exists('value', $search) ? $search['value'] : '';
+        return $this->request->get('search')['value'] ?? '';
     }
 
     /**

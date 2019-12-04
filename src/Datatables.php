@@ -5,6 +5,7 @@ namespace Ozdemir\Datatables;
 use Closure;
 use Ozdemir\Datatables\DB\DatabaseInterface;
 use Ozdemir\Datatables\Http\Request;
+use Ozdemir\Datatables\Iterators\ColumnCollection;
 
 /**
  * Class Datatables
@@ -14,24 +15,24 @@ use Ozdemir\Datatables\Http\Request;
 class Datatables
 {
     /**
-     * @var \Ozdemir\Datatables\DB\DatabaseInterface
+     * @var DatabaseInterface
      */
     protected $db;
 
     /**
-     * @var \Ozdemir\Datatables\Iterators\ColumnCollection
+     * @var ColumnCollection
      */
     protected $columns;
 
     /**
-     * @var \Ozdemir\Datatables\QueryBuilder
+     * @var QueryBuilder
      */
     protected $builder;
 
     /**
      * @var Option
      */
-    public $options;
+    protected $options;
 
     /**
      * @var array
@@ -51,7 +52,7 @@ class Datatables
     /**
      * Datatables constructor.
      *
-     * @param \Ozdemir\Datatables\DB\DatabaseInterface $db
+     * @param DatabaseInterface $db
      * @param Request $request
      */
     public function __construct(DatabaseInterface $db, Request $request = null)

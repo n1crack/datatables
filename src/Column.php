@@ -24,7 +24,6 @@ class Column
     public $hidden = false;
 
     /**
-     * Column seachable
      *
      * @var bool
      */
@@ -81,6 +80,7 @@ class Column
 
     /**
      * Set visibility of the column.
+     * @param bool $searchable
      */
     public function hide($searchable = false): void
     {
