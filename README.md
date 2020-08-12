@@ -14,6 +14,7 @@ PHP Library to handle server-side processing for Datatables, in a fast and simpl
     - [CodeIgniter 3](https://datatables.ozdemir.be/codeigniter)
     - [Phalcon 3+](https://datatables.ozdemir.be/phalcon)
     - [Prestashop](https://datatables.ozdemir.be/prestashop)
+    - [PostgreSql](https://datatables.ozdemir.be/postgresql)
 
 ## Installation
 
@@ -158,12 +159,12 @@ __getQuery()__
     });
 
     $dt->edit('email', function($data){
-        // mask email : mail@mail.com => m***@mail.com
+        // masks email : mail@mail.com => m***@mail.com
         return preg_replace('/(?<=.).(?=.*@)/u','*', $data['email']);
     });
 
     $dt->edit('address', function($data){
-        // check if a user has authorized to see the column value.
+        // checks user access.
         $current_user_plevel = 4;
         if ($current_user_plevel > 2 && $current_user_plevel > $data['plevel']) {
             return $data['address'];
@@ -172,10 +173,10 @@ __getQuery()__
         return 'you are not authorized to view this column';
     });
     
-    $dt->hide('plevel'); // hide 'plevel' column from the output
+    $dt->hide('plevel'); // hides 'plevel' column from the output
 
     $dt->add('action', function($data){
-        // return a link in a new column
+        // returns a link in a new column
         return "<a href='user.php?id=" . $data['id'] . "'>edit</a>";
     });
 
@@ -186,6 +187,10 @@ __getQuery()__
 
     echo $dt->generate()->toJson(); // same as 'echo $dt->generate()';
 ```
+
+## Road Map
+* better test suites for each class
+* improve integrations for php frameworks
 
 ## Requirements
 Composer  
