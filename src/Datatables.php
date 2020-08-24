@@ -220,7 +220,13 @@ class Datatables
     {
         $this->response['draw'] = $this->options->draw();
         $this->response['recordsTotal'] = $this->db->count($this->builder->query);
-        $this->response['recordsFiltered'] = $this->db->count($this->builder->filtered);
+
+        if($this->builder->query === $this->builder->filtered) {
+            $this->response['recordsFiltered'] = $this->response['recordsTotal'];
+        } else {
+            $this->response['recordsFiltered'] = $this->db->count($this->builder->filtered);
+        }
+
         $this->response['data'] = $this->getData();
 
         if (\count($this->distinctColumn) > 0 || \count($this->distinctData) > 0) {
