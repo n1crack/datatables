@@ -221,7 +221,7 @@ class Datatables
         $this->response['draw'] = $this->options->draw();
         $this->response['recordsTotal'] = $this->db->count($this->builder->query);
 
-        if($this->builder->query === $this->builder->filtered) {
+        if($this->builder->query->sql === $this->builder->filtered->sql) {
             $this->response['recordsFiltered'] = $this->response['recordsTotal'];
         } else {
             $this->response['recordsFiltered'] = $this->db->count($this->builder->filtered);
