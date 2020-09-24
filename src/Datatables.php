@@ -35,6 +35,12 @@ class Datatables
     protected $options;
 
     /**
+     * Custom escapes
+     * @var array
+     */
+    public $escapes = [];
+
+    /**
      * @var array
      */
     protected $response;
@@ -98,6 +104,18 @@ class Datatables
     {
         $column = $this->columns->getByName($column);
         $column->customFilter = $closure;
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @return Datatables
+     */
+    public function escape($key, $value): Datatables
+    {
+        $this->escapes[$key] = $value;
 
         return $this;
     }
@@ -171,6 +189,8 @@ class Datatables
         $this->builder->setColumnAttributes();
         $this->builder->setFilteredQuery();
         $this->builder->setFullQuery();
+        $this->builder->setEscapes($this->escapes);
+
         $this->setResponseData();
 
         return $this;
