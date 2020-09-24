@@ -11,11 +11,6 @@
          processIsolation="false"
          stopOnFailure="false"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-    <coverage>
-        <include>
-            <directory suffix=".php">src</directory>
-        </include>
-    </coverage>
     <testsuites>
         <testsuite name="Datatables Test Suite">
             <directory>tests/unit</directory>
