@@ -169,8 +169,8 @@ class QueryBuilder
      */
     public function setEscapes($escapes): void
     {
-        $this->query->escapes = array_merge($escapes, $this->full->escapes);
-        $this->filtered->escapes = array_merge($escapes, $this->full->escapes);
+        $this->query->escapes = array_merge($escapes, $this->query->escapes);
+        $this->filtered->escapes = array_merge($escapes, $this->filtered->escapes);
         $this->full->escapes = array_merge($escapes, $this->full->escapes);
     }
 
