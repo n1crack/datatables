@@ -39,7 +39,7 @@ class Codeigniter4Adapter extends DBAdapter
      */
     public function query(Query $query)
     {
-        $sql = $this->db->query($query, array_values($query->escapes));
+        $sql = $this->db->query($query, $query->escapes);
 
         return $sql->getResultArray();
     }
@@ -50,7 +50,7 @@ class Codeigniter4Adapter extends DBAdapter
      */
     public function count(Query $query)
     {
-        $sql = $this->db->query("Select count(*) as rowcount from ($query)t", array_values($query->escapes));
+        $sql = $this->db->query("Select count(*) as rowcount from ($query)t", $query->escapes);
 
         return (int)$sql->getRow()->rowcount;
     }
