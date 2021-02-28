@@ -39,6 +39,7 @@ class MySQL extends DBAdapter
         $port = $this->config['port'];
         $user = $this->config['username'];
         $pass = $this->config['password'];
+        $database = $this->config['database'];
         $options = $this->config['options'];
         $charset = 'utf8';
 
