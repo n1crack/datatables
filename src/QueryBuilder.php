@@ -58,6 +58,25 @@ class QueryBuilder
     private $dataObject = false;
 
     /**
+     * Used to add order by columns in front of 
+     * users selected columns.  May be useful 
+     * when some data should always be at the top
+     *
+     * @var string
+     */
+    private $orderByPrepend = "";
+
+    /**
+     * Used to add order by columns in back of 
+     * users selected columns.  May not be useful 
+     * but I added prepend so append seemed like 
+     * it made sense.
+     *
+     * @var string
+     */
+    private $orderByAppend = "";
+
+    /**
      *
      * @param string $query
      * @param Option $options
@@ -285,6 +304,8 @@ class QueryBuilder
         });
 
         $o = [];
+        if(!empty($this->orderByPrepend))
+            $o[] = $this->orderByPrepend;
 
         foreach ($orders as $order) {
             $id = $this->options->columns()[$order['column']]['data'];
@@ -301,7 +322,36 @@ class QueryBuilder
             $o[] = $this->defaultOrder();
         }
 
+        if(!empty($this->orderByAppend))
+            $o[] = $this->orderByAppend;
+
         return $this->db->makeOrderByString($o);
+    }
+
+    /**
+     * Order by prepend getter / setter
+     *
+     * @param string $orderByString
+     * @return string
+     */
+    public function orderByPrepend($orderByString = ""): string {
+        if(!empty($orderByString))
+            $this->orderByPrepend = $orderByString;
+
+        return $this->orderByPrepend;
+    }
+
+    /**
+     * Order by append getter / setter
+     *
+     * @param string $orderByString
+     * @return void
+     */
+    public function orderByAppend($orderByString = ""): string {
+        if(!empty($orderByString))
+            $this->orderByAppend = $orderByString;
+
+        return $this->orderByAppend;
     }
 
     /**
