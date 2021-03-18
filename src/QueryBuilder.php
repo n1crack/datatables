@@ -192,7 +192,7 @@ class QueryBuilder
      */
     protected function hasOrderBy($query): bool
     {
-        return (bool)\count(preg_grep("/(order\s+by)\s+(.+)$/i", explode("\n", $query)));
+        return (bool)preg_match("/order by/i", $query);
     }
 
     /**
