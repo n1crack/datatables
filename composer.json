@@ -1,5 +1,5 @@
 {
-  "name": "ozdemir/datatables",
+  "name": "goddard/datatables",
   "description": "PHP Library to handle server-side processing for Datatables, in a fast and simple way.",
   "license": "MIT",
   "config": {
@@ -12,16 +12,20 @@
     {
       "name": "Yusuf Özdemir",
       "email": "yusuf@ozdemir.be"
+    },
+    {
+      "name": "Ryein Goddard",
+      "email": "ryein@live.com"
     }
   ],
   "autoload": {
     "psr-4": {
-      "Ozdemir\\Datatables\\": "src/"
+      "Goddard\\Datatables\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Ozdemir\\Datatables\\Test\\": "src/tests/unit"
+      "Goddard\\Datatables\\Test\\": "src/tests/unit"
     }
   },
   "minimum-stability": "dev",
