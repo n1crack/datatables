@@ -1,14 +1,14 @@
 <?php
 
-namespace Ozdemir\Datatables;
+namespace Goddard\Datatables;
 
-use Ozdemir\Datatables\DB\DatabaseInterface;
-use Ozdemir\Datatables\Iterators\ColumnCollection;
+use Goddard\Datatables\DB\DatabaseInterface;
+use Goddard\Datatables\Iterators\ColumnCollection;
 
 /**
  * Class Query Builder
  *
- * @package Ozdemir\Datatables
+ * @package Goddard\Datatables
  */
 class QueryBuilder
 {

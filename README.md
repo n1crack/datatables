@@ -1,7 +1,7 @@
 # Datatables library for PHP 
-[![Latest Stable Version](https://poser.pugx.org/ozdemir/datatables/v/stable)](https://packagist.org/packages/ozdemir/datatables) [![Build Status](https://travis-ci.org/n1crack/datatables.svg?branch=master)](https://travis-ci.org/n1crack/datatables) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/n1crack/datatables/blob/master/LICENCE) 
+[![Latest Stable Version](https://poser.pugx.org/Goddard/datatables/v/stable)](https://packagist.org/packages/Goddard/datatables) [![Build Status](https://travis-ci.org/n1crack/datatables.svg?branch=master)](https://travis-ci.org/n1crack/datatables) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/n1crack/datatables/blob/master/LICENCE) 
 
-PHP Library to handle server-side processing for Datatables, in a fast and simple way. [Live Demo](https://datatables.ozdemir.be/)
+PHP Library to handle server-side processing for Datatables, in a fast and simple way. [Live Demo](https://datatables.Goddard.be/)
 
 ## Features  
 * Easy to use. Generates json using only a few lines of code.
@@ -10,11 +10,11 @@ PHP Library to handle server-side processing for Datatables, in a fast and simpl
 * Can handle most complicated queries.
 * Supports mysql and sqlite for native php.
 * Works with :
-    - [Laravel](https://datatables.ozdemir.be/laravel)
-    - [CodeIgniter 3](https://datatables.ozdemir.be/codeigniter)
-    - [Phalcon 3+](https://datatables.ozdemir.be/phalcon)
-    - [Prestashop](https://datatables.ozdemir.be/prestashop)
-    - [PostgreSql](https://datatables.ozdemir.be/postgresql)
+    - [Laravel](https://datatables.Goddard.be/laravel)
+    - [CodeIgniter 3](https://datatables.Goddard.be/codeigniter)
+    - [Phalcon 3+](https://datatables.Goddard.be/phalcon)
+    - [Prestashop](https://datatables.Goddard.be/prestashop)
+    - [PostgreSql](https://datatables.Goddard.be/postgresql)
 
 ## Installation
 
@@ -28,7 +28,7 @@ Put a file named `composer.json` at the root of your project, containing this in
 
     {
         "require": {
-           "ozdemir/datatables": "2.*"
+           "Goddard/datatables": "2.*"
         }
     }
 
@@ -41,7 +41,7 @@ composer install
 Or just run : 
 
 ```
-composer require ozdemir/datatables
+composer require Goddard/datatables
 ```
 
 Add the autoloader to your project:
@@ -58,8 +58,8 @@ You're now ready to begin using the Datatables php library.
     <?php
     require_once 'vendor/autoload.php';
 
-    use Ozdemir\Datatables\Datatables;
-    use Ozdemir\Datatables\DB\MySQL;
+    use Goddard\Datatables\Datatables;
+    use Goddard\Datatables\DB\MySQL;
 
     $config = [ 'host'     => 'localhost',
                 'port'     => '3306',
@@ -145,8 +145,8 @@ __getQuery()__
     <?php
     require_once 'vendor/autoload.php';
 
-    use Ozdemir\Datatables\Datatables;
-    use Ozdemir\Datatables\DB\SQLite;
+    use Goddard\Datatables\Datatables;
+    use Goddard\Datatables\DB\SQLite;
 
     $path = __DIR__ . '/../path/to/database.db';
     $dt = new Datatables( new SQLite($path) );
@@ -201,6 +201,6 @@ PHP > 7.1.3
 Copyright (c) 2015 Yusuf ÖZDEMİR, released under [the MIT license](https://github.com/n1crack/Datatables/blob/master/LICENCE)
 
 #### If you like the library  
-<a href="https://www.buymeacoffee.com/ozdemir" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+<a href="https://www.buymeacoffee.com/Goddard" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 

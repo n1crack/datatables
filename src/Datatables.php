@@ -1,16 +1,16 @@
 <?php
 
-namespace Ozdemir\Datatables;
+namespace Goddard\Datatables;
 
 use Closure;
-use Ozdemir\Datatables\DB\DatabaseInterface;
-use Ozdemir\Datatables\Http\Request;
-use Ozdemir\Datatables\Iterators\ColumnCollection;
+use Goddard\Datatables\DB\DatabaseInterface;
+use Goddard\Datatables\Http\Request;
+use Goddard\Datatables\Iterators\ColumnCollection;
 
 /**
  * Class Datatables
  *
- * @package Ozdemir\Datatables
+ * @package Goddard\Datatables
  */
 class Datatables
 {

@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Ozdemir\Datatables\DB;
+namespace Goddard\Datatables\DB;
 
 
-use Ozdemir\Datatables\Column;
-use Ozdemir\Datatables\Iterators\ColumnCollection;
-use Ozdemir\Datatables\Query;
+use Goddard\Datatables\Column;
+use Goddard\Datatables\Iterators\ColumnCollection;
+use Goddard\Datatables\Query;
 
 abstract class DBAdapter implements DatabaseInterface
 {

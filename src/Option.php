@@ -1,13 +1,13 @@
 <?php
 
 
-namespace Ozdemir\Datatables;
+namespace Goddard\Datatables;
 
-use Ozdemir\Datatables\Http\Request;
+use Goddard\Datatables\Http\Request;
 
 /**
  * Class Option
- * @package Ozdemir\Datatables
+ * @package Goddard\Datatables
  */
 class Option
 {
