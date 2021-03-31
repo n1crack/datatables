@@ -1,6 +1,6 @@
 <?php
 
-namespace Ozdemir\Datatables\Iterators;
+namespace Goddard\Datatables\Iterators;
 
 
 use FilterIterator;
@@ -8,7 +8,7 @@ use FilterIterator;
 /**
  * Class VisibleColumns
  *
- * @package Ozdemir\Datatables\Iterators
+ * @package Goddard\Datatables\Iterators
  */
 class VisibleColumns extends FilterIterator
 {

@@ -1,13 +1,13 @@
 <?php
 
-namespace Ozdemir\Datatables;
+namespace Goddard\Datatables;
 
 
-use Ozdemir\Datatables\DB\DatabaseInterface;
+use Goddard\Datatables\DB\DatabaseInterface;
 
 /**
  * Class FilterHelper
- * @package Ozdemir\Datatables
+ * @package Goddard\Datatables
  */
 class FilterHelper
 {

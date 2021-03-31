@@ -1,13 +1,13 @@
 <?php
 
-namespace Ozdemir\Datatables\DB;
+namespace Goddard\Datatables\DB;
 
-use Ozdemir\Datatables\Query;
+use Goddard\Datatables\Query;
 use \Phalcon\Db;
 
 /**
  * Class PhalconAdapter
- * @package Ozdemir\Datatables\DB
+ * @package Goddard\Datatables\DB
  */
 class PhalconAdapter extends DBAdapter
 {

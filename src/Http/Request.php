@@ -1,10 +1,10 @@
 <?php
 
-namespace Ozdemir\Datatables\Http;
+namespace Goddard\Datatables\Http;
 
 /**
  * Class Request
- * @package Ozdemir\Datatables\Http
+ * @package Goddard\Datatables\Http
  */
 class Request
 {

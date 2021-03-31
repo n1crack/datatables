@@ -1,13 +1,13 @@
 <?php
 
-namespace Ozdemir\Datatables\DB;
+namespace Goddard\Datatables\DB;
 
-use Ozdemir\Datatables\Query;
+use Goddard\Datatables\Query;
 use PDO;
 
 /**
  * Class SQLite
- * @package Ozdemir\Datatables\DB
+ * @package Goddard\Datatables\DB
  */
 class SQLite extends DBAdapter
 {

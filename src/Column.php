@@ -1,11 +1,11 @@
 <?php
 
-namespace Ozdemir\Datatables;
+namespace Goddard\Datatables;
 
 /**
  * Class Column
  *
- * @package Ozdemir\Datatables
+ * @package Goddard\Datatables
  */
 class Column
 {

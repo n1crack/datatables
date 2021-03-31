@@ -1,11 +1,11 @@
-<?php namespace Ozdemir\Datatables\DB;
+<?php namespace Goddard\Datatables\DB;
 
 use Db;
-use Ozdemir\Datatables\Query;
+use Goddard\Datatables\Query;
 
 /**
  * Class PSAdapter
- * @package Ozdemir\Datatables\DB
+ * @package Goddard\Datatables\DB
  */
 class PSAdapter extends DBAdapter
 {

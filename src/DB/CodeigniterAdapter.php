@@ -1,12 +1,12 @@
 <?php
 
-namespace Ozdemir\Datatables\DB;
+namespace Goddard\Datatables\DB;
 
-use Ozdemir\Datatables\Query;
+use Goddard\Datatables\Query;
 
 /**
  * Class CodeigniterAdapter
- * @package Ozdemir\Datatables\DB
+ * @package Goddard\Datatables\DB
  */
 class CodeigniterAdapter extends DBAdapter
 {

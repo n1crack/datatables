@@ -1,10 +1,10 @@
 <?php
 
-namespace Ozdemir\Datatables;
+namespace Goddard\Datatables;
 
 /**
  * Class Query
- * @package Ozdemir\Datatables
+ * @package Goddard\Datatables
  */
 class Query
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Ozdemir\Datatables;
+namespace Goddard\Datatables;
 
 /**
  * Trait Explode
- * @package Ozdemir\Datatables
+ * @package Goddard\Datatables
  */
 trait Explode
 {

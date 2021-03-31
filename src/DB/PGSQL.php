@@ -1,14 +1,14 @@
 <?php
 
-namespace Ozdemir\Datatables\DB;
+namespace Goddard\Datatables\DB;
 
-use Ozdemir\Datatables\Column;
-use Ozdemir\Datatables\Query;
+use Goddard\Datatables\Column;
+use Goddard\Datatables\Query;
 use PDO;
 
 /**
  * Class PGSQL // PostgreSql Adapter
- * @package Ozdemir\Datatables\DB
+ * @package Goddard\Datatables\DB
  */
 class PGSQL extends DBAdapter
 {

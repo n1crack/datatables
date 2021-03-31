@@ -1,14 +1,14 @@
 <?php
 
-namespace Ozdemir\Datatables\DB;
+namespace Goddard\Datatables\DB;
 
 use DB;
-use Ozdemir\Datatables\Query;
+use Goddard\Datatables\Query;
 
 
 /**
  * Class LaravelAdapter
- * @package Ozdemir\Datatables\DB
+ * @package Goddard\Datatables\DB
  */
 class LaravelAdapter extends DBAdapter
 {

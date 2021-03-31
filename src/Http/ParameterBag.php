@@ -1,6 +1,6 @@
 <?php
 
-namespace Ozdemir\Datatables\Http;
+namespace Goddard\Datatables\Http;
 
 use Traversable;
 
