@@ -1,5 +1,5 @@
 # Datatables library for PHP 
-[![Latest Stable Version](https://poser.pugx.org/ozdemir/datatables/v/stable)](https://packagist.org/packages/ozdemir/datatables) [![Build Status](https://travis-ci.org/n1crack/datatables.svg?branch=master)](https://travis-ci.org/n1crack/datatables) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/n1crack/datatables/blob/master/LICENCE) 
+[![PHP Composer](https://github.com/n1crack/datatables/actions/workflows/tests.yml/badge.svg)](https://github.com/n1crack/datatables/actions/workflows/tests.yml) [![Latest Stable Version](https://poser.pugx.org/ozdemir/datatables/v/stable)](https://packagist.org/packages/ozdemir/datatables) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/n1crack/datatables/blob/master/LICENCE) 
 
 PHP Library to handle server-side processing for Datatables, in a fast and simple way. [Live Demo](https://datatables.ozdemir.be/)
 
