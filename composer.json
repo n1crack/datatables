@@ -3,9 +3,6 @@
   "description": "PHP Library to handle server-side processing for Datatables, in a fast and simple way.",
   "license": "MIT",
   "config": {
-    "platform": {
-      "php": "7.1.3"
-    },
     "bin-dir": "vendor/bin"
   },
   "authors": [
@@ -33,6 +30,6 @@
     "php": ">=7.1.3"
   },
   "require-dev": {
-    "phpunit/phpunit": "^7.0"
+    "phpunit/phpunit": "^7.0|^8.0|^9.0"
   }
 }
