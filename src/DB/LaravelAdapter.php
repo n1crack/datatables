@@ -73,14 +73,14 @@ class LaravelAdapter extends DBAdapter
      */
     public function getQueryString($query)
     {
-        if ($query instanceof Illuminate\Database\Eloquent\Builder) {
+        if ($query instanceof \Illuminate\Database\Eloquent\Builder) {
             return vsprintf(str_replace('?', '%s', $query->toSql()),
                 collect($query->getBindings())
                     ->map(function ($binding) {
                         return is_numeric($binding) ? $binding : "'$binding'";
                     })
                     ->toArray());
-        }elseif ($query instanceof Illuminate\Database\Eloquent\Collection) {
+        }elseif ($query instanceof \Illuminate\Database\Eloquent\Collection) {
             throw new \Exception('The library does not support Eloquent Collections. Instead use Eloquent Builder class.');
         }
 
