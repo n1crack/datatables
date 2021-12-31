@@ -81,7 +81,7 @@ class LaravelAdapter extends DBAdapter
                     })
                     ->toArray());
         }elseif ($query instanceof \Illuminate\Database\Eloquent\Collection) {
-            throw new \Exception('The library does not support Eloquent Collections. Instead use Eloquent Builder class.');
+            throw new \Exception('The library does not support Eloquent Collections. Use the Eloquent Builder class instead.');
         }
 
         return $query;
