@@ -175,6 +175,7 @@ class Datatables
      */
     public function query($query): Datatables
     {
+        $query = $this->db->getQueryString($query);
         $this->builder = new QueryBuilder($query, $this->options, $this->db);
         $this->columns = $this->builder->columns();
 

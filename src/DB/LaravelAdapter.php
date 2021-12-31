@@ -14,7 +14,7 @@ class LaravelAdapter extends DBAdapter
 {
     /**
      * LaravelAdapter constructor.
-     * @param null $config
+     * @param  null  $config
      */
     public function __construct($config = null)
     {
@@ -29,7 +29,7 @@ class LaravelAdapter extends DBAdapter
     }
 
     /**
-     * @param Query $query
+     * @param  Query  $query
      * @return array
      */
     public function query(Query $query)
@@ -38,14 +38,14 @@ class LaravelAdapter extends DBAdapter
         $row = [];
 
         foreach ($data as $item) {
-            $row[] = (array)$item;
+            $row[] = (array) $item;
         }
 
         return $row;
     }
 
     /**
-     * @param Query $query
+     * @param  Query  $query
      * @return mixed
      */
     public function count(Query $query)
@@ -57,7 +57,7 @@ class LaravelAdapter extends DBAdapter
 
     /**
      * @param $string
-     * @param Query $query
+     * @param  Query  $query
      * @return string
      */
     public function escape($string, Query $query)
@@ -66,5 +66,24 @@ class LaravelAdapter extends DBAdapter
 
         return ':binding_'.count($query->escapes);
     }
-}
 
+    /**
+     * @param $query
+     * @return string
+     */
+    public function getQueryString($query)
+    {
+        if ($query instanceof Illuminate\Database\Eloquent\Builder) {
+            return vsprintf(str_replace('?', '%s', $query->toSql()),
+                collect($query->getBindings())
+                    ->map(function ($binding) {
+                        return is_numeric($binding) ? $binding : "'$binding'";
+                    })
+                    ->toArray());
+        }elseif ($query instanceof Illuminate\Database\Eloquent\Collection) {
+            throw new \Exception('The library does not support Eloquent Collections. Instead use Eloquent Builder class.');
+        }
+
+        return $query;
+    }
+}

@@ -93,4 +93,13 @@ abstract class DBAdapter implements DatabaseInterface
     {
         return " LIMIT $take OFFSET $skip";
     }
+
+    /**
+     * @param $query
+     * @return string
+     */
+    public function getQueryString($query)
+    {
+        return $query;
+    }
 }
