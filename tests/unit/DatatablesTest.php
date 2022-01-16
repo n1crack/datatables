@@ -98,6 +98,19 @@ class DatatablesTest extends TestCase
         $this->assertSame('Mar...', $data[2]);
     }
 
+    public function testReturnsUsingSpecialMysqlWordsIfItIsEscaped()
+    {
+        $this->db->query('select name, surname as `default`, age from mytable');
+
+        $this->db->edit('default', function ($data) {
+            return $this->customfunction($data['default']);
+        });
+
+        $data = $this->db->generate()->toArray()['data']['2'];
+
+        $this->assertSame('Mar...', $data[1]);
+    }
+
     public function testReturnsColumnNamesFromQueryThatIncludesASubqueryInSelectStatement()
     {
         $dt = $this->db->query("SELECT column_name,

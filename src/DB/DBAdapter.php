@@ -42,7 +42,7 @@ abstract class DBAdapter implements DatabaseInterface
      */
     public function makeQueryString(string $query, ColumnCollection $columns): string
     {
-        return 'SELECT '.implode(', ', $columns->names())." FROM ($query)t";
+        return 'SELECT `'.implode('`, `', $columns->names())."` FROM ($query)t";
     }
 
     /**
