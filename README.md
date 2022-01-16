@@ -73,6 +73,78 @@ You're now ready to begin using the Datatables php library.
 
     echo $dt->generate();
 ```
+If you are using a php framework such as codeigniter and laravel, you can use the relevant database adapter.
+
+```php
+// Codeigniter 4 Example
+
+<?php
+
+namespace App\Controllers;
+
+use Config\Database;
+use Ozdemir\Datatables\Datatables;
+use Ozdemir\Datatables\DB\Codeigniter4Adapter;
+
+class Home extends BaseController
+{
+    public function index()
+    {
+        return view('index');
+    }
+
+    public function ajax()
+    {
+        // CI 4 builder class
+        $db = Database::connect();
+
+        $builder = $db->table('Track');
+        $builder->select('TrackId, Name, UnitPrice');
+
+        // Datatables Php Library
+        $datatables = new Datatables(new Codeigniter4Adapter);
+
+        // using CI4 Builder
+        $datatables->query($builder);
+
+        // alternatively plain sql
+        // $datatables->query('Select TrackId, Name, UnitPrice from Track');
+
+        return $this->response->setJSON($datatables->generate()->toJson());
+    }
+}
+```
+
+```php
+// Laravel Example
+
+<?php
+// routes/web.php 
+
+use Ozdemir\Datatables\Datatables;
+use Ozdemir\Datatables\DB\LaravelAdapter;
+
+Route::get('/ajax/laravel', function () {
+
+    $sqlBuilder = Track::select([
+        'TrackId',
+        'Track.Name',
+        'Title as Album',
+        'MediaType.Name as MediaType',
+        'UnitPrice',
+        'Milliseconds',
+        'Bytes',
+    ])
+        ->join('Album', 'Album.AlbumId', 'Track.AlbumId')
+        ->join('MediaType', 'MediaType.MediaTypeId', 'Track.MediaTypeId');
+
+    $dt = new Datatables(new LaravelAdapter);
+    $dt->query($sqlBuilder); // same as the previous example, sql statement can be used.
+
+    return $dt->generate();
+});
+
+```
 
 ## Methods
 This is the list of available public methods.
