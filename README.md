@@ -73,7 +73,7 @@ You're now ready to begin using the Datatables php library.
 
     echo $dt->generate();
 ```
-If you are using a php framework such as codeigniter and laravel, you can use the relevant database adapter.
+If you are using a php framework such as codeigniter or laravel, you can use the relevant database adapter.
 
 ```php
 // Codeigniter 4 Example
