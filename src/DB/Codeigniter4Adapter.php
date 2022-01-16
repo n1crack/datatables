@@ -66,4 +66,17 @@ class Codeigniter4Adapter extends DBAdapter
 
         return '?';
     }
+
+    /**
+     * @param $query
+     * @return string
+     */
+    public function getQueryString($query)
+    {
+        if ($query instanceof \CodeIgniter\Database\BaseBuilder) {
+            return $query->getCompiledSelect();
+        }
+
+        return $query;
+    }
 }
