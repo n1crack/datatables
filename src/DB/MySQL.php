@@ -40,7 +40,7 @@ class MySQL extends DBAdapter
         $user = $this->config['username'];
         $pass = $this->config['password'];
         $database = $this->config['database'];
-        $charset = 'utf8';
+        $charset = $this->config['charset'] ?? 'utf8';
 
         $this->pdo = new PDO("mysql:host=$host;dbname=$database;port=$port;charset=$charset", "$user", "$pass");
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
