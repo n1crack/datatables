@@ -113,11 +113,12 @@ class Column
     }
 
     /**
+     * @param string $property data as object, fallback data as string  
      * @return string
      */
-    public function data(): string
+    public function data($property = '_'): string
     {
-        return $this->attr['data'] ?? '';
+        return $this->attr['data'][$property] ?? $this->attr['data']['_'] ?? $this->attr['data'] ?? '';
     }
 
     /**
