@@ -89,9 +89,8 @@ class QueryBuilder
     {
         $columns = $this->options->columns();
         if ($columns) {
-            $attributes = array_column($columns, null, 'data');
-
-            foreach ($attributes as $index => $attr) {
+            foreach ($columns as $attr) {
+                $index = $attr['data']['_'] ?? $attr['data'];
                 if ($this->columns->visible()->isExists($index)) {
                     $this->columns->visible()->get($index)->attr = $attr;
                 }
@@ -278,7 +277,7 @@ class QueryBuilder
     protected function orderBy(): string
     {
         $orders = $this->options->order();
-
+        
         $orders = array_filter($orders, function ($order) {
             return \in_array($order['dir'], ['asc', 'desc'],
                     true) && $this->columns->visible()->offsetGet($order['column'])->isOrderable();
@@ -287,7 +286,8 @@ class QueryBuilder
         $o = [];
 
         foreach ($orders as $order) {
-            $id = $this->options->columns()[$order['column']]['data'];
+            $data = $this->options->columns()[$order['column']]['data'];
+            $id = $data['sort'] ?? $data['_'] ?? $data;
 
             if ($this->columns->visible()->isExists($id)) {
                 $o[] = $this->columns->visible()->get($id)->name.' '.$order['dir'];
