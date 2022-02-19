@@ -286,7 +286,8 @@ class QueryBuilder
         $o = [];
 
         foreach ($orders as $order) {
-            $id = $this->columns->get($order['column'])->data('sort');
+            $data = $this->options->columns()[$order['column']]['data'];
+            $id = $data['sort'] ?? $data['_'] ?? $data;
 
             if ($this->columns->visible()->isExists($id)) {
                 $o[] = $this->columns->visible()->get($id)->name.' '.$order['dir'];
