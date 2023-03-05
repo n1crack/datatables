@@ -240,14 +240,15 @@ class Datatables
     public function setResponseData(): void
     {
         $this->response['draw'] = $this->options->draw();
-        $this->response['recordsTotal'] = $this->db->count($this->builder->query);
-
+        $this->response['recordsTotal'] = $this->db->count($this->builder->filtered);
+        $this->response['recordsFiltered'] = $this->response['recordsTotal'];
+/*
         if($this->builder->query->sql === $this->builder->filtered->sql) {
             $this->response['recordsFiltered'] = $this->response['recordsTotal'];
         } else {
             $this->response['recordsFiltered'] = $this->db->count($this->builder->filtered);
         }
-
+*/
         $this->response['data'] = $this->getData();
 
         if (\count($this->distinctColumn) > 0 || \count($this->distinctData) > 0) {
