@@ -2,6 +2,7 @@
 
 namespace Ozdemir\Datatables\DB;
 
+use Ozdemir\Datatables\Iterators\ColumnCollection;
 use Ozdemir\Datatables\Query;
 
 /**
@@ -65,6 +66,20 @@ class Codeigniter4Adapter extends DBAdapter
         $query->escapes[] = $string;
 
         return '?';
+    }
+
+    /**
+     * @param string $query
+     * @param ColumnCollection $columns
+     * @return string
+     */
+    public function makeQueryString(string $query, ColumnCollection $columns): string
+    {
+        if ($this->db->getPlatform() == 'Postgre') {
+            return 'SELECT "'.implode('", "', $columns->names())."\" FROM ($query)t";
+        }
+        
+        return 'SELECT `'.implode('`, `', $columns->names())."` FROM ($query)t";
     }
 
     /**
