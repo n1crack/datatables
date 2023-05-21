@@ -36,6 +36,8 @@ class QueryBuilder
      */
     protected $hasDefaultOrder = false;
 
+    protected $queryDefaultOrder;
+
     /**
      * the query has default ordering
      * @var ColumnCollection
@@ -137,6 +139,11 @@ class QueryBuilder
         return $this->hasDefaultOrder;
     }
 
+    public function setQueryDefaultOrder($column, $dir)
+    {
+        $this->queryDefaultOrder =  $column . ' ' . $dir;
+    }
+
     /**
      * @param $query
      */
@@ -151,7 +158,7 @@ class QueryBuilder
     public function setFilteredQuery(): void
     {
         $this->filtered = new Query();
-        $this->filtered->set($this->query.$this->filter($this->filtered));
+        $this->filtered->set($this->query . $this->filter($this->filtered));
     }
 
     /**
@@ -160,7 +167,7 @@ class QueryBuilder
     public function setFullQuery(): void
     {
         $this->full = clone $this->filtered;
-        $this->full->set($this->filtered.$this->orderBy().$this->limit());
+        $this->full->set($this->filtered . $this->orderBy() . $this->limit());
     }
 
     /**
@@ -234,7 +241,7 @@ class QueryBuilder
                 $look[] = $this->db->makeLikeString($query, $column, $word);
             }
 
-            $search[] = '('.implode(' OR ', $look).')';
+            $search[] = '(' . implode(' OR ', $look) . ')';
         }
 
         return implode(' AND ', $search);
@@ -277,10 +284,13 @@ class QueryBuilder
     protected function orderBy(): string
     {
         $orders = $this->options->order();
-        
+
         $orders = array_filter($orders, function ($order) {
-            return \in_array($order['dir'], ['asc', 'desc'],
-                    true) && $this->columns->visible()->offsetGet($order['column'])->isOrderable();
+            return \in_array(
+                $order['dir'],
+                ['asc', 'desc'],
+                true
+            ) && $this->columns->visible()->offsetGet($order['column'])->isOrderable();
         });
 
         $o = [];
@@ -290,7 +300,7 @@ class QueryBuilder
             $id = $data['sort'] ?? $data['_'] ?? $data;
 
             if ($this->columns->visible()->isExists($id)) {
-                $o[] = $this->columns->visible()->get($id)->name.' '.$order['dir'];
+                $o[] = $this->columns->visible()->get($id)->name . ' ' . $order['dir'];
             }
         }
 
@@ -309,7 +319,7 @@ class QueryBuilder
      */
     public function defaultOrder(): string
     {
-        return $this->columns->visible()->offsetGet(0)->name.' asc';
+        return $this->queryDefaultOrder ?? $this->columns->visible()->offsetGet(0)->name . ' asc';
     }
 
     /**
