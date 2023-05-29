@@ -40,22 +40,22 @@ class QueryBuilder
      * the query has default ordering
      * @var ColumnCollection
      */
-    private $columns;
+    protected $columns;
 
     /**
      * @var Option
      */
-    private $options;
+    protected $options;
 
     /**
      * @var DatabaseInterface
      */
-    private $db;
+    protected $db;
 
     /**
      * @var boolean
      */
-    private $dataObject = false;
+    protected $dataObject = false;
 
     /**
      *
