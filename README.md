@@ -1,7 +1,7 @@
 # Datatables library for PHP 
 [![Latest Stable Version](https://poser.pugx.org/ozdemir/datatables/v/stable)](https://packagist.org/packages/ozdemir/datatables) [![PHP Composer](https://github.com/n1crack/datatables/actions/workflows/tests.yml/badge.svg)](https://github.com/n1crack/datatables/actions/workflows/tests.yml) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/n1crack/datatables/blob/master/LICENCE) 
 
-PHP Library to handle server-side processing for Datatables, in a fast and simple way. [Live Demo](https://datatables.ozdemir.be/)
+Effortlessly manage server-side processing for Datatables with our lightning-fast PHP library, simplifying your workflow. [Live Demo](https://datatables.ozdemir.be/)
 
 ## Features  
 * Easy to use. Generates json using only a few lines of code.
