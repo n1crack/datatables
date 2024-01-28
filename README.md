@@ -127,20 +127,22 @@ use Ozdemir\Datatables\DB\LaravelAdapter;
 
 Route::get('/ajax/laravel', function () {
 
-    $sqlBuilder = Track::select([
-        'TrackId',
-        'Track.Name',
-        'Title as Album',
-        'MediaType.Name as MediaType',
-        'UnitPrice',
-        'Milliseconds',
-        'Bytes',
-    ])
-        ->join('Album', 'Album.AlbumId', 'Track.AlbumId')
-        ->join('MediaType', 'MediaType.MediaTypeId', 'Track.MediaTypeId');
-
     $dt = new Datatables(new LaravelAdapter);
-    $dt->query($sqlBuilder); // same as the previous example, sql statement can be used.
+
+    $dt->query(
+      Track::query()
+          ->select([
+              'TrackId',
+              'Track.Name',
+              'Title as Album',
+              'MediaType.Name as MediaType',
+              'UnitPrice',
+              'Milliseconds',
+              'Bytes',
+          ])
+          ->join('Album', 'Album.AlbumId', 'Track.AlbumId')
+          ->join('MediaType', 'MediaType.MediaTypeId', 'Track.MediaTypeId')
+    ); // same as the previous example, sql statement can be used.
 
     return $dt->generate();
 });
