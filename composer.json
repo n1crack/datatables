@@ -1,6 +1,6 @@
 {
   "name": "ozdemir/datatables",
-  "description": "Effortlessly manage server-side processing for Datatables with our lightning-fast PHP library, simplifying your workflow.",
+  "description": "Simplify your Datatables server-side processing effortlessly using our lightning-fast PHP library, streamlining your workflow seamlessly.",
   "license": "MIT",
   "config": {
     "bin-dir": "vendor/bin"
