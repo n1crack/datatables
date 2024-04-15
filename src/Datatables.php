@@ -170,7 +170,7 @@ class Datatables
     }
 
     /**
-     * @param string $query
+     * @param string|\CodeIgniter\Database\BaseBuilder $query
      * @return Datatables
      */
     public function query($query): Datatables
