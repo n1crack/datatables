@@ -86,7 +86,7 @@ class Codeigniter4Adapter extends DBAdapter
      * @param $query
      * @return string
      */
-    public function getQueryString($query)
+    public function getQueryString($query): string
     {
         if ($query instanceof \CodeIgniter\Database\BaseBuilder) {
             return $query->getCompiledSelect();

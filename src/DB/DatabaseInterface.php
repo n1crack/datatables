@@ -74,4 +74,10 @@ interface DatabaseInterface
      * @return mixed
      */
     public function makeLimitString(int $take, int $skip);
+
+    /**
+     * @param $query
+     * @return string
+     */
+    public function getQueryString($query): string;
 }

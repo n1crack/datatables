@@ -180,7 +180,7 @@ class Datatables
     }
 
     /**
-     * @param string $query
+     * @param mixed $query
      * @return Datatables
      */
     public function query($query): Datatables
