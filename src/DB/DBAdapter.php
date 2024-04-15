@@ -98,7 +98,7 @@ abstract class DBAdapter implements DatabaseInterface
      * @param $query
      * @return string
      */
-    public function getQueryString($query)
+    public function getQueryString($query): string
     {
         return $query;
     }
