@@ -45,6 +45,24 @@ class DatatablesTest extends TestCase
         $this->assertSame(8, $datatables['recordsFiltered']);
     }
 
+    public function testReturnsRecordCountsThatSetWithoutRunningAnotherQuery()
+    {
+        $this->db->query('select id as fid, name, surname, age from mytable where id > 3');
+
+        $datatables = $this->db->generate()->toArray();
+
+        $this->assertSame(2, count($this->db->queries()));
+        $this->assertSame(8, $datatables['recordsTotal']);
+        $this->assertSame(8, $datatables['recordsFiltered']);
+
+        $this->db->setTotalRecords(8);
+        $datatables = $this->db->generate()->toArray();
+
+        $this->assertSame(1, count($this->db->queries()));
+        $this->assertSame(8, $datatables['recordsTotal']);
+        $this->assertSame(8, $datatables['recordsFiltered']);
+    }
+
     public function testReturnsDataFromABasicSql()
     {
         $this->db->query('select id as fid, name, surname, age from mytable');
@@ -155,7 +173,6 @@ class DatatablesTest extends TestCase
 
         $this->assertSame(11, $datatables['recordsTotal']);
         $this->assertSame(2, $datatables['recordsFiltered']);
-
     }
 
     public function testSortsDataViaSorting()

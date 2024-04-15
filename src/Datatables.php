@@ -56,6 +56,16 @@ class Datatables
     protected $distinctData = [];
 
     /**
+     * @var array
+     */
+    private $queries = [];
+
+    /**
+     * @var int
+     */
+    private $recordsTotal;
+
+    /**
      * Datatables constructor.
      *
      * @param DatabaseInterface $db
@@ -234,26 +244,50 @@ class Datatables
         return $output ?? [];
     }
 
+    public function setTotalRecords(int $total): Datatables
+    {
+        $this->recordsTotal = $total;
+
+        return $this;
+    }
+
     /**
      *
      */
     public function setResponseData(): void
     {
+        $this->queries = [];
         $this->response['draw'] = $this->options->draw();
-        $this->response['recordsTotal'] = $this->db->count($this->builder->query);
+
+        if (is_null($this->recordsTotal)) {
+            $this->response['recordsTotal'] = $this->db->count($this->builder->query);
+            $this->queries['query'] = $this->builder->query;
+        } else {
+            $this->response['recordsTotal'] = $this->recordsTotal;
+        }
 
         if($this->builder->query->sql === $this->builder->filtered->sql) {
             $this->response['recordsFiltered'] = $this->response['recordsTotal'];
         } else {
             $this->response['recordsFiltered'] = $this->db->count($this->builder->filtered);
+            $this->queries['recordsFiltered'] = $this->builder->filtered;
         }
 
         $this->response['data'] = $this->getData();
+        $this->queries['full'] = $this->builder->full;
 
         if (\count($this->distinctColumn) > 0 || \count($this->distinctData) > 0) {
             $this->response['distinctData'] = array_merge($this->response['distinctData'] ?? [],
                 $this->getDistinctData(), $this->distinctData);
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function queries(): array
+    {
+        return $this->queries;
     }
 
     /**
