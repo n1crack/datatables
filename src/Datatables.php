@@ -183,11 +183,15 @@ class Datatables
      * @param mixed $query
      * @return Datatables
      */
-    public function query($query): Datatables
+    public function query($query, array $escapes = []): Datatables
     {
         $query = $this->db->getQueryString($query);
         $this->builder = new QueryBuilder($query, $this->options, $this->db);
         $this->columns = $this->builder->columns();
+
+        foreach ($escapes as $key => $value) {
+            $this->escape($key, $value);
+        }
 
         return $this;
     }
