@@ -218,16 +218,16 @@ class QueryBuilder
      */
     protected function filterGlobal(Query $query): string
     {
-        $searchinput = preg_replace("/\W+/u", ' ', $this->options->searchValue());
+        $searchInput = preg_replace("/\W+/u", ' ', $this->options->searchValue());
         $columns = $this->columns->searchable();
 
-        if ($searchinput === null || $searchinput === '' || \count($columns) === 0) {
+        if ($searchInput === null || $searchInput === '' || \count($columns) === 0) {
             return '';
         }
 
         $search = [];
 
-        foreach (explode(' ', $searchinput) as $word) {
+        foreach (explode(' ', $searchInput) as $word) {
             $look = [];
 
             foreach ($columns as $column) {
@@ -252,6 +252,8 @@ class QueryBuilder
         foreach ($columns as $column) {
             $look[] = $this->columnFilter($column, new FilterHelper($query, $column, $this->db));
         }
+
+        $look = array_filter($look);
 
         return implode(' AND ', $look);
     }
