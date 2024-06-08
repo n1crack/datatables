@@ -55,12 +55,32 @@ interface DatabaseInterface
     public function makeWhereString(array $filter);
 
     /**
+     * @param bool $value
+     * @return void
+     */
+    public function setExactMatch(bool $value);
+
+    /**
+     * @return mixed
+     */
+    public function isExactMatch();
+
+    /**
      * @param Query $query
      * @param Column $column
      * @param string $word
      * @return mixed
      */
     public function makeLikeString(Query $query, Column $column, string $word);
+
+
+    /**
+     * @param Query $query
+     * @param Column $column
+     * @param string $word
+     * @return mixed
+     */
+    public function makeEqualString(Query $query, Column $column, string $word);
 
     /**
      * @param array $o

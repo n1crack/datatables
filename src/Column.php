@@ -50,7 +50,19 @@ class Column
      * Custom filter
      * @var \Closure
      */
-    public $customFilter;
+    public $customIndividualFilter;
+
+    /**
+     * Custom filter
+     * @var \Closure
+     */
+    public $customGlobalFilter;
+
+    /**
+     *
+     * @var string
+     */
+    public $customFilterType;
 
     /**
      * Column constructor.
@@ -82,7 +94,7 @@ class Column
      * Set visibility of the column.
      * @param bool $searchable
      */
-    public function hide($searchable = false): void
+    public function hide(bool $searchable = false): void
     {
         $this->hidden = true;
         $this->forceSearch = $searchable;
@@ -91,9 +103,17 @@ class Column
     /**
      * @return bool
      */
-    public function hasFilter(): bool
+    public function hasCustomIndividualFilter(): bool
     {
-        return $this->customFilter instanceof \Closure;
+        return $this->customIndividualFilter instanceof \Closure;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasCustomGlobalFilter(): bool
+    {
+        return $this->customGlobalFilter instanceof \Closure;
     }
 
     /**

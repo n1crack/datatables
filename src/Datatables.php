@@ -110,10 +110,18 @@ class Datatables
      * @param Closure $closure
      * @return Datatables
      */
-    public function filter($column, Closure $closure): Datatables
+    public function filter($column, Closure $closure, $filterType = CustomFilterType::INDIVIDUAL): Datatables
     {
         $column = $this->columns->getByName($column);
-        $column->customFilter = $closure;
+        $column->customIndividualFilter = $closure;
+
+        $column->customFilterType = $filterType;
+        if ($filterType !== CustomFilterType::GLOBALLY) {
+            $column->customIndividualFilter = $closure;
+        }
+        if ($filterType !== CustomFilterType::INDIVIDUAL) {
+            $column->customGlobalFilter = $closure;
+        }
 
         return $this;
     }
@@ -126,6 +134,17 @@ class Datatables
     public function escape($key, $value): Datatables
     {
         $this->escapes[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $value
+     * @return Datatables
+     */
+    public function forceExactMatch(bool $value): Datatables
+    {
+        $this->db->setExactMatch($value);
 
         return $this;
     }
