@@ -231,8 +231,10 @@ class QueryBuilder
             $look = [];
 
             foreach ($columns as $column) {
-                $look[] = $this->db->makeLikeString($query, $column, $word);
+                $look[] = $this->columnGlobalFilter($column, new FilterHelper($query, $column, $this->db, $word));
             }
+
+            $look = array_filter($look);
 
             $search[] = '('.implode(' OR ', $look).')';
         }
@@ -250,7 +252,7 @@ class QueryBuilder
         $look = [];
 
         foreach ($columns as $column) {
-            $look[] = $this->columnFilter($column, new FilterHelper($query, $column, $this->db));
+            $look[] = $this->columnIndividualFilter($column, new FilterHelper($query, $column, $this->db));
         }
 
         $look = array_filter($look);
@@ -319,10 +321,24 @@ class QueryBuilder
      * @param FilterHelper $helper
      * @return string
      */
-    public function columnFilter(Column $column, FilterHelper $helper): string
+    public function columnIndividualFilter(Column $column, FilterHelper $helper): string
     {
-        if ($column->hasFilter()) {
-            return $column->customFilter->call($helper) ?? $helper->defaultFilter();
+        if ($column->hasCustomIndividualFilter()) {
+            return $column->customIndividualFilter->call($helper) ?? $helper->defaultFilter();
+        }
+
+        return $helper->defaultFilter();
+    }
+
+    /**
+     * @param Column $column
+     * @param FilterHelper $helper
+     * @return string
+     */
+    public function columnGlobalFilter(Column $column, FilterHelper $helper): string
+    {
+        if ($column->hasCustomGlobalFilter()) {
+            return $column->customGlobalFilter->call($helper) ?? $helper->defaultFilter();
         }
 
         return $helper->defaultFilter();
