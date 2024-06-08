@@ -227,7 +227,9 @@ class QueryBuilder
 
         $search = [];
 
-        foreach (explode(' ', $searchInput) as $word) {
+        $searchKeywords = $this->db->isExactMatch() ? [$searchInput] : explode(' ', $searchInput);
+
+        foreach ($searchKeywords as $word) {
             $look = [];
 
             foreach ($columns as $column) {
