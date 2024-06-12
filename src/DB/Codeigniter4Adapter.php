@@ -2,6 +2,7 @@
 
 namespace Ozdemir\Datatables\DB;
 
+use Ozdemir\Datatables\Column;
 use Ozdemir\Datatables\Iterators\ColumnCollection;
 use Ozdemir\Datatables\Query;
 
@@ -96,5 +97,20 @@ class Codeigniter4Adapter extends DBAdapter
         }
 
         return $query;
+    }
+
+    /**
+     * @param Query $query
+     * @param Column $column
+     * @param $word
+     * @return string
+     */
+    public function makeLikeString(Query $query, Column $column, string $word)
+    {
+        if ($this->db->getPlatform() == 'Postgre') {
+            return $column->name.'::TEXT ILIKE '.$this->escape('%'.$word.'%', $query);
+        }
+
+        return $column->name.' LIKE '.$this->escape('%'.$word.'%', $query);
     }
 }
