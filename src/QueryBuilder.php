@@ -40,22 +40,22 @@ class QueryBuilder
      * the query has default ordering
      * @var ColumnCollection
      */
-    private $columns;
+    protected $columns;
 
     /**
      * @var Option
      */
-    private $options;
+    protected $options;
 
     /**
      * @var DatabaseInterface
      */
-    private $db;
+    protected $db;
 
     /**
      * @var boolean
      */
-    private $dataObject = false;
+    protected $dataObject = false;
 
     /**
      *
@@ -218,21 +218,25 @@ class QueryBuilder
      */
     protected function filterGlobal(Query $query): string
     {
-        $searchinput = preg_replace("/\W+/u", ' ', $this->options->searchValue());
+        $searchInput = preg_replace("/\W+/u", ' ', $this->options->searchValue());
         $columns = $this->columns->searchable();
 
-        if ($searchinput === null || $searchinput === '' || \count($columns) === 0) {
+        if ($searchInput === null || $searchInput === '' || \count($columns) === 0) {
             return '';
         }
 
         $search = [];
 
-        foreach (explode(' ', $searchinput) as $word) {
+        $searchKeywords = $this->db->isExactMatch() ? [$searchInput] : explode(' ', $searchInput);
+
+        foreach ($searchKeywords as $word) {
             $look = [];
 
             foreach ($columns as $column) {
-                $look[] = $this->db->makeLikeString($query, $column, $word);
+                $look[] = $this->columnGlobalFilter($column, new FilterHelper($query, $column, $this->db, $word));
             }
+
+            $look = array_filter($look);
 
             $search[] = '('.implode(' OR ', $look).')';
         }
@@ -250,8 +254,10 @@ class QueryBuilder
         $look = [];
 
         foreach ($columns as $column) {
-            $look[] = $this->columnFilter($column, new FilterHelper($query, $column, $this->db));
+            $look[] = $this->columnIndividualFilter($column, new FilterHelper($query, $column, $this->db));
         }
+
+        $look = array_filter($look);
 
         return implode(' AND ', $look);
     }
@@ -317,10 +323,24 @@ class QueryBuilder
      * @param FilterHelper $helper
      * @return string
      */
-    public function columnFilter(Column $column, FilterHelper $helper): string
+    public function columnIndividualFilter(Column $column, FilterHelper $helper): string
     {
-        if ($column->hasFilter()) {
-            return $column->customFilter->call($helper) ?? $helper->defaultFilter();
+        if ($column->hasCustomIndividualFilter()) {
+            return $column->customIndividualFilter->call($helper) ?? $helper->defaultFilter();
+        }
+
+        return $helper->defaultFilter();
+    }
+
+    /**
+     * @param Column $column
+     * @param FilterHelper $helper
+     * @return string
+     */
+    public function columnGlobalFilter(Column $column, FilterHelper $helper): string
+    {
+        if ($column->hasCustomGlobalFilter()) {
+            return $column->customGlobalFilter->call($helper) ?? $helper->defaultFilter();
         }
 
         return $helper->defaultFilter();

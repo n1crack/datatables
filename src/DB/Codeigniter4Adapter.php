@@ -18,11 +18,14 @@ class Codeigniter4Adapter extends DBAdapter
     protected $db;
 
     /**
-     * @var $config
+     * @var array
      */
+    protected $config;
+
     public function __construct($config = null)
     {
-
+        $this->config = $config ?? ['DBGroup' => 'default'];
+        $this->config['DBGroup'] = $this->config['DBGroup'] ?? 'default';
     }
 
     /**
@@ -30,7 +33,7 @@ class Codeigniter4Adapter extends DBAdapter
      */
     public function connect()
     {
-        $this->db = \Config\Database::connect();
+        $this->db = \Config\Database::connect($this->config['DBGroup']);
 
         return $this;
     }
@@ -87,7 +90,7 @@ class Codeigniter4Adapter extends DBAdapter
      * @param $query
      * @return string
      */
-    public function getQueryString($query)
+    public function getQueryString($query): string
     {
         if ($query instanceof \CodeIgniter\Database\BaseBuilder) {
             return $query->getCompiledSelect();

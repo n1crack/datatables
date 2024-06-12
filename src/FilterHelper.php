@@ -25,16 +25,23 @@ class FilterHelper
     private $db;
 
     /**
+     * @var string|null
+     */
+    private $searchValue;
+
+
+    /**
      * FilterHelper constructor.
      * @param Query $query
      * @param Column $column
      * @param DatabaseInterface $db
      */
-    public function __construct(Query $query, Column $column, DatabaseInterface $db)
+    public function __construct(Query $query, Column $column, DatabaseInterface $db, $searchValue = null)
     {
         $this->query = $query;
         $this->column = $column;
         $this->db = $db;
+        $this->searchValue = $searchValue;
     }
 
     /**
@@ -51,7 +58,7 @@ class FilterHelper
      */
     public function searchValue(): string
     {
-        return $this->column->searchValue();
+        return $this->searchValue ?? $this->column->searchValue();
     }
 
     /**
@@ -59,6 +66,10 @@ class FilterHelper
      */
     public function defaultFilter(): string
     {
+        if ($this->db->isExactMatch()) {
+            return $this->db->makeEqualString($this->query, $this->column, $this->searchValue());
+        }
+
         return $this->db->makeLikeString($this->query, $this->column, $this->searchValue());
     }
 

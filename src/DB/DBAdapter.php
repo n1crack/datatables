@@ -10,6 +10,7 @@ use Ozdemir\Datatables\Query;
 
 abstract class DBAdapter implements DatabaseInterface
 {
+    public $exactMatch = false;
 
     /**
      * @return void
@@ -64,15 +65,44 @@ abstract class DBAdapter implements DatabaseInterface
         return ' WHERE '.implode(' AND ', $filter);
     }
 
+
+    /**
+     * @return bool
+     */
+    public function isExactMatch()
+    {
+        return $this->exactMatch;
+    }
+
+    /**
+     * @param bool $value
+     * @return void
+     */
+    public function setExactMatch(bool $value)
+    {
+        $this->exactMatch = $value;
+    }
+
     /**
      * @param Query $query
      * @param Column $column
-     * @param $word
+     * @param string $word
      * @return string
      */
     public function makeLikeString(Query $query, Column $column, string $word)
     {
         return $column->name.' LIKE '.$this->escape('%'.$word.'%', $query);
+    }
+
+     /**
+     * @param Query $query
+     * @param Column $column
+     * @param string $word
+     * @return string
+     */
+    public function makeEqualString(Query $query, Column $column, string $word)
+    {
+        return $column->name.' = '.$this->escape( $word, $query);
     }
 
     /**
@@ -98,7 +128,7 @@ abstract class DBAdapter implements DatabaseInterface
      * @param $query
      * @return string
      */
-    public function getQueryString($query)
+    public function getQueryString($query): string
     {
         return $query;
     }

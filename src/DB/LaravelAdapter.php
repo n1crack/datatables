@@ -71,7 +71,7 @@ class LaravelAdapter extends DBAdapter
      * @param $query
      * @return string
      */
-    public function getQueryString($query)
+    public function getQueryString($query): string
     {
         if ($query instanceof \Illuminate\Database\Eloquent\Builder) {
             return vsprintf(str_replace('?', '%s', $query->toSql()),
