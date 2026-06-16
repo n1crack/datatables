@@ -3,6 +3,7 @@
 namespace Ozdemir\Datatables\DB;
 
 use Ozdemir\Datatables\Column;
+use Ozdemir\Datatables\Iterators\ColumnCollection;
 use Ozdemir\Datatables\Query;
 use PDO;
 
@@ -85,6 +86,19 @@ class PGSQL extends DBAdapter
         return ':binding_'.count($query->escapes);
     }
 
+
+    /**
+     * PostgreSQL does not support MySQL-style backtick identifier quoting used
+     * by the base adapter, so use the standard double-quoted identifiers.
+     *
+     * @param string $query
+     * @param ColumnCollection $columns
+     * @return string
+     */
+    public function makeQueryString(string $query, ColumnCollection $columns): string
+    {
+        return 'SELECT "'.implode('", "', $columns->names())."\" FROM ($query)t";
+    }
 
     /**
      * @param Query $query
