@@ -71,7 +71,7 @@ class Datatables
      * @param DatabaseInterface $db
      * @param Request $request
      */
-    public function __construct(DatabaseInterface $db, Request $request = null)
+    public function __construct(DatabaseInterface $db, ?Request $request = null)
     {
         $this->db = $db->connect();
         $this->options = new Option($request ?: Request::createFromGlobals());

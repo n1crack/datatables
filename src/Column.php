@@ -79,15 +79,23 @@ class Column
 
     /**
      * @param $row array
-     * @return string
+     * @return mixed the value can be a scalar or an array (e.g. orthogonal data)
      */
-    public function value($row): string
+    public function value($row)
     {
         if ($this->closure instanceof \Closure) {
-            return call_user_func($this->closure, $row) ?? '';
+            $value = call_user_func($this->closure, $row);
+        } else {
+            $value = $row[$this->name] ?? null;
         }
 
-        return $row[$this->name] ?? '';
+        // Arrays (e.g. orthogonal data) are passed through untouched; scalars are
+        // cast to string to preserve the previous behaviour and a null becomes ''.
+        if (is_array($value)) {
+            return $value;
+        }
+
+        return (string) $value;
     }
 
     /**

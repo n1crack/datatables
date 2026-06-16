@@ -386,4 +386,66 @@ class DatatablesTest extends TestCase
         $this->assertSame(1, $datatables['recordsFiltered']);
         $this->assertSame(['5', 'Ruby', 'Pickett', '28'], $datatables['data'][0]);
     }
+
+    // https://github.com/n1crack/datatables/issues/98
+    public function testMultiColumnSortingIsNotAffectedBySelectColumnOrder()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        // age asc, then name desc
+        $this->request->query->set('order', [
+            ['column' => '0', 'dir' => 'asc'],
+            ['column' => '1', 'dir' => 'desc'],
+        ]);
+
+        $this->request->query->set('columns', [
+            ['data' => 'age', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => '']],
+            ['data' => 'name', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => '']],
+        ]);
+
+        // surname sits between name and age in the select statement and is not
+        // configured/orderable; previously its position made the second order
+        // column silently dropped.
+        $this->db->query('Select id as fid, name, surname, age from mytable');
+        $this->db->hide('fid');
+        $datatables = $this->db->generate()->toArray();
+
+        // age 22 is shared by Jane and Marvin; the secondary "name desc" sort
+        // must place Marvin before Jane.
+        $this->assertSame('Marvin', $datatables['data'][2]['name']);
+        $this->assertSame('Jane', $datatables['data'][3]['name']);
+    }
+
+    // https://github.com/n1crack/datatables/issues/88
+    public function testSortingWorksWhenColumnDataIsAFunction()
+    {
+        $this->request->query->set('search', ['value' => '']);
+        $this->request->query->set('order', [['column' => '1', 'dir' => 'desc']]); // surname desc
+
+        // DataTables sends "function" as the data value for every column when
+        // columns.data is defined as a JS function.
+        $this->request->query->set('columns', [
+            ['data' => 'function', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => '']],
+            ['data' => 'function', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => '']],
+            ['data' => 'function', 'name' => '', 'searchable' => 'true', 'orderable' => 'true', 'search' => ['value' => '']],
+        ]);
+
+        $this->db->query('Select name, surname, age from mytable');
+        $datatables = $this->db->generate()->toArray();
+
+        $this->assertSame(['name' => 'Todd', 'surname' => 'Wycoff', 'age' => '36'], $datatables['data'][0]);
+    }
+
+    // https://github.com/n1crack/datatables/issues/90
+    public function testEditCanReturnAnArrayForOrthogonalData()
+    {
+        $this->db->query('select id as fid, name, surname, age from mytable');
+
+        $this->db->edit('name', function ($data) {
+            return ['display' => strtoupper($data['name']), 'raw' => $data['name']];
+        });
+
+        $data = $this->db->generate()->toArray()['data'][0];
+
+        $this->assertSame(['display' => 'JOHN', 'raw' => 'John'], $data[1]);
+    }
 }
