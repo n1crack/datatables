@@ -8,6 +8,10 @@ use Ozdemir\Datatables\Query;
 
 /**
  * Class Codeigniter4Adapter
+ *
+ * Supports CodeIgniter 4.x (MySQL and PostgreSQL). For CodeIgniter 3.x use
+ * CodeigniterAdapter instead.
+ *
  * @package Ozdemir\Datatables\DB
  */
 class Codeigniter4Adapter extends DBAdapter

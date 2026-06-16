@@ -89,8 +89,15 @@ class QueryBuilder
     {
         $columns = $this->options->columns();
         if ($columns) {
-            foreach ($columns as $attr) {
+            foreach ($columns as $key => $attr) {
                 $index = $attr['data']['_'] ?? $attr['data'];
+
+                // DataTables sends "function" as the data value when columns.data
+                // is defined as a JS function; fall back to the column position.
+                if ($index === 'function') {
+                    $index = $key;
+                }
+
                 if ($this->columns->visible()->isExists($index)) {
                     $this->columns->visible()->get($index)->attr = $attr;
                 }
@@ -283,21 +290,38 @@ class QueryBuilder
     protected function orderBy(): string
     {
         $orders = $this->options->order();
-        
-        $orders = array_filter($orders, function ($order) {
-            return \in_array($order['dir'], ['asc', 'desc'],
-                    true) && $this->columns->visible()->offsetGet($order['column'])->isOrderable();
-        });
 
         $o = [];
 
         foreach ($orders as $order) {
+            if (!\in_array($order['dir'], ['asc', 'desc'], true)) {
+                continue;
+            }
+
             $data = $this->options->columns()[$order['column']]['data'];
             $id = $data['sort'] ?? $data['_'] ?? $data;
 
-            if ($this->columns->visible()->isExists($id)) {
-                $o[] = $this->columns->visible()->get($id)->name.' '.$order['dir'];
+            // DataTables sends "function" as the data value when columns.data
+            // is defined as a JS function; fall back to the column position.
+            if ($id === 'function') {
+                $id = $order['column'];
             }
+
+            if (!$this->columns->visible()->isExists($id)) {
+                continue;
+            }
+
+            // Resolve the column by its data name (not by its position in the
+            // select statement) so that the orderable check is applied to the
+            // correct column even when the select order differs from the
+            // DataTables column order, or when multiple columns are sorted.
+            $column = $this->columns->visible()->get($id);
+
+            if (!$column->isOrderable()) {
+                continue;
+            }
+
+            $o[] = $column->name.' '.$order['dir'];
         }
 
         if (\count($o) === 0) {
