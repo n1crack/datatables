@@ -13,7 +13,7 @@ Simplify your Datatables server-side processing effortlessly using our lightning
     - [Laravel](https://datatables.ozdemir.be/laravel)
     - [CodeIgniter 3](https://datatables.ozdemir.be/codeigniter)
     - [CodeIgniter 4](https://datatables.ozdemir.be/codeigniter4)
-    - [Phalcon 3+](https://datatables.ozdemir.be/phalcon)
+    - [Phalcon 3 / 4 / 5](https://datatables.ozdemir.be/phalcon)
     - [Prestashop](https://datatables.ozdemir.be/prestashop)
     - [PostgreSql](https://datatables.ozdemir.be/postgresql)
 

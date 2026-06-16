@@ -6,6 +6,9 @@ use Ozdemir\Datatables\Query;
 
 /**
  * Class CodeigniterAdapter
+ *
+ * Supports CodeIgniter 3.x. For CodeIgniter 4.x use Codeigniter4Adapter instead.
+ *
  * @package Ozdemir\Datatables\DB
  */
 class CodeigniterAdapter extends DBAdapter

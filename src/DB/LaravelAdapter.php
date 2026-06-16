@@ -10,6 +10,11 @@ use Ozdemir\Datatables\Query;
 
 /**
  * Class LaravelAdapter
+ *
+ * Works with any Laravel version exposing the DB facade. Picks identifier
+ * quoting based on the active connection driver, so both MySQL and PostgreSQL
+ * are supported.
+ *
  * @package Ozdemir\Datatables\DB
  */
 class LaravelAdapter extends DBAdapter

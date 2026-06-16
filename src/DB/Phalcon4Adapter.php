@@ -3,17 +3,17 @@
 namespace Ozdemir\Datatables\DB;
 
 use Ozdemir\Datatables\Query;
-use \Phalcon\Db;
+use Phalcon\Db\Enum;
 
 /**
- * Class PhalconAdapter
+ * Class Phalcon4Adapter
  *
- * Supports Phalcon 3.x. On Phalcon 4 and 5 the fetch-mode constants moved to
- * \Phalcon\Db\Enum, so use Phalcon4Adapter for those versions instead.
+ * Supports Phalcon 4 and 5, where the fetch-mode constants moved from
+ * \Phalcon\Db to \Phalcon\Db\Enum. For Phalcon 3.x use PhalconAdapter instead.
  *
  * @package Ozdemir\Datatables\DB
  */
-class PhalconAdapter extends DBAdapter
+class Phalcon4Adapter extends DBAdapter
 {
     /**
      * @var
@@ -21,7 +21,7 @@ class PhalconAdapter extends DBAdapter
     protected $db;
 
     /**
-     * PhalconAdapter constructor.
+     * Phalcon4Adapter constructor.
      * @param $di
      * @param string $serviceName
      */
@@ -46,7 +46,7 @@ class PhalconAdapter extends DBAdapter
     {
         $data = $this->db->query($query->sql, $query->escapes);
 
-        return $data->fetchAll(Db::FETCH_ASSOC);
+        return $data->fetchAll(Enum::FETCH_ASSOC);
     }
 
     /**
